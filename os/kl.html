@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>帝都コンサルティング向け 教材コンテンツ提供案</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Light gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .presentation-container {
+            background-color: #ffffff;
+            border-radius: 16px; /* Rounded corners for the main container */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 960px; /* Max width for presentation */
+            height: auto;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Hide overflow for slides */
+            position: relative;
+            padding: 32px;
+            box-sizing: border-box;
+        }
+        .slide {
+            display: none; /* Hidden by default */
+            width: 100%;
+            height: 100%;
+            flex-grow: 1; /* Allows slide to take available space */
+            padding-bottom: 60px; /* Space for navigation buttons */
+            box-sizing: border-box;
+            overflow-y: auto; /* Enable scrolling for long content */
+        }
+        .slide.active {
+            display: block; /* Show active slide */
+        }
+        .slide-title {
+            font-size: 2.5rem; /* text-5xl */
+            font-weight: 700; /* font-bold */
+            color: #1f2937; /* gray-900 */
+            margin-bottom: 1.5rem; /* mb-6 */
+            text-align: center;
+        }
+        .section-title {
+            font-size: 1.875rem; /* text-3xl */
+            font-weight: 600; /* font-semibold */
+            color: #374151; /* gray-700 */
+            margin-top: 1.5rem; /* mt-6 */
+            margin-bottom: 0.75rem; /* mb-3 */
+            border-bottom: 2px solid #e5e7eb; /* border-gray-200 */
+            padding-bottom: 0.5rem;
+        }
+        .bullet-point {
+            margin-bottom: 0.75rem; /* Increased spacing */
+            color: #4b5563; /* gray-700 */
+            line-height: 1.8; /* Increased line height */
+            font-size: 1.125rem; /* text-lg */
+            display: flex;
+            align-items: flex-start;
+        }
+        .bullet-point .icon {
+            font-size: 2.5rem; /* text-4xl, enlarged icon */
+            margin-right: 1rem;
+            line-height: 1; /* Align icon better */
+            flex-shrink: 0; /* Prevent icon from shrinking */
+        }
+        .bullet-point .text-content {
+            flex-grow: 1;
+        }
+        .sub-bullet-point {
+            margin-left: 2rem; /* Increased indent */
+            margin-bottom: 0.5rem;
+            color: #6b7280; /* gray-600 */
+            line-height: 1.6;
+            font-size: 1rem; /* text-base */
+            display: flex;
+            align-items: flex-start;
+        }
+        .sub-bullet-point .icon {
+            font-size: 1.5rem; /* text-xl */
+            margin-right: 0.75rem;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .sub-bullet-point .text-content {
+            flex-grow: 1;
+        }
+        .navigation-buttons {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 16px;
+            width: calc(100% - 64px); /* Account for padding */
+            justify-content: center;
+        }
+        .nav-button {
+            background-color: #10b981; /* emerald-500 */
+            color: white;
+            padding: 12px 24px;
+            border-radius: 9999px; /* Full rounded */
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+        .nav-button:hover {
+            background-color: #059669; /* emerald-600 */
+            transform: translateY(-2px);
+        }
+        .nav-button:disabled {
+            background-color: #d1d5db; /* gray-300 */
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        .page-indicator {
+            position: absolute;
+            bottom: 20px;
+            right: 32px;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        /* Styling for the content lineup table-like structure */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Adjusted minmax for fewer items per column */
+            gap: 1.5rem; /* Increased gap */
+            margin-top: 1.5rem;
+        }
+        .content-category {
+            background-color: #f9fafb; /* gray-50 */
+            border-radius: 12px; /* More rounded */
+            padding: 1.25rem; /* More padding */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+        }
+        .category-title {
+            font-weight: 700; /* font-bold */
+            color: #1f2937;
+            margin-bottom: 0.75rem; /* More spacing */
+            font-size: 1.25rem; /* text-xl */
+            text-align: center;
+        }
+        .category-item {
+            color: #4b5563;
+            font-size: 1rem; /* text-base */
+            margin-bottom: 0.4rem;
+            line-height: 1.5;
+        }
+        .explanation {
+            background-color: #e0f2fe; /* blue-100 */
+            border-left: 4px solid #38b2ac; /* teal-500 */
+            padding: 1rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            color: #1a202c; /* gray-900 */
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .explanation strong {
+            color: #2c5282; /* blue-800 */
+        }
+        .main-icon {
+            font-size: 6rem; /* Very large icon for emphasis */
+            text-align: center;
+            margin-bottom: 2rem;
+            display: block;
+            width: 100%;
+        }
+        .key-point-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        @media (min-width: 768px) {
+            .key-point-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        .key-point-card {
+            background-color: #f0f9ff; /* blue-50 */
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid #bfdbfe; /* blue-200 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .key-point-card .icon {
+            font-size: 3rem; /* Larger icon for key points */
+            margin-bottom: 0.75rem;
+        }
+        .key-point-card .title {
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 700;
+            color: #1e3a8a; /* blue-900 */
+            margin-bottom: 0.5rem;
+        }
+        .key-point-card .description {
+            font-size: 1rem;
+            color: #3b82f6; /* blue-600 */
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <!-- Slide 1: Title Slide -->
+        <div class="slide active" id="slide1">
+            <h1 class="slide-title">
+                <span class="main-icon">💡</span><br>
+                帝都コンサルティング向け<br>
+                教材コンテンツ提供案
+            </h1>
+            <p class="text-center text-gray-600 text-xl mt-8">
+                教育PoDからのご提案
+            </p>
+            <div class="explanation">
+                <strong>Explanation (English):</strong> This is the opening slide, serving as the title page for the proposal. It introduces the main topic: a proposal for providing educational content to Teito Consulting from Education PoD.
+            </div>
+        </div>
+
+        <!-- Slide 2: 提案の全体像 (Overall Proposal Overview) -->
+        <div class="slide" id="slide2">
+            <h1 class="slide-title">提案の全体像</h1>
+            <div class="explanation">
+                <strong>Explanation (English):</strong> This crucial slide provides a high-level overview of the entire proposal by addressing the four key aspects: Background, Challenges, Purpose, and Deliverables. This helps the audience quickly grasp the context and objectives.
+            </div>
+
+            <div class="key-point-grid">
+                <div class="key-point-card">
+                    <span class="icon">🏢</span>
+                    <div class="title">背景</div>
+                    <div class="description">
+                        帝都コンサルティング様からのご相談を受け、コンテンツ提供を検討。
+                    </div>
+                </div>
+                <div class="key-point-card">
+                    <span class="icon">❓</span>
+                    <div class="title">課題</div>
+                    <div class="description">
+                        専門的な研修コンテンツが不足しており、会員向けサービス強化が必要。
+                    </div>
+                </div>
+                <div class="key-point-card">
+                    <span class="icon">🎯</span>
+                    <div class="title">目的</div>
+                    <div class="description">
+                        売上ではなく、会員への広告効果と教育PoDの認知度向上。
+                    </div>
+                </div>
+                <div class="key-point-card">
+                    <span class="icon">📦</span>
+                    <div class="title">成果物</div>
+                    <div class="description">
+                        教育PoDのビジネスコンテンツの短縮版と新規動画。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: 背景：ご相談のきっかけ (Background: The Consultation Trigger) -->
+        <div class="slide" id="slide3">
+            <h1 class="slide-title">背景：ご相談のきっかけ</h1>
+            <div class="explanation">
+                <strong>Explanation (English):</strong> This slide elaborates on the background, specifically focusing on how the consultation with Teito Consulting came about. It highlights their relationship with Teito Bank and their current service model.
+            </div>
+            <ul>
+                <li class="bullet-point">
+                    <span class="icon">🏦</span>
+                    <span class="text-content">国内大手、帝都銀行の子会社「帝都コンサルティング」様よりご相談をいただきました。</span>
+                </li>
+                <li class="bullet-point">
+                    <span class="icon">🤝</span>
+                    <span class="text-content">帝都コンサルティング様は、帝都銀行のお客様（会員）向けに、安くて定額で受け放題の研修を提供しています。</span>
+                </li>
+                <li class="bullet-point">
+                    <span class="icon">👂</span>
+                    <span class="text-content">以前から専門的な研修コンテンツが足りないと感じており、そんな中で帝都銀行様からアクセンチュアの教育の話を聞きました。</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 4: 現状：Webセミナーの規模 (Current Situation: Web Seminar Scale) -->
+        <div class="slide" id="slide4">
+            <h1 class="slide-title">現状：Webセミナーの規模</h1>
+            <div class="explanation">
+                <strong>Explanation (English):</strong> This slide details the current scale of Teito Consulting's web seminar offerings, providing key figures about the number of courses and member companies.
+            </div>
+            <ul>
+                <li class="bullet-point">
+                    <span class="icon">💻</span>
+                    <span class="text-content">現在、定額制Webセミナーでは**400本**の研修を提供しています。</span>
+                </li>
+                <li class="bullet-point">
+                    <span class="icon">🏢</span>
+                    <span class="text-content">会員企業は**1,250社**にのぼります。</span>
+                </li>
+            </ul>
+            <p class="text-center text-gray-600 text-lg mt-8">
+                <span class="icon">📈</span> この大きな基盤を活かして、さらに価値を提供していきます。
+            </p>
+        </div>
+
+        <!-- Slide 5: 目的 (Purpose) -->
+        <div class="slide" id="slide5">
+            <h1 class="slide-title">目的：広告効果と認知度向上</h1>
+            <div class="explanation">
+                <strong>Explanation (English):</strong> This slide clearly states the primary objectives of providing the content. It emphasizes that the goal is not direct sales but rather leveraging the member base for advertising and increasing the visibility of Education PoD.
+            </div>
+            <ul>
+                <li class="bullet-point">
+                    <span class="icon">📢</span>
+                    <span class="text-content">コンテンツ提供の目的は、売上ではなく**1,250社の会員への広告効果**です。</span>
+                </li>
+                <li class="bullet-point">
+                    <span class="icon">🚀</span>
+                    <span class="text-content">帝都コンサルティング様で研修を受けてもらい、その後に教育PoDが提供する他の研修への申込みを増やしたいと考えています。</span>
+                </li>
+                <li class="bullet-point">
+                    <span class="icon">🌐</span>
+                    <span class="text-content">帝都銀行本体への良い影響も期待しています。</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 6: 方針 (Policy) -->
+        <div class="slide" id="slide6">
+            <h1 class="slide-title">方針：コンテンツ提供の進め方</h1>
+            <div class="explanation">
+                <strong>Explanation (English):</strong> This slide outlines the strategic approach for content provision, including the format of the content, naming conventions, and video production.
+            </div>
+            <ul>
+                <li class="bullet-point">
+                    <span class="icon">⏱️</span>
+                    <span class="text-content">教育PoDが持つビジネス系のコンテンツを、**1〜4時間程度の短いバージョン**にして提供します（講座によって時間は変わります）。</span>
+                </li>
+                <li class="bullet-point">
+                    <span class="icon">📝</span>
+                    <span class="text-content">講座の名前は、教育PoDで使っているものとは違う名前にします（この資料では仮の名前を使います）。</span>
+                </li>
+                <li class="bullet-point">
+                    <span class="icon">🎥</span>
+                    <span class="text-content">新しい講義動画を撮影します（撮影は帝都コンサルティング様の場所で行います）。</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 7: 現状のコンテンツについて (About Current Content) -->
+        <div class="slide" id="slide7">
+            <h1 class="slide-title">現状のコンテンツについて</h1>
+            <div class="explanation">
+                <strong>Explanation (English):</strong> This slide describes the general nature of the existing content offered by Repic Global, based *only* on the descriptive text in the PDF, without listing specific categories from the example image.
+            </div>
+            <ul>
+                <li class="bullet-point">
+                    <span class="icon">📚</span>
+                    <span class="text-content">レピックグローバルの教育コンテンツは、内定者や新人研修のような基本的なビジネス教材から、管理者向けの評価・マネジメント、語学や資格取得など、幅広い内容が揃っています。</span>
+                </li>
+                <li class="bullet-point">
+                    <span class="icon">📱</span>
+                    <span class="text-content">eラーニング、ネット用動画、DVD、モバイルコンテンツなど、ニーズに合わせて様々な形式で提供されています。</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 8: 最近のニーズ (Recent Needs) -->
+        <div class="slide" id="slide8">
+            <h1 class="slide-title">最近のニーズ：データ分析</h1>
+            <div class="explanation">
+                <strong>Explanation (English):</strong> This slide highlights a specific, high-demand area identified recently: basic data analysis using Excel. This indicates a potential area for new content focus.
+            </div>
+            <ul>
+                <li class="bullet-point">
+                    <span class="icon">📊</span>
+                    <span class="text-content">最近では、**Excelを使った簡単なデータ分析の基礎講座**のニーズが特に高いとのことです。</span>
+                </li>
+                <li class="bullet-point">
+                    <span class="icon">💡</span>
+                    <span class="text-content">アクセンチュアとして、このニーズに応える提案ができないか、ご要望をいただいています。</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 9: TODO (Next Steps) -->
+        <div class="slide" id="slide9">
+            <h1 class="slide-title">TODO：次のステップ</h1>
+            <div class="explanation">
+                <strong>Explanation (English):</strong> This slide clearly states the immediate next action item for Education PoD: to create the formal proposal document based on these discussions.
+            </div>
+            <ul>
+                <li class="bullet-point">
+                    <span class="icon">✍️</span>
+                    <span class="text-content">この内容をもとに、具体的な**提案書を作成**します。</span>
+                </li>
+            </ul>
+            <p class="text-center text-gray-600 text-lg mt-8">
+                <span class="icon">➡️</span> 今後、この提案書を元に進めていきます。
+            </p>
+        </div>
+
+        <!-- Slide 10: 候補講座1: データ分析入門 (Candidate Course 1: Data Analysis Introduction - Combined) -->
+        <div class="slide" id="slide10">
+            <h1 class="slide-title">候補講座1: データ分析入門</h1>
+            <div class="explanation">
+                <strong>Explanation (English):</strong> This slide combines the overview and expected learnings for the "Data Analysis Introduction" course. It outlines the main topics and the key takeaways for participants.
+            </div>
+            <ul>
+                <li class="bullet-point">
+                    <span class="icon">📈</span>
+                    <span class="text-content">データ分析の基本を学び、ビジネスに役立てるための入門講座です。数字から意味を読み解く力を養います。</span>
+                </li>
+            </ul>
+            <h2 class="section-title">主な内容</h2>
+            <ul>
+                <li class="sub-bullet-point">
+                    <span class="icon">📊</span>
+                    <span class="text-content">データの見せ方（グラフの使い方）</span>
+                </li>
+                <li class="sub-bullet-point">
+                    <span class="icon">🔢</span>
+                    <span class="text-content">基本的な統計の計算（平均、ばらつきなど）</span>
+                </li>
+                <li class="sub-bullet-point">
+                    <span class="icon">🔗</span>
+                    <span class="text-content">データ同士の関係性を見る方法（相関分析）</span>
+                </li>
+            </ul>
+            <h2 class="section-title">期待する気づき</h2>
+            <ul>
+                <li class="sub-bullet-point">
+                    <span class="icon">✅</span>
+                    <span class="text-content">データを正しく見せるための知識と注意点がわかります。</span>
+                </li>
+                <li class="sub-bullet-point">
+                    <span class="icon">💡</span>
+                    <span class="text-content">データを確認するために必要な統計の知識と、その使い方を身につけます。</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 11: 候補講座2: AI・分析プロジェクトの進め方 (Candidate Course 2: AI/Analysis Project Progression - Combined) -->
+        <div class="slide" id="slide11">
+            <h1 class="slide-title">候補講座2: AI・分析プロジェクトの進め方</h1>
+            <div class="explanation">
+                <strong>Explanation (English):</strong> This slide combines the overview and expected learnings for the "How to Proceed with AI/Analysis Projects" course. It covers the strategic planning aspects and the insights participants will gain.
+            </div>
+            <ul>
+                <li class="bullet-point">
+                    <span class="icon">🗺️</span>
+                    <span class="text-content">データ分析やAIを使ったプロジェクトをどう進めるか、計画の立て方を学びます。ビジネスでAIやデータをどう活かすかを考えます。</span>
+                </li>
+            </ul>
+            <h2 class="section-title">主な内容</h2>
+            <ul>
+                <li class="sub-bullet-point">
+                    <span class="icon">🌟</span>
+                    <span class="text-content">データ分析やAIに何を期待するか</span>
+                </li>
+                <li class="sub-bullet-point">
+                    <span class="icon">🤔</span>
+                    <span class="text-content">仮説を立ててデータを分析する方法</span>
+                </li>
+                <li class="sub-bullet-point">
+                    <span class="icon">🏗️</span>
+                    <span class="text-content">AI・分析プロジェクトの計画作り（テーマ選定、分析方針、運用方針）</span>
+                </li>
+            </ul>
+            <h2 class="section-title">期待する気づき</h2>
+            <ul>
+                <li class="sub-bullet-point">
+                    <span class="icon">🏆</span>
+                    <span class="text-content">データを活用することで、ビジネスを有利に進める方法や、他社との競争に勝つための考え方がわかります。</span>
+                </li>
+                <li class="sub-bullet-point">
+                    <span class="icon">⚠️</span>
+                    <span class="text-content">プロジェクトの計画を立てる段階で、特に気をつけるべき点が理解できます。</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 12: 候補講座3: 非エンジニアのための機械学習入門 (Candidate Course 3: ML for Non-Engineers - Combined) -->
+        <div class="slide" id="slide12">
+            <h1 class="slide-title">候補講座3: 非エンジニアのための機械学習入門</h1>
+            <div class="explanation">
+                <strong>Explanation (English):</strong> This slide combines the overview and expected learnings for the "Introduction to Machine Learning for Non-Engineers" course. It covers foundational concepts and the practical understanding participants will gain.
+            </div>
+            <ul>
+                <li class="bullet-point">
+                    <span class="icon">🤖</span>
+                    <span class="text-content">エンジニアではない方向けに、機械学習の基本をわかりやすく解説します。AIの中での機械学習の位置づけや、何ができるかを学びます。</span>
+                </li>
+            </ul>
+            <h2 class="section-title">主な内容</h2>
+            <ul>
+                <li class="sub-bullet-point">
+                    <span class="icon">❓</span>
+                    <span class="text-content">機械学習って何？</span>
+                </li>
+                <li class="sub-bullet-point">
+                    <span class="icon"> 분류</span>
+                    <span class="text-content">機械学習の種類</span>
+                </li>
+                <li class="sub-bullet-point">
+                    <span class="icon">🧑‍🏫</span>
+                    <span class="text-content">教師あり学習の考え方と進め方</span>
+                </li>
+            </ul>
+            <h2 class="section-title">期待する気づき</h2>
+            <ul>
+                <li class="sub-bullet-point">
+                    <span class="icon">📍</span>
+                    <span class="text-content">AIや機械学習の中で、教師あり学習がどんな役割を果たすのか理解できます。</span>
+                </li>
+                <li class="sub-bullet-point">
+                    <span class="icon">🛠️</span>
+                    <span class="text-content">教師あり学習で何ができるのか、そしてそれを実現するための具体的なステップがわかります。</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 13: まとめ (Summary/Conclusion) -->
+        <div class="slide" id="slide13">
+            <h1 class="slide-title">まとめ</h1>
+            <div class="explanation">
+                <strong>Explanation (English):</strong> This is the concluding slide, providing a brief summary and a forward-looking statement to wrap up the presentation.
+            </div>
+            <p class="text-center text-gray-700 text-xl mt-12">
+                <span class="main-icon">✨</span><br>
+                帝都コンサルティング様の会員企業様へ、<br>
+                より価値ある研修コンテンツを提供し、<br>
+                共に成長できることを楽しみにしています。
+            </p>
+            <p class="mt-8 text-center text-gray-600 font-medium text-lg">以上</p>
+        </div>
+
+
+        <!-- Navigation Buttons -->
+        <div class="navigation-buttons">
+            <button id="prevBtn" class="nav-button" disabled>前のスライド</button>
+            <button id="nextBtn" class="nav-button">次のスライド</button>
+        </div>
+        <div class="page-indicator" id="pageIndicator"></div>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageIndicator = document.getElementById('pageIndicator');
+        let currentSlide = 0;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                if (i === index) {
+                    slide.classList.add('active');
+                }
+            });
+            updateNavigationButtons();
+            updatePageIndicator();
+        }
+
+        function updateNavigationButtons() {
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+        }
+
+        function updatePageIndicator() {
+            pageIndicator.textContent = `${currentSlide + 1} / ${slides.length}`;
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        });
+
+        // Initialize presentation
+        showSlide(currentSlide);
+    </script>
+</body>
+</html>
