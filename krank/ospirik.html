@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Code Display</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for code display */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .code-container {
+            background-color: #2d2d2d; /* Dark background for code */
+            color: #f8f8f2; /* Light text for code */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            overflow-x: auto; /* Enable horizontal scrolling for long lines */
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        pre {
+            margin: 0;
+            white-space: pre-wrap; /* Preserve whitespace and wrap lines */
+            word-wrap: break-word; /* Break long words */
+        }
+        code {
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', 'Monaco', monospace; /* Monospaced font for code */
+        }
+    </style>
+</head>
+<body>
+    <div class="code-container">
+        <!-- The pre tag preserves whitespace and line breaks -->
+        <pre><code>
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import re
+import gzip
+
+with gzip.open('online_retail_II.csv', 'rt') as f:
+    df = pd.read_csv(f)
+
+print(f"Initial number of rows: {len(df)}")
+
+cols_to_group_by = [col for col in df.columns if col != 'Quantity']
+df = df.groupby(cols_to_group_by, as_index=False)['Quantity'].sum()
+print(f"Number of rows after aggregating duplicates: {len(df)}")
+
+df.drop_duplicates(inplace=True)
+print(f"Number of rows after removing exact duplicates: {len(df)}")
+
+df.dropna(subset=['CustomerID', 'Description'], inplace=True)
+print(f"Number of rows after removing nulls: {len(df)}")
+
+df['InvoiceDate'] = pd.to_datetime(df['InvoiceDate'])
+df['CustomerID'] = df['CustomerID'].astype(int)
+df['InvoiceNo'] = df['InvoiceNo'].astype(str)
+df['StockCode'] = df['StockCode'].astype(str)
+df['Description'] = df['Description'].astype(str)
+df['Country'] = df['Country'].astype(str)
+
+df = df[df['InvoiceDate'].dt.dayofweek != 5]
+print(f"Number of rows after removing Saturdays: {len(df)}")
+
+df = df[df['Quantity'] > 0]
+df = df[df['UnitPrice'] > 0]
+print(f"Number of rows after removing non-positive Quantity/UnitPrice: {len(df)}")
+
+quantity_threshold = df['Quantity'].quantile(0.99)
+unitprice_threshold = df['UnitPrice'].quantile(0.99)
+
+df = df[df['Quantity'] <= quantity_threshold]
+df = df[df['UnitPrice'] <= unitprice_threshold]
+print(f"Number of rows after removing top 1% outliers from Quantity and UnitPrice: {len(df)}")
+
+stock_codes_to_remove = ['TEST001', 'TEST002', 'BANK CHARGES']
+df = df[~df['StockCode'].isin(stock_codes_to_remove)]
+print(f"Number of rows after removing specific Stock Codes: {len(df)}")
+
+print(f"Final number of rows after all cleaning steps: {len(df)}")
+
+df['purchase_log'] = df['InvoiceNo'].apply(lambda x: 1 if len(x) == 6 and not x.startswith('C') else 0)
+df['cancel_log'] = df['InvoiceNo'].apply(lambda x: 1 if x.startswith('C') else 0)
+df['product'] = df['StockCode'].apply(lambda x: 1 if re.match(r'^\d{5}[A-Z]?$', x) else 0)
+df['discount'] = df['StockCode'].apply(lambda x: 1 if x == 'D' else 0)
+df['adjust'] = df['StockCode'].apply(lambda x: 1 if x in ['M', 'ADJUST', 'ADJUST2'] else 0)
+df['no_detail'] = df['StockCode'].apply(lambda x: 1 if x in ['PADS', 'SP1002'] else 0)
+df['domestic'] = df['Country'].apply(lambda x: 1 if x == 'United Kingdom' else 0)
+df['abroad'] = df['Country'].apply(lambda x: 1 if x != 'United Kingdom' else 0)
+df['total_price'] = df['Quantity'] * df['UnitPrice']
+
+# New: Description-based categorical flags
+df['is_christmas_item'] = df['Description'].str.contains('CHRISTMAS', case=False, na=False).astype(int)
+df['is_vintage_item'] = df['Description'].str.contains('VINTAGE|RETRO', case=False, na=False).astype(int)
+df['is_bag_item'] = df['Description'].str.contains('BAG|POCKET', case=False, na=False).astype(int)
+df['is_box_item'] = df['Description'].str.contains('BOX|TIN', case=False, na=False).astype(int)
+df['is_light_item'] = df['Description'].str.contains('LIGHT|LAMP', case=False, na=False).astype(int)
+
+
+# --- Feature Engineering for Customer-Level Prediction ---
+
+# Calculate invoice-level unique products for later aggregation
+invoice_product_counts = df.groupby(['InvoiceNo', 'CustomerID'])['StockCode'].nunique().reset_index()
+invoice_product_counts.rename(columns={'StockCode': 'num_unique_products_per_invoice'}, inplace=True)
+df = pd.merge(df, invoice_product_counts, on=['InvoiceNo', 'CustomerID'], how='left')
+
+
+customer_df = df.groupby('CustomerID').agg(
+    first_purchase_date=('InvoiceDate', 'min'),
+    last_purchase_date=('InvoiceDate', 'max'),
+
+    total_unique_invoices=('InvoiceNo', lambda x: x.nunique()),
+    total_items_purchased=('Quantity', 'sum'),
+
+    total_spending=('total_price', 'sum'),
+    average_order_value=('total_price', 'mean'),
+    max_order_value=('total_price', 'max'),
+
+    total_purchase_logs=('purchase_log', 'sum'),
+    total_product_purchases=('product', 'sum'),
+    total_discount_transactions=('discount', 'sum'),
+    total_domestic_transactions=('domestic', 'sum'),
+    total_abroad_transactions=('abroad', 'sum'),
+    total_cancelled_orders=('cancel_log', 'sum'),
+
+    num_unique_products=('StockCode', lambda x: x.nunique()),
+    avg_quantity_per_item=('Quantity', 'mean'),
+    avg_unit_price_per_item=('UnitPrice', 'mean'),
+    avg_items_per_invoice=('Quantity', lambda x: x.sum() / x.nunique()),
+    avg_unique_products_per_invoice=('num_unique_products_per_invoice', 'mean'),
+    num_unique_countries=('Country', lambda x: x.nunique()),
+
+    # New: Aggregations from Description-based flags
+    total_christmas_items=('is_christmas_item', 'sum'),
+    total_vintage_items=('is_vintage_item', 'sum'),
+    total_bag_items=('is_bag_item', 'sum'),
+    total_box_items=('is_box_item', 'sum'),
+    total_light_items=('is_light_item', 'sum')
+
+).reset_index()
+
+customer_df['customer_tenure_days'] = (customer_df['last_purchase_date'] - customer_df['first_purchase_date']).dt.days
+
+df['day_of_week_num'] = df['InvoiceDate'].dt.dayofweek
+df['hour'] = df['InvoiceDate'].dt.hour
+
+def get_mode(series):
+    modes = series.mode()
+    return modes.iloc[0] if not modes.empty else np.nan
+
+preferred_time_features = df.groupby('CustomerID').agg(
+    preferred_day_of_week=('day_of_week_num', get_mode),
+    preferred_hour_of_day=('hour', get_mode)
+).reset_index()
+
+customer_df = pd.merge(customer_df, preferred_time_features, on='CustomerID', how='left')
+
+day_map = {0: 'Monday', 1: 'Tuesday', 2: 'Wednesday', 3: 'Thursday', 4: 'Friday', 6: 'Sunday'}
+customer_df['preferred_day_of_week'] = customer_df['preferred_day_of_week'].map(day_map)
+
+# Calculate Average and Standard Deviation of Days Between Purchases
+customer_invoice_dates = df.groupby('CustomerID')['InvoiceDate'].apply(lambda x: x.sort_values().unique()).reset_index()
+customer_invoice_dates['date_diffs'] = customer_invoice_dates['InvoiceDate'].apply(lambda x: np.diff(x).astype('timedelta64[D]').astype(int))
+
+avg_days_between_purchases_df = customer_invoice_dates[customer_invoice_dates['date_diffs'].apply(len) > 0].copy()
+avg_days_between_purchases_df['avg_days_between_purchases'] = avg_days_between_purchases_df['date_diffs'].apply(lambda x: np.mean(x) if len(x) > 0 else np.nan)
+avg_days_between_purchases_df['std_days_between_purchases'] = avg_days_between_purchases_df['date_diffs'].apply(lambda x: np.std(x) if len(x) > 0 else np.nan)
+avg_days_between_purchases_df = avg_days_between_purchases_df[['CustomerID', 'avg_days_between_purchases', 'std_days_between_purchases']]
+
+customer_df = pd.merge(customer_df, avg_days_between_purchases_df, on='CustomerID', how='left')
+
+# New: Number of distinct months purchased in
+df['purchase_month'] = df['InvoiceDate'].dt.to_period('M')
+num_distinct_months = df.groupby('CustomerID')['purchase_month'].nunique().reset_index()
+num_distinct_months.rename(columns={'purchase_month': 'num_distinct_months_purchased'}, inplace=True)
+customer_df = pd.merge(customer_df, num_distinct_months, on='CustomerID', how='left')
+
+
+# --- Define Target Variable: Repurchase Status ---
+
+avg_tenure_excluding_zeros = customer_df[customer_df['customer_tenure_days'] > 0]['customer_tenure_days'].mean()
+
+if pd.isna(avg_tenure_excluding_zeros):
+    print("Warning: Could not calculate average customer tenure excluding zeros. Setting default repurchase window to 60 days.")
+    repurchase_window_days = 60
+else:
+    repurchase_window_days = int(np.ceil(avg_tenure_excluding_zeros))
+
+print(f"Calculated average customer tenure (excluding 0-day tenures): {avg_tenure_excluding_zeros:.2f} days.")
+print(f"Using a repurchase window of {repurchase_window_days} days for the target variable.")
+
+max_invoice_date = df['InvoiceDate'].max()
+snapshot_date = max_invoice_date - pd.Timedelta(days=repurchase_window_days)
+
+print(f"Snapshot date for feature calculation: {snapshot_date.strftime('%Y-%m-%d')}")
+print(f"End of observation period: {max_invoice_date.strftime('%Y-%m-%d')}")
+
+future_purchases = df[df['InvoiceDate'] > snapshot_date]
+repurchasing_customers = future_purchases['CustomerID'].unique()
+
+customer_df['repurchased_in_next_X_days'] = customer_df['CustomerID'].isin(repurchasing_customers).astype(int)
+
+# New: Calculate Recency (days since last purchase from snapshot date)
+customer_df['recency_days'] = (snapshot_date - customer_df['last_purchase_date']).dt.days
+# Handle cases where last_purchase_date is after snapshot_date (shouldn't happen if snapshot is calculated correctly, but good to be safe)
+customer_df['recency_days'] = customer_df['recency_days'].apply(lambda x: max(0, x))
+
+
+customer_df.drop(columns=['first_purchase_date', 'last_purchase_date'], inplace=True)
+
+df['day_of_week'] = df['InvoiceDate'].dt.day_name()
+df['hour'] = df['InvoiceDate'].dt.hour
+
+day_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Sunday']
+
+sales_heatmap_data = df.groupby(['day_of_week', 'hour'])['total_price'].sum().unstack(fill_value=0)
+sales_heatmap_data = sales_heatmap_data.reindex(day_order)
+
+plt.figure(figsize=(12, 8))
+sns.heatmap(sales_heatmap_data, cmap='viridis', annot=True, fmt=".0f", linewidths=.5)
+plt.title('Total Sales by Day of Week and Hour')
+plt.xlabel('Hour of Day')
+plt.ylabel('Day of Week')
+plt.show()
+
+df['month'] = df['InvoiceDate'].dt.to_period('M')
+monthly_purchases = df[df['purchase_log'] == 1].groupby('month').size()
+monthly_purchases = monthly_purchases.sort_index()
+
+plt.figure(figsize=(10, 6))
+monthly_purchases.plot(kind='bar', color='skyblue')
+plt.title('Frequency of Purchases Per Month')
+plt.xlabel('Month')
+plt.ylabel('Number of Purchases')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+        </code></pre>
+    </div>
+</body>
+</html>
