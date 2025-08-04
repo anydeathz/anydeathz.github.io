@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Code Display</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for code display */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .code-container {
+            background-color: #2d2d2d; /* Dark background for code */
+            color: #f8f8f2; /* Light text for code */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            overflow-x: auto; /* Enable horizontal scrolling for long lines */
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        pre {
+            margin: 0;
+            white-space: pre-wrap; /* Preserve whitespace and wrap lines */
+            word-wrap: break-word; /* Break long words */
+        }
+        code {
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', 'Monaco', monospace; /* Monospaced font for code */
+        }
+    </style>
+</head>
+<body>
+    <div class="code-container">
+        <!-- The pre tag preserves whitespace and line breaks -->
+        <pre><code>
+#%%
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import re
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, roc_curve, confusion_matrix
+#%%
+file_path = 'online_retail_II.xlsx'
+#%%
+xls = pd.ExcelFile(file_path)
+sheet_names = xls.sheet_names
+print(f"Found sheets: {sheet_names}")
+#%%
+dfs = {}
+for sheet_name in sheet_names:
+    dfs[sheet_name] = pd.read_excel(file_path, sheet_name=sheet_name)
+    print(f"Loaded '{sheet_name}' with {len(dfs[sheet_name])} rows.")
+#%%
+df = pd.concat(dfs.values(), ignore_index=True)
+print(f"Concatenated all sheets into a single DataFrame with {len(df)} rows.")
+#%%
+df.head()
+#%%
+df = df.rename(columns={
+    'Invoice': 'InvoiceNo',
+    'Customer ID': 'CustomerID',
+    'Price': 'UnitPrice'
+
+})
+#%%
+cols_to_group_by = [col for col in df.columns if col != 'Quantity']
+df = df.groupby(cols_to_group_by, as_index=False)['Quantity'].sum()
+print(f"Number of rows after duplicates: {len(df)}")
+
+df.dropna(subset=['CustomerID', 'Description'], inplace=True)
+print(f"Number of rows after removing nulls: {len(df)}")
+
+df['InvoiceDate'] = pd.to_datetime(df['InvoiceDate'])
+df['CustomerID'] = df['CustomerID'].astype(int)
+df['InvoiceNo'] = df['InvoiceNo'].astype(str)
+df['StockCode'] = df['StockCode'].astype(str)
+df['Description'] = df['Description'].astype(str)
+df['Country'] = df['Country'].astype(str)
+
+df = df[df['InvoiceDate'].dt.dayofweek != 5]
+print(f"Number of rows after removing Saturdays: {len(df)}")
+
+df = df[df['Quantity'] > 0]
+df = df[df['UnitPrice'] > 0]
+print(f"Number of rows after removing non-positive Quantity/UnitPrice: {len(df)}")
+
+quantity_threshold = df['Quantity'].quantile(0.99)
+unitprice_threshold = df['UnitPrice'].quantile(0.99)
+
+df = df[df['Quantity'] <= quantity_threshold]
+df = df[df['UnitPrice'] <= unitprice_threshold]
+print(f"Number of rows after removing top 1% outliers from Quantity and UnitPrice: {len(df)}")
+
+stock_codes_to_remove = ['TEST001', 'TEST002', 'BANK CHARGES']
+df = df[~df['StockCode'].isin(stock_codes_to_remove)]
+print(f"Number of rows after removing specific Stock Codes: {len(df)}")
+
+print(f"Final number of rows after all cleaning steps: {len(df)}")
+
+df['purchase_log'] = df['InvoiceNo'].apply(lambda x: 1 if len(x) == 6 and not x.startswith('C') else 0)
+df['cancel_log'] = df['InvoiceNo'].apply(lambda x: 1 if x.startswith('C') else 0)
+df['product'] = df['StockCode'].apply(lambda x: 1 if re.match(r'^\d{5}[A-Z]?$', x) else 0)
+df['discount'] = df['StockCode'].apply(lambda x: 1 if x == 'D' else 0)
+df['adjust'] = df['StockCode'].apply(lambda x: 1 if x in ['M', 'ADJUST', 'ADJUST2'] else 0)
+df['no_detail'] = df['StockCode'].apply(lambda x: 1 if x in ['PADS', 'SP1002'] else 0)
+df['domestic'] = df['Country'].apply(lambda x: 1 if x == 'United Kingdom' else 0)
+df['abroad'] = df['Country'].apply(lambda x: 1 if x != 'United Kingdom' else 0)
+df['total_price'] = df['Quantity'] * df['UnitPrice']
+df['is_christmas_item'] = df['Description'].str.contains('CHRISTMAS', case=False, na=False).astype(int)
+df['is_vintage_item'] = df['Description'].str.contains('VINTAGE|RETRO', case=False, na=False).astype(int)
+df['is_bag_item'] = df['Description'].str.contains('BAG|POCKET', case=False, na=False).astype(int)
+df['is_box_item'] = df['Description'].str.contains('BOX|TIN', case=False, na=False).astype(int)
+df['is_light_item'] = df['Description'].str.contains('LIGHT|LAMP', case=False, na=False).astype(int)
+
+
+#%%
+def get_mode(series):
+    modes = series.mode()
+    return modes.iloc[0] if not modes.empty else np.nan
+#%%
+# Finding average repurchase
+invoice_date = df.groupby('CustomerID')['InvoiceDate'].apply(lambda x: x.sort_values().unique()).reset_index()
+invoice_date['date_diffs'] = invoice_date['InvoiceDate'].apply(lambda x: np.diff(x).astype('timedelta64[D]').astype(int))
+avg_days_snapshot = invoice_date[invoice_date['date_diffs'].apply(len) > 0]['date_diffs'].apply(np.mean).mean()
+
+if pd.isna(avg_days_snapshot):
+    repurchase_window_days = -1
+else:
+    repurchase_window_days = int(np.ceil(avg_days_snapshot))
+
+print(f"Average days between purchases: {avg_days_snapshot:.2f} days.")
+print(f"{repurchase_window_days} days will be used for the target variable.")
+
+max_invoice_date = df['InvoiceDate'].max()
+min_invoice_date = df['InvoiceDate'].min()
+snapshot_date = max_invoice_date - pd.Timedelta(days=repurchase_window_days)
+
+print(f"Date of feature calculation: {min_invoice_date.strftime('%Y-%m-%d'), snapshot_date.strftime('%Y-%m-%d')}")
+print(f"End of prediction period: {max_invoice_date.strftime('%Y-%m-%d')}")
+#%%
+# Dataframe for feature calculation
+snapshot_df = df[df['InvoiceDate'] <= snapshot_date].copy()
+
+# Future dataframe for target variable
+future_purchases = df[df['InvoiceDate'] > snapshot_date].copy()
+#%%
+# Calculating features inside snapshot_df
+
+invoice_counts = snapshot_df.groupby(['InvoiceNo', 'CustomerID'])['StockCode'].nunique().reset_index()
+invoice_counts.rename(columns={'StockCode': 'unique_products_per_invoice'}, inplace=True)
+snapshot_df = pd.merge(snapshot_df, invoice_counts, on=['InvoiceNo', 'CustomerID'], how='left')
+
+customer_df = snapshot_df.groupby('CustomerID').agg(
+    last_purchase_date=('InvoiceDate', 'max'),
+    first_purchase_date=('InvoiceDate', 'min'),
+    total_unique_invoices=('InvoiceNo', lambda x: x.nunique()),
+    total_items_purchased=('Quantity', 'sum'),
+    total_spending=('total_price', 'sum'),
+    average_order_value=('total_price', 'mean'),
+    max_order_value=('total_price', 'max'),
+    total_purchase_logs=('purchase_log', 'sum'),
+    total_product_purchases=('product', 'sum'),
+    total_discount_transactions=('discount', 'sum'),
+    total_domestic_transactions=('domestic', 'sum'),
+    total_abroad_transactions=('abroad', 'sum'),
+    total_cancelled_orders=('cancel_log', 'sum'),
+    num_unique_products=('StockCode', lambda x: x.nunique()),
+    avg_quantity_per_item=('Quantity', 'mean'),
+    avg_unit_price_per_item=('UnitPrice', 'mean'),
+    avg_items_per_invoice=('Quantity', lambda x: x.sum() / x.nunique()),
+    avg_unique_products_per_invoice=('unique_products_per_invoice', 'mean'),
+    num_unique_countries=('Country', lambda x: x.nunique()),
+    total_christmas_items=('is_christmas_item', 'sum'),
+    total_vintage_items=('is_vintage_item', 'sum'),
+    total_bag_items=('is_bag_item', 'sum'),
+    total_box_items=('is_box_item', 'sum'),
+    total_light_items=('is_light_item', 'sum'),
+    customer_tenure_days=('InvoiceDate', lambda x: (x.max() - x.min()).days)
+).reset_index()
+
+snapshot_df['day_of_week_num'] = snapshot_df['InvoiceDate'].dt.dayofweek
+snapshot_df['hour'] = snapshot_df['InvoiceDate'].dt.hour
+preferred_time = snapshot_df.groupby('CustomerID').agg(
+    preferred_day_of_week=('day_of_week_num', get_mode),
+    preferred_hour_of_day=('hour', get_mode)
+).reset_index()
+customer_df = pd.merge(customer_df, preferred_time, on='CustomerID', how='left')
+customer_df['preferred_day_of_week'] = customer_df['preferred_day_of_week'] + 1
+
+invoice_date_snap = snapshot_df.groupby('CustomerID')['InvoiceDate'].apply(lambda x: x.sort_values().unique()).reset_index()
+invoice_date_snap['date_diffs'] = invoice_date_snap['InvoiceDate'].apply(lambda x: np.diff(x).astype('timedelta64[D]').astype(int))
+
+avg_days_purchase_df = invoice_date_snap[invoice_date_snap['date_diffs'].apply(len) > 0].copy()
+avg_days_purchase_df['avg_days_purchase'] = avg_days_purchase_df['date_diffs'].apply(lambda x: np.mean(x) if len(x) > 0 else np.nan)
+avg_days_purchase_df['std_days_purchase'] = avg_days_purchase_df['date_diffs'].apply(lambda x: np.std(x) if len(x) > 0 else np.nan)
+avg_days_purchase_df = avg_days_purchase_df[['CustomerID', 'avg_days_purchase', 'std_days_purchase']]
+customer_df = pd.merge(customer_df, avg_days_purchase_df, on='CustomerID', how='left')
+
+snapshot_df['purchase_month'] = snapshot_df['InvoiceDate'].dt.to_period('M')
+num_months = snapshot_df.groupby('CustomerID')['purchase_month'].nunique().reset_index()
+num_months.rename(columns={'purchase_month': 'num_months_purchased'}, inplace=True)
+customer_df = pd.merge(customer_df, num_months, on='CustomerID', how='left')
+
+customer_df.drop(columns=['first_purchase_date', 'last_purchase_date'], inplace=True)
+#%%
+# Target variable
+repurchasing_customers = future_purchases['CustomerID'].unique()
+customer_df['repurchased'] = customer_df['CustomerID'].isin(repurchasing_customers).astype(int)
+#%%
+print(customer_df.head())
+print("\nDistribution of the target variable 'repurchased':")
+print(customer_df['repurchased'].value_counts())
+#%%
+# Random Forest Training
+X = customer_df.drop(columns=['CustomerID', 'repurchased'])
+y = customer_df['repurchased']
+
+# Replace NaN values with -1
+X.fillna(-1, inplace=True)
+# Replace 0 values with -1
+X.replace(0, -1, inplace=True)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+rf_model = RandomForestClassifier(n_estimators=100, random_state=42, class_weight='balanced')
+rf_model.fit(X_train, y_train)
+
+rf_proba = rf_model.predict_proba(X_test)[:, 1]
+rf_pred = (rf_proba > 0.5).astype(int)
+
+rf_accuracy = accuracy_score(y_test, rf_pred)
+rf_precision = precision_score(y_test, rf_pred, zero_division=0)
+rf_recall = recall_score(y_test, rf_pred, zero_division=0)
+rf_f1 = f1_score(y_test, rf_pred, zero_division=0)
+rf_roc_auc = roc_auc_score(y_test, rf_proba)
+
+print("\n--- Random Forest Model Performance ---")
+print(f"{'Metric':<15} | {'Random Forest':<20}")
+print("-" * 40)
+print(f"{'Accuracy':<15} | {rf_accuracy:<20.2f}")
+print(f"{'Precision':<15} | {rf_precision:<20.2f}")
+print(f"{'Recall':<15} | {rf_recall:<20.2f}")
+print(f"{'F1-Score':<15} | {rf_f1:<20.2f}")
+print(f"{'ROC AUC Score':<15} | {rf_roc_auc:<20.2f}")
+#%%
+# ROC Curve
+rf_fpr, rf_tpr, _ = roc_curve(y_test, rf_proba)
+
+plt.figure(figsize=(8, 6))
+plt.plot(rf_fpr, rf_tpr, label=f'Random Forest (AUC = {rf_roc_auc:.2f})', color='orange')
+plt.plot([0, 1], [0, 1], 'r--', label='Random Classifier')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC Curve')
+plt.legend()
+plt.grid(True)
+plt.show()
+#%%
+df['day_of_week'] = df['InvoiceDate'].dt.day_name()
+df['hour'] = df['InvoiceDate'].dt.hour
+
+day_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Sunday']
+
+sales_heatmap = df.groupby(['day_of_week', 'hour'])['total_price'].sum().unstack(fill_value=0)
+sales_heatmap = sales_heatmap.reindex(day_order)
+
+plt.figure(figsize=(12, 8))
+sns.heatmap(sales_heatmap, cmap='viridis', annot=True, fmt=".0f", linewidths=.5)
+plt.title('Total Sales by Day of Week and Hour')
+plt.xlabel('Hour of Day')
+plt.ylabel('Day of Week')
+plt.show()
+#%%
+df['month'] = df['InvoiceDate'].dt.to_period('M')
+monthly_purchases = df[df['purchase_log'] == 1].groupby('month').size()
+monthly_purchases = monthly_purchases.sort_index()
+
+plt.figure(figsize=(10, 6))
+monthly_purchases.plot(kind='bar', color='skyblue')
+plt.title('Frequency of Purchases Per Month')
+plt.xlabel('Month')
+plt.ylabel('Number of Purchases')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+#%%
+
+#%%
+# New: Visualization to show monetary difference between repurchasers and non-repurchasers
+total_spending_by_repurchase_status = customer_df.groupby('repurchased')['total_spending'].mean()
+total_spending_by_repurchase_status.index = ['Did Not Repurchase', 'Repurchased']
+
+plt.figure(figsize=(8, 6))
+total_spending_by_repurchase_status.plot(kind='bar', color=['lightcoral', 'lightgreen'])
+plt.title('Average Total Spending by Repurchase Status')
+plt.xlabel('Repurchase Status')
+plt.ylabel('Average Total Spending')
+plt.xticks(rotation=0)
+plt.tight_layout()
+plt.show()
+
+#%%
+# --- Feature Importance Analysis ---
+print("\n--- Feature Importance Analysis ---")
+
+# Random Forest Feature Importance
+rf_feature_importances = pd.DataFrame(
+    {'feature': X.columns, 'importance': rf_model.feature_importances_}
+).sort_values('importance', ascending=False)
+print("\nRandom Forest - Top 10 Most Important Features:")
+print(rf_feature_importances.head(30))
+
+# Logistic Regression Feature Importance
+lr_feature_importances = pd.DataFrame(
+    {'feature': X.columns, 'coefficient': lr_model.coef_[0]}
+).sort_values('coefficient', ascending=False, key=abs)
+print("\nLogistic Regression - Top 10 Most Important Features (by absolute coefficient):")
+print(lr_feature_importances.head(10))
+
+# Visualize Random Forest Feature Importance
+plt.figure(figsize=(12, 8))
+sns.barplot(x='importance', y='feature', data=rf_feature_importances.head(15), palette='viridis')
+plt.title('Random Forest Feature Importance')
+plt.xlabel('Importance')
+plt.ylabel('Feature')
+plt.tight_layout()
+plt.show()
+
+#%%
+# --- Actionable Insights Visualizations ---
+print("\n--- Actionable Insights ---")
+
+# 2. Preferred days of repurchasing customers
+repurchasing_customers_df = customer_df[customer_df['repurchased'] == 1].copy()
+day_counts = repurchasing_customers_df['preferred_day_of_week'].value_counts().sort_index()
+
+# Map numerical days back to names
+day_map = {1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 7: 'Sunday'}
+day_counts.index = day_counts.index.map(day_map)
+
+plt.figure(figsize=(10, 6))
+day_counts.plot(kind='bar', color='skyblue')
+plt.title('Preferred Days of Repurchasing Customers')
+plt.xlabel('Day of Week')
+plt.ylabel('Number of Customers')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+
+# 3. Top 10 frequently re-purchased items
+repurchasing_customer_ids = customer_df[customer_df['repurchased'] == 1]['CustomerID'].unique()
+
+# Filter the original df for transactions by repurchasing customers
+repurchaser_transactions = df[df['CustomerID'].isin(repurchasing_customer_ids)]
+
+# Get the count of each item (Description)
+top_items = repurchaser_transactions['Description'].value_counts().head(10)
+
+plt.figure(figsize=(12, 8))
+sns.barplot(x=top_items.values, y=top_items.index, palette='viridis')
+plt.title('Top 10 Most Frequently Repurchased Items')
+plt.xlabel('Number of Times Purchased')
+plt.ylabel('Item Description')
+plt.tight_layout()
+plt.show()
+
+#%%
+# Filter original dataframe for repurchasing customers
+repurchaser_df = df[df['CustomerID'].isin(repurchasing_customer_ids)].copy()
+
+# Sort by CustomerID and InvoiceDate to ensure correct order
+repurchaser_df.sort_values(by=['CustomerID', 'InvoiceDate'], inplace=True)
+
+# Find the first and second unique items purchased for each customer
+# Using drop_duplicates to handle multiple items in the same invoice
+first_items = repurchaser_df.drop_duplicates(subset=['CustomerID', 'Description']).groupby('CustomerID').nth(0)['Description']
+second_items = repurchaser_df.drop_duplicates(subset=['CustomerID', 'Description']).groupby('CustomerID').nth(1)['Description']
+
+# Count the occurrences of each item to find the most popular
+top_10_first_items = first_items.value_counts().head(10)
+top_10_second_items = second_items.value_counts().head(10)
+
+print("\nTop 10 First Items Purchased by Repurchasing Customers:")
+print(top_10_first_items)
+
+print("\nTop 10 Second Items Purchased by Repurchasing Customers:")
+print(top_10_second_items)
+
+#%%
+
+</code></pre>
+    </div>
+</body>
+</html>
