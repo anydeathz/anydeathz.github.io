@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Code Display</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for code display */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .code-container {
+            background-color: #2d2d2d; /* Dark background for code */
+            color: #f8f8f2; /* Light text for code */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            overflow-x: auto; /* Enable horizontal scrolling for long lines */
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        pre {
+            margin: 0;
+            white-space: pre-wrap; /* Preserve whitespace and wrap lines */
+            word-wrap: break-word; /* Break long words */
+        }
+        code {
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', 'Monaco', monospace; /* Monospaced font for code */
+        }
+    </style>
+</head>
+<body>
+    <div class="code-container">
+        <!-- The pre tag preserves whitespace and line breaks -->
+        <pre><code>
+機械学習モデルと評価指標
+
+ここでは、Random Forest（多数の決定木を組み合わせた強力なモデル）とLogistic Regression（線形モデル）を使って、顧客が再購入するかを予測します。
+
+モデルの性能を評価するために、以下の指標を使用します。
+
+Accuracy (正解率): 全予測のうち、正しかった割合。
+
+Precision (適合率): 再購入すると予測した顧客のうち、実際に再購入した割合。
+
+Recall (再現率): 実際に再購入した顧客のうち、モデルが正しく見つけられた割合。
+
+F1-Score (F1スコア): PrecisionとRecallのバランスを示す指標。
+
+ROC AUC Score: モデルが再購入者と非再購入者をどれだけうまく区別できるかを示す指標。
+
+これらの指標を使って、どのモデルが最も優れているかを比較します。
+</code></pre>
+    </div>
+</body>
+</html>
