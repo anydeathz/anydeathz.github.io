@@ -1,0 +1,15 @@
+特徴量名,意味,補足
+total_spending,過去の総支出額,顧客の金銭的価値（Monetary）を示す指標です。
+total_unique_invoices,過去の総購入回数,顧客の購入頻度（Frequency）を示す指標です。
+recency_days,最終購入からの経過日数,スナップショット日付から最終購入日までの日数。値が小さいほど、顧客の活動が最近であることを示します。
+avg_days_between_purchases,購入間隔の平均日数,複数の購入がある顧客の、購入と購入の間の平均的な期間です。
+num_unique_products,購入したユニーク商品の総数,顧客が購入した商品の多様性を示します。
+total_purchase_logs,購入ログの総数,個別の購入ログ（取引明細行）の合計で、購入回数とは異なります。
+total_cancelled_orders,キャンセルした注文の総数,キャンセル履歴があるかどうかの指標です。
+total_domestic_transactions,国内取引の総数,イギリス国内からの購入回数です。
+total_abroad_transactions,海外取引の総数,イギリス国外からの購入回数です。
+customer_tenure_days,顧客の在籍日数,最初の購入から最後の購入までの期間（日数）です。
+preferred_day_of_week,最も多く購入した曜日,顧客の行動パターンを曜日別に示します。1=月曜日、7=日曜日です。
+avg_order_value,平均注文額,顧客の注文1回あたりの平均支出額です。
+total_christmas_items,クリスマス関連商品の総数,季節的な商品の購入傾向を示します。
+total_vintage_items,ヴィンテージ関連商品の総数,特定のカテゴリへの関心度を示します。
