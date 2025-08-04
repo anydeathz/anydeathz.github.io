@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Code Display</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for code display */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .code-container {
+            background-color: #2d2d2d; /* Dark background for code */
+            color: #f8f8f2; /* Light text for code */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            overflow-x: auto; /* Enable horizontal scrolling for long lines */
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        pre {
+            margin: 0;
+            white-space: pre-wrap; /* Preserve whitespace and wrap lines */
+            word-wrap: break-word; /* Break long words */
+        }
+        code {
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', 'Monaco', monospace; /* Monospaced font for code */
+        }
+    </style>
+</head>
+<body>
+    <div class="code-container">
+        <!-- The pre tag preserves whitespace and line breaks -->
+        <pre><code>
+購入間隔の平均日数の算出
+
+このステップでは、顧客が2回目以降の購入を行うまでの平均的な期間を求めています。
+
+目的: モデルの予測対象となる「再購入」が、現実的にどのくらいの期間内に発生するかを定義するためです。例えば、平均的な顧客が40日後に再購入する場合、予測期間を5日に設定しても意味がありません。
+
+計算方法:
+
+まず、各顧客の全購入日を時系列で並べます。
+
+次に、連続する購入日（1回目と2回目、2回目と3回目など）の差を計算し、その日数を求めます。
+
+最後に、全ての顧客のこれらの購入間隔日数を集計し、その平均値を算出します。
+
+なぜこれを行うのか: この平均値を基に、スナップショット日付と観測期間の終了日を設定します。このアプローチにより、モデルの予測期間がデータの実際の顧客行動に即したものとなり、より現実的で信頼性の高い予測が可能になります。
+</code></pre>
+    </div>
+</body>
+</html>
