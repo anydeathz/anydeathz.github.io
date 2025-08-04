@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Code Display</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for code display */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .code-container {
+            background-color: #2d2d2d; /* Dark background for code */
+            color: #f8f8f2; /* Light text for code */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            overflow-x: auto; /* Enable horizontal scrolling for long lines */
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        pre {
+            margin: 0;
+            white-space: pre-wrap; /* Preserve whitespace and wrap lines */
+            word-wrap: break-word; /* Break long words */
+        }
+        code {
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', 'Monaco', monospace; /* Monospaced font for code */
+        }
+    </style>
+</head>
+<body>
+    <div class="code-container">
+        <!-- The pre tag preserves whitespace and line breaks -->
+        <pre><code>
+データセットの分割 (Dataset Separation) 📊
+
+このステップでは、元のデータセットを2つの期間に分割します。
+
+予測期間の定義: 平均購入間隔日数 104 日を「再購入がいつ発生するか」という予測の観測期間として設定します。
+
+スナップショット日付の決定: データセットの最終日から104日前を 「スナップショット日付」 として決定します。これにより、データは以下のように分割されます。
+
+特徴量作成用のデータ: スナップショット日付以前のすべてのデータを、顧客の特徴量（合計購入額、平均注文額など）の計算に使用します。
+
+ターゲット変数作成用のデータ: スナップショット日付以降の104日間のデータを、再購入の有無を判断するための「未来のデータ」として使用します。
+
+この方法により、モデルの学習に未来の情報が紛れ込むことを防ぎ、現実的で信頼性の高い予測モデルを構築することができます。</code></pre>
+    </div>
+</body>
+</html>
