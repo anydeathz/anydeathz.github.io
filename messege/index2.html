@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Chat</title>
+    <style>
+        /*
+         * General styling for the Windows XP-era look and feel.
+         * We're using a pixelated font and classic gray color scheme.
+         */
+        @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans&display=swap');
+        
+        :root {
+            --bg-color: #d1d1d1;
+            --main-bg-color: #ececec;
+            --border-color: #808080;
+            --button-color: #c0c0c0;
+            --text-color: #000000;
+            --accent-color: #404040;
+            --scrollbar-bg: #c0c0c0;
+            --scrollbar-thumb: #808080;
+            --online-color: #008000;
+            --offline-color: #ff0000;
+        }
+
+        body {
+            font-family: 'Pixelify Sans', monospace;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-color);
+        }
+
+        /*
+         * Main chat window container.
+         * It's centered and has a fixed percentage of the viewport.
+         */
+        .chat-container {
+            width: 70vw;
+            max-width: 800px;
+            height: 70vh;
+            max-height: 900px;
+            background-color: var(--main-bg-color);
+            border: 2px solid var(--border-color);
+            box-shadow: 5px 5px 0 var(--accent-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-size: 1.2rem;
+        }
+
+        /*
+         * Styling for the top bar and buttons.
+         */
+        .title-bar {
+            background-color: #000080;
+            color: #ffffff;
+            padding: 5px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            text-shadow: 1px 1px #000;
+            cursor: move;
+        }
+
+        .title-bar-text {
+            font-size: 1.2rem;
+        }
+
+        .title-bar-controls button {
+            background-color: var(--button-color);
+            border: 2px solid var(--border-color);
+            border-bottom-color: var(--accent-color);
+            border-right-color: var(--accent-color);
+            font-size: 1rem;
+            width: 20px;
+            height: 20px;
+            padding: 0;
+            cursor: pointer;
+            box-shadow: inset -1px -1px var(--accent-color), inset 1px 1px #fff;
+        }
+
+        .title-bar-controls button:active {
+            box-shadow: inset 1px 1px var(--accent-color), inset -1px -1px #fff;
+        }
+
+        /*
+         * Main layout for the chat area and user list.
+         */
+        .chat-main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /*
+         * The user list on the right side.
+         */
+        .user-list {
+            width: 200px;
+            border-left: 2px solid var(--border-color);
+            background-color: #e0e0e0;
+            padding: 10px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .user-list h3 {
+            margin-top: 0;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 5px;
+            font-size: 1rem;
+        }
+        
+        .user-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .user-list li {
+            padding: 5px 0;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+            border: 1px solid var(--accent-color);
+        }
+
+        .online {
+            background-color: var(--online-color);
+        }
+
+        .offline {
+            background-color: var(--offline-color);
+        }
+
+        /*
+         * The main message display area.
+         */
+        .chat-messages {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        
+        .chat-messages::-webkit-scrollbar {
+            width: 10px;
+        }
+        .chat-messages::-webkit-scrollbar-track {
+            background: var(--scrollbar-bg);
+            border-left: 2px solid var(--border-color);
+        }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border: 2px solid var(--border-color);
+            border-top-color: #fff;
+            border-left-color: #fff;
+        }
+        
+        .message-bubble {
+            background-color: #ffffff;
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            box-shadow: 2px 2px 0 var(--accent-color);
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message-bubble.sent {
+            align-self: flex-end;
+            background-color: #a0a0ff;
+        }
+
+        .message-bubble.received {
+            align-self: flex-start;
+        }
+
+        .message-nickname {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #000080;
+            margin-bottom: 5px;
+        }
+        
+        .message-text {
+            line-height: 1.2;
+        }
+
+        /*
+         * Input area at the bottom.
+         */
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            border-top: 2px solid var(--border-color);
+            background-color: #e0e0e0;
+        }
+
+        .chat-input input {
+            flex: 1;
+            border: 2px inset var(--border-color);
+            padding: 5px;
+            font-family: inherit;
+            font-size: 1rem;
+            background-color: #fff;
+            margin-right: 5px;
+        }
+        
+        .chat-input button {
+            background-color: var(--button-color);
+            border: 2px solid var(--border-color);
+            border-bottom-color: var(--accent-color);
+            border-right-color: var(--accent-color);
+            padding: 5px 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: inset -1px -1px var(--accent-color), inset 1px 1px #fff;
+        }
+
+        .chat-input button:active {
+            box-shadow: inset 1px 1px var(--accent-color), inset -1px -1px #fff;
+        }
+
+        /*
+         * Nickname entry screen.
+         */
+        .nickname-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: var(--bg-color);
+        }
+
+        .nickname-box {
+            background-color: var(--main-bg-color);
+            border: 2px solid var(--border-color);
+            box-shadow: 5px 5px 0 var(--accent-color);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .nickname-box input, .nickname-box button {
+            font-family: 'Pixelify Sans', monospace;
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+
+        .nickname-box button {
+            padding: 5px 15px;
+            background-color: var(--button-color);
+            border: 2px solid var(--border-color);
+            border-bottom-color: var(--accent-color);
+            border-right-color: var(--accent-color);
+            box-shadow: inset -1px -1px var(--accent-color), inset 1px 1px #fff;
+            cursor: pointer;
+        }
+
+        .nickname-box button:active {
+            box-shadow: inset 1px 1px var(--accent-color), inset -1px -1px #fff;
+        }
+
+        /* Helper to hide elements */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- This is the nickname entry screen -->
+    <div id="nickname-container" class="nickname-container">
+        <div class="nickname-box">
+            <h2>Enter your Nickname</h2>
+            <p>App ID: <span id="app-id-display"></span></p>
+            <p>User ID: <span id="user-id-display"></span></p>
+            <input type="text" id="nickname-input" placeholder="Your nickname..." maxlength="15">
+            <button id="join-chat-btn">Join Chat</button>
+        </div>
+    </div>
+
+    <!-- This is the main chat application interface, initially hidden -->
+    <div id="chat-app" class="chat-container hidden">
+        <div class="title-bar">
+            <div class="title-bar-text">Retro Chat - <span id="chat-nickname-display"></span></div>
+            <div class="title-bar-controls">
+                <button aria-label="Minimize"></button>
+                <button aria-label="Maximize"></button>
+                <button aria-label="Close"></button>
+            </div>
+        </div>
+        <div class="chat-main">
+            <div id="chat-messages" class="chat-messages">
+                <!-- Messages will be injected here by JavaScript -->
+            </div>
+            <div class="user-list">
+                <h3>Online Users</h3>
+                <ul id="online-users-list">
+                    <!-- Online users will be injected here -->
+                </ul>
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="message-input" placeholder="Type a message...">
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
+    
+    <!-- Audio element for sound effects -->
+    <audio id="message-sound-sent" src="data:audio/wav;base64,UklGRl9AAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YR5AAAADBAAACAAAAAwAAAAAAAA=" preload="auto"></audio>
+
+    <script type="module">
+        // Import Firebase modules for use in the script. This resolves the `ReferenceError`.
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, addDoc, onSnapshot, collection, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables for Firebase configuration, provided by the Canvas environment.
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Initialize Firebase.
+        let app, db, auth;
+        let userId = null;
+        let nickname = localStorage.getItem('nickname') || null; // Load nickname from local storage on start
+
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+        } catch (error) {
+            console.error("Firebase initialization failed:", error);
+        }
+
+        // --- DOM Elements ---
+        const nicknameContainer = document.getElementById('nickname-container');
+        const nicknameInput = document.getElementById('nickname-input');
+        const joinChatBtn = document.getElementById('join-chat-btn');
+        const chatApp = document.getElementById('chat-app');
+        const chatNicknameDisplay = document.getElementById('chat-nickname-display');
+        const chatMessages = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('message-input');
+        const sendBtn = document.getElementById('send-btn');
+        const onlineUsersList = document.getElementById('online-users-list');
+        const messageSound = document.getElementById('message-sound-sent');
+        const appIdDisplay = document.getElementById('app-id-display');
+        const userIdDisplay = document.getElementById('user-id-display');
+
+        // --- Firebase Firestore Collections ---
+        // Public collection for chat messages, accessible by all users
+        const messagesCollectionRef = collection(db, `artifacts/${appId}/public/data/messages`);
+        // Public collection for user online/offline status, accessible by all users
+        const onlineStatusCollectionRef = collection(db, `artifacts/${appId}/public/data/onlineStatus`);
+
+        /**
+         * Starts the main chat application UI and listeners.
+         * This function is called only after a user is authenticated and has a nickname.
+         */
+        async function startChatApp() {
+            nicknameContainer.classList.add('hidden');
+            chatApp.classList.remove('hidden');
+            chatNicknameDisplay.textContent = nickname;
+
+            // Update user status to online
+            await updateUserStatus(true);
+            
+            // Start listening for real-time updates
+            listenForMessages();
+            listenForOnlineUsers();
+        }
+
+        /**
+         * Converts simple text emoticons to retro emojis.
+         * @param {string} text The text to process.
+         * @returns {string} The text with emojis.
+         */
+        function parseEmojis(text) {
+            const emojis = {
+                ":)": "🙂",
+                ":(": "🙁",
+                ";)": "😉",
+                ":D": "😃",
+                ":P": "😜",
+                "xD": "😆",
+                "<3": "❤️"
+            };
+            let parsedText = text;
+            for (const emoji in emojis) {
+                parsedText = parsedText.replace(new RegExp(emoji.replace(/[()]/g, '\\$&'), 'g'), emojis[emoji]);
+            }
+            return parsedText;
+        }
+
+        /**
+         * Renders a message bubble in the chat window.
+         * @param {object} message The message data from Firestore.
+         * @param {boolean} isSender Is the current user the sender?
+         */
+        function renderMessage(message, isSender) {
+            const messageBubble = document.createElement('div');
+            messageBubble.classList.add('message-bubble');
+            messageBubble.classList.add(isSender ? 'sent' : 'received');
+
+            const nicknameEl = document.createElement('div');
+            nicknameEl.classList.add('message-nickname');
+            nicknameEl.textContent = message.nickname;
+
+            const textEl = document.createElement('div');
+            textEl.classList.add('message-text');
+            textEl.textContent = parseEmojis(message.text);
+
+            messageBubble.appendChild(nicknameEl);
+            messageBubble.appendChild(textEl);
+            chatMessages.appendChild(messageBubble);
+
+            // Auto-scroll to the bottom.
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        /**
+         * Plays a short retro sound effect.
+         */
+        function playSound() {
+            if (messageSound) {
+                messageSound.currentTime = 0;
+                messageSound.play();
+            }
+        }
+
+        /**
+         * Sends a new message to Firestore.
+         */
+        async function sendMessage() {
+            const messageText = messageInput.value.trim();
+            if (messageText && userId && nickname) {
+                try {
+                    await addDoc(messagesCollectionRef, {
+                        nickname: nickname,
+                        text: messageText,
+                        timestamp: serverTimestamp(),
+                        senderId: userId
+                    });
+                    messageInput.value = '';
+                    // Sound is played in the onSnapshot listener for a more natural feel
+                } catch (e) {
+                    console.error("Error adding document: ", e);
+                }
+            }
+        }
+        
+        /**
+         * Updates the user's online status in Firestore.
+         * @param {boolean} isOnline
+         */
+        async function updateUserStatus(isOnline) {
+            if (userId && nickname) {
+                // Use a public collection and the user's ID as the document name
+                const userDocRef = doc(onlineStatusCollectionRef, userId);
+                try {
+                    await setDoc(userDocRef, {
+                        nickname: nickname,
+                        isOnline: isOnline,
+                        lastSeen: serverTimestamp()
+                    });
+                } catch (e) {
+                    console.error("Error updating user status:", e);
+                }
+            }
+        }
+        
+        /**
+         * Listens for real-time updates to the chat messages.
+         */
+        function listenForMessages() {
+            const messagesQuery = query(messagesCollectionRef, orderBy('timestamp'));
+
+            onSnapshot(messagesQuery, (snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === 'added') {
+                        const message = change.doc.data();
+                        // Only play sound for messages from other users
+                        if (message.senderId !== userId) {
+                           playSound();
+                        }
+                        renderMessage(message, message.senderId === userId);
+                    }
+                });
+            });
+        }
+        
+        /**
+         * Listens for real-time updates to the online user list.
+         */
+        function listenForOnlineUsers() {
+            onSnapshot(onlineStatusCollectionRef, (snapshot) => {
+                onlineUsersList.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const user = doc.data();
+                    if (user.nickname) {
+                        const li = document.createElement('li');
+                        const statusDot = document.createElement('span');
+                        statusDot.classList.add('status-dot', user.isOnline ? 'online' : 'offline');
+                        li.appendChild(statusDot);
+                        li.appendChild(document.createTextNode(user.nickname));
+                        onlineUsersList.appendChild(li);
+                    }
+                });
+            });
+        }
+
+        // --- Authentication Logic and App Initialization ---
+
+        /**
+         * Handles the authentication state change and starts the app logic.
+         */
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
+                appIdDisplay.textContent = appId;
+                userIdDisplay.textContent = userId;
+
+                // If nickname is set in localStorage, start the app.
+                if (nickname) {
+                    await startChatApp();
+                } else {
+                    // Otherwise, show the nickname input.
+                    nicknameContainer.classList.remove('hidden');
+                }
+            } else {
+                // If not signed in, sign in anonymously or with custom token.
+                try {
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (error) {
+                    console.error("Authentication failed:", error);
+                }
+            }
+        });
+
+        // --- Event Listeners ---
+
+        // Join chat button click
+        joinChatBtn.addEventListener('click', () => {
+            const inputNickname = nicknameInput.value.trim();
+            if (inputNickname) {
+                nickname = inputNickname;
+                localStorage.setItem('nickname', nickname);
+                // Call the start function directly after setting the nickname.
+                startChatApp();
+            } else {
+                // Handle missing nickname with a custom modal UI.
+                console.error("Please enter a nickname.");
+                // A better approach would be a custom modal dialog here instead of alert().
+                // But for this example, we'll just log to the console.
+            }
+        });
+
+        // Send button click
+        sendBtn.addEventListener('click', sendMessage);
+
+        // Enter key press in the message input
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Handle online/offline status with tab visibility.
+        document.addEventListener('visibilitychange', () => {
+            if (nickname && userId) {
+                 updateUserStatus(document.visibilityState === 'visible');
+            }
+        });
+
+        // Handle cleanup on page unload.
+        window.addEventListener('beforeunload', () => {
+            if (nickname && userId) {
+                updateUserStatus(false);
+            }
+        });
+    </script>
+</body>
+</html>
