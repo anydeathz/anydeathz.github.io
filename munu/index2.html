@@ -194,11 +194,22 @@
             align-self: flex-start;
         }
 
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 5px;
+        }
+
         .message-nickname {
             font-weight: bold;
             font-size: 0.9rem;
             color: #000080;
-            margin-bottom: 5px;
+        }
+
+        .message-date {
+            font-size: 0.8rem;
+            color: #555;
         }
         
         .message-text {
@@ -433,6 +444,25 @@
             }
             return parsedText;
         }
+        
+        /**
+         * Formats a Firestore timestamp into a retro date string with the year 2008.
+         * @param {object} timestamp The Firestore timestamp object.
+         * @returns {string} The formatted date string (e.g., "01/01/2008 12:00").
+         */
+        function formatRetroDate(timestamp) {
+            if (!timestamp) return '';
+
+            const date = timestamp.toDate();
+            const year = "2008"; // Hardcoded year for the retro effect
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+
+            return `${month}/${day}/${year} ${hours}:${minutes}`;
+        }
+
 
         /**
          * Renders a message bubble in the chat window.
@@ -444,15 +474,28 @@
             messageBubble.classList.add('message-bubble');
             messageBubble.classList.add(isSender ? 'sent' : 'received');
 
+            // Message Header with Nickname and Date
+            const messageHeader = document.createElement('div');
+            messageHeader.classList.add('message-header');
+            
             const nicknameEl = document.createElement('div');
             nicknameEl.classList.add('message-nickname');
             nicknameEl.textContent = message.nickname;
+
+            const dateEl = document.createElement('div');
+            dateEl.classList.add('message-date');
+            if (message.timestamp) {
+                dateEl.textContent = formatRetroDate(message.timestamp);
+            }
+            
+            messageHeader.appendChild(nicknameEl);
+            messageHeader.appendChild(dateEl);
 
             const textEl = document.createElement('div');
             textEl.classList.add('message-text');
             textEl.textContent = parseEmojis(message.text);
 
-            messageBubble.appendChild(nicknameEl);
+            messageBubble.appendChild(messageHeader);
             messageBubble.appendChild(textEl);
             chatMessages.appendChild(messageBubble);
 
