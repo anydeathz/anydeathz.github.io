@@ -250,6 +250,20 @@
             line-height: 1.2;
         }
 
+        /* Message image styling */
+        .message-image {
+            max-width: 100%;
+            height: auto;
+            image-rendering: pixelated;
+        }
+        /* Thumbnail styling */
+        .message-image.thumbnail {
+            max-width: 150px; /* Smaller size for thumbnail */
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            box-shadow: 1px 1px 0 var(--accent-color);
+        }
+
         /*
          * Input area at the bottom.
          */
@@ -259,7 +273,11 @@
             border-top: 2px solid var(--border-color);
             background-color: #e0e0e0;
         }
-
+        .chat-input-buttons {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
         .chat-input input {
             flex: 1;
             border: 2px inset var(--border-color);
@@ -356,6 +374,35 @@
             line-height: 1;
             padding: 0 5px;
         }
+        
+        /* Modal for images */
+        .image-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 99;
+            justify-content: center;
+            align-items: center;
+        }
+        .image-modal-content {
+            background-color: var(--main-bg-color);
+            border: 2px solid var(--border-color);
+            box-shadow: 5px 5px 0 var(--accent-color);
+            padding: 20px;
+            position: relative;
+            max-width: 70vw; /* Limit modal size */
+            max-height: 70vh;
+            overflow: auto;
+        }
+        .image-modal-content img {
+            max-width: 100%; /* Ensure image fits inside modal */
+            max-height: 100%;
+        }
+
 
         /* Helper to hide elements */
         .hidden {
@@ -425,6 +472,14 @@
     </style>
 </head>
 <body>
+    <!-- Modal for viewing full-size image -->
+    <div id="image-modal-overlay" class="image-modal-overlay">
+        <div id="image-modal-content" class="image-modal-content">
+            <button id="image-modal-close-btn" style="position: absolute; top: 5px; right: 5px; font-size: 1.5rem; background: var(--button-color); border: 2px solid var(--border-color); border-bottom-color: var(--accent-color); border-right-color: var(--accent-color); padding: 0 5px; cursor: pointer;">X</button>
+            <img id="image-modal-full-image" style="max-width: 100%; max-height: 100%; image-rendering: pixelated;" alt="Full size chat image">
+        </div>
+    </div>
+
     <!-- Custom Modal for error messages -->
     <div id="error-modal" class="modal">
         <div class="modal-content">
@@ -476,7 +531,11 @@
         </div>
         <div class="chat-input">
             <input type="text" id="message-input" placeholder="Type a message...">
-            <button id="send-btn">Send</button>
+            <div class="chat-input-buttons">
+                <input type="file" id="image-input" accept="image/*" class="hidden">
+                <button id="send-image-btn">Send Image</button>
+                <button id="send-btn">Send</button>
+            </div>
         </div>
     </div>
     
@@ -521,6 +580,8 @@
         const chatMessages = document.getElementById('chat-messages');
         const messageInput = document.getElementById('message-input');
         const sendBtn = document.getElementById('send-btn');
+        const imageInput = document.getElementById('image-input');
+        const sendImageBtn = document.getElementById('send-image-btn');
         const onlineUsersList = document.getElementById('online-users-list');
         const messageSound = document.getElementById('message-sound-sent');
         const appIdDisplay = document.getElementById('app-id-display');
@@ -531,6 +592,9 @@
         const roomTestBtn = document.getElementById('room-test-btn');
         const mobileToggleUsersBtn = document.getElementById('mobile-toggle-users');
         const userListDiv = document.getElementById('user-list');
+        const imageModalOverlay = document.getElementById('image-modal-overlay');
+        const imageModalCloseBtn = document.getElementById('image-modal-close-btn');
+        const imageModalFullImage = document.getElementById('image-modal-full-image');
 
         /**
          * Converts simple text emoticons to retro emojis.
@@ -553,7 +617,7 @@
             }
             return parsedText;
         }
-        
+
         /**
          * Formats a Firestore timestamp into a retro date string with the year 2008.
          * @param {object} timestamp The Firestore timestamp object.
@@ -571,7 +635,6 @@
 
             return `${month}/${day}/${year} ${hours}:${minutes}`;
         }
-
 
         /**
          * Renders a message bubble in the chat window.
@@ -600,12 +663,26 @@
             messageHeader.appendChild(nicknameEl);
             messageHeader.appendChild(dateEl);
 
-            const textEl = document.createElement('div');
-            textEl.classList.add('message-text');
-            textEl.textContent = parseEmojis(message.text);
-
             messageBubble.appendChild(messageHeader);
-            messageBubble.appendChild(textEl);
+
+            // Check if message contains an image or text
+            if (message.image) {
+                const imgEl = document.createElement('img');
+                imgEl.classList.add('message-image', 'thumbnail');
+                imgEl.src = message.image;
+                // Store the full-size image data on the element for the modal
+                imgEl.onclick = () => {
+                    imageModalFullImage.src = message.image;
+                    imageModalOverlay.style.display = 'flex';
+                };
+                messageBubble.appendChild(imgEl);
+            } else if (message.text) {
+                const textEl = document.createElement('div');
+                textEl.classList.add('message-text');
+                textEl.textContent = parseEmojis(message.text);
+                messageBubble.appendChild(textEl);
+            }
+            
             chatMessages.appendChild(messageBubble);
 
             // Auto-scroll to the bottom.
@@ -624,9 +701,9 @@
         }
 
         /**
-         * Sends a new message to Firestore.
+         * Sends a new text message to Firestore.
          */
-        async function sendMessage() {
+        async function sendTextMessage() {
             const messageText = messageInput.value.trim();
             if (messageText && userId && nickname) {
                 try {
@@ -645,7 +722,57 @@
                 }
             }
         }
-        
+
+        /**
+         * Pixelates and sends an image to Firestore.
+         * @param {File} imageFile The image file to process.
+         */
+        async function sendImageMessage(imageFile) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = async () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Pixelation logic
+                    // The smaller the size, the more pixelated the image
+                    const pixelSize = 64; 
+                    canvas.width = pixelSize;
+                    canvas.height = pixelSize * (img.height / img.width);
+
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    // Scale it back up for the pixelated effect
+                    const pixelatedCanvas = document.createElement('canvas');
+                    pixelatedCanvas.width = img.width;
+                    pixelatedCanvas.height = img.height;
+                    const pixelatedCtx = pixelatedCanvas.getContext('2d');
+                    pixelatedCtx.imageSmoothingEnabled = false; // Important for pixelation!
+                    pixelatedCtx.drawImage(canvas, 0, 0, pixelatedCanvas.width, pixelatedCanvas.height);
+
+                    const pixelatedImageData = pixelatedCanvas.toDataURL('image/jpeg', 0.8);
+
+                    // Send the pixelated image to Firestore
+                    try {
+                        const messagesCollectionRef = collection(db, `artifacts/${appId}/public_data/${currentChatRoom}/messages`);
+                        await addDoc(messagesCollectionRef, {
+                            nickname: nickname,
+                            image: pixelatedImageData,
+                            timestamp: serverTimestamp(),
+                            senderId: userId
+                        });
+                        // Play sound when image is sent
+                        playSound();
+                    } catch (e) {
+                        console.error("Error adding image document: ", e);
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(imageFile);
+        }
+
         /**
          * Updates the user's online status in Firestore for the current room.
          * @param {boolean} isOnline
@@ -745,7 +872,6 @@
             if (unsubscribeOnlineUsers) {
                 unsubscribeOnlineUsers(); // Unsubscribe from previous room's online users
             }
-            // Corrected collection path for online status
             const onlineStatusCollectionRef = collection(db, `artifacts/${appId}/public_data/${currentChatRoom}/onlineStatus`);
             onSnapshot(onlineStatusCollectionRef, (snapshot) => {
                 onlineUsersList.innerHTML = '';
@@ -865,15 +991,42 @@
         errorCloseBtn.addEventListener('click', () => {
             errorModal.style.display = 'none';
         });
+        
+        // Close image modal on button click
+        imageModalCloseBtn.addEventListener('click', () => {
+            imageModalOverlay.style.display = 'none';
+        });
 
-        // Send button click
-        sendBtn.addEventListener('click', sendMessage);
+        // Close image modal on overlay click
+        imageModalOverlay.addEventListener('click', (e) => {
+            if (e.target.id === 'image-modal-overlay') {
+                imageModalOverlay.style.display = 'none';
+            }
+        });
+
+        // Send text message button click
+        sendBtn.addEventListener('click', sendTextMessage);
 
         // Enter key press in the message input
         messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                sendMessage();
+                sendTextMessage();
             }
+        });
+
+        // Send image button click
+        sendImageBtn.addEventListener('click', () => {
+            imageInput.click();
+        });
+
+        // Handle image selection
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                sendImageMessage(file);
+            }
+            // Clear the input to allow sending the same image again
+            e.target.value = '';
         });
 
         // Chat room button click listeners
