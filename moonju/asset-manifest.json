@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/moonju/static/css/main.e6c13ad2.css",
+    "main.js": "/moonju/static/js/main.5e6277e1.js",
+    "static/js/453.13f4a1e2.chunk.js": "/moonju/static/js/453.13f4a1e2.chunk.js",
+    "index.html": "/moonju/index.html",
+    "main.e6c13ad2.css.map": "/moonju/static/css/main.e6c13ad2.css.map",
+    "main.5e6277e1.js.map": "/moonju/static/js/main.5e6277e1.js.map",
+    "453.13f4a1e2.chunk.js.map": "/moonju/static/js/453.13f4a1e2.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.5e6277e1.js"
+  ]
+}
