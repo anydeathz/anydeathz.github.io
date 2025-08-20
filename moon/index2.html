@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonju Satisfaction Gauge</title>
+    <!-- Google Fonts link for the retro font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'VT323', monospace;
+        }
+        .vt323-font {
+            font-family: 'VT323', monospace;
+        }
+    </style>
+</head>
+<body class="bg-slate-100">
+    <div id="root"></div>
+
+    <!-- React and ReactDOM CDNs -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel Standalone for in-browser JSX compilation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Separate module script for Firebase imports and initialization -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, query, deleteDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        
+        // Define global variables to be accessed by the React component.
+        window.firebaseApp = null;
+        window.firebaseDb = null;
+        window.firebaseAuth = null;
+        window.firebaseUserId = null;
+        window.isAuthReady = false;
+
+        // Make Firestore functions globally available for the React script.
+        window.collection = collection;
+        window.doc = doc;
+        window.setDoc = setDoc;
+        window.onSnapshot = onSnapshot;
+        window.query = query;
+        window.deleteDoc = deleteDoc;
+        window.addDoc = addDoc;
+
+        // Define the global Firebase variables provided by the runtime.
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        async function initFirebase() {
+            try {
+                window.firebaseApp = initializeApp(firebaseConfig);
+                window.firebaseDb = getFirestore(window.firebaseApp);
+                window.firebaseAuth = getAuth(window.firebaseApp);
+
+                if (initialAuthToken) {
+                    await signInWithCustomToken(window.firebaseAuth, initialAuthToken);
+                } else {
+                    await signInAnonymously(window.firebaseAuth);
+                }
+
+                window.firebaseAuth.onAuthStateChanged(user => {
+                    if (user) {
+                        window.firebaseUserId = user.uid;
+                        window.isAuthReady = true;
+                        console.log("Firebase Auth State Changed: User signed in.");
+                    } else {
+                        console.log("Firebase Auth State Changed: No user signed in.");
+                    }
+                });
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+            }
+        }
+
+        // Initialize Firebase on window load to ensure all scripts are ready.
+        window.addEventListener('load', initFirebase);
+    </script>
+
+    <!-- Main React App, now using globally accessible Firebase variables -->
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // The main application component.
+        const App = () => {
+            // UI state variables
+            const [currentView, setCurrentView] = useState('calendar');
+            const [selectedDate, setSelectedDate] = useState(null);
+            const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+            const [currentEntry, setCurrentEntry] = useState({});
+            const [message, setMessage] = useState('');
+            const [editingEntryId, setEditingEntryId] = useState(null);
+            const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+            const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+
+            // Data state variables
+            const [allEntries, setAllEntries] = useState({});
+            const [viewableEntries, setViewableEntries] = useState([]);
+            const [averageSatisfaction, setAverageSatisfaction] = useState(0);
+
+            // Firebase state variables
+            const [db, setDb] = useState(null);
+            const [auth, setAuth] = useState(null);
+            const [userId, setUserId] = useState(null);
+            const [isAuthReady, setIsAuthReady] = useState(false);
+
+            // Survey questions
+            const questions = [
+                { id: 'time', question: 'What time was the intercourse?', type: 'time' },
+                { id: 'duration', question: 'How long did it last? (in minutes)', type: 'number' },
+                { id: 'enjoyment', question: 'On a scale of 1-10, how enjoyable was it?', type: 'enjoyment-scale' },
+                { id: 'atmosphere', question: 'Describe the atmosphere/mood.', type: 'text' },
+                { id: 'notes', question: 'Any additional notes or thoughts?', type: 'text' },
+            ];
+            
+            // Effect to set up Firebase and authentication.
+            useEffect(() => {
+                // Wait for the global variables to be set by the module script.
+                const checkFirebaseReady = setInterval(() => {
+                    if (window.isAuthReady) {
+                        setDb(window.firebaseDb);
+                        setAuth(window.firebaseAuth);
+                        setUserId(window.firebaseUserId);
+                        setIsAuthReady(true);
+                        clearInterval(checkFirebaseReady);
+                    }
+                }, 100);
+            }, []);
+
+            // Effect to listen for real-time data from Firestore.
+            useEffect(() => {
+                if (!isAuthReady || !db || !userId) return;
+
+                // Define the collection path using the global appId and userId
+                const collectionPath = `/artifacts/${typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'}/users/${userId}/intercourse_surveys`;
+                const entriesCollectionRef = collection(db, collectionPath);
+                const q = query(entriesCollectionRef);
+
+                // Set up the real-time listener using onSnapshot.
+                const unsubscribe = onSnapshot(q, (querySnapshot) => {
+                    let totalWeightedSatisfaction = 0;
+                    let totalDuration = 0;
+                    const entriesByDate = {};
+                    
+                    querySnapshot.forEach((doc) => {
+                        const entry = { id: doc.id, ...doc.data() };
+                        const date = new Date(entry.timestamp).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                        if (!entriesByDate[date]) {
+                            entriesByDate[date] = [];
+                        }
+                        entriesByDate[date].push(entry);
+                        
+                        // Accumulate satisfaction for average calculation
+                        const enjoyment = parseInt(entry.enjoyment, 10);
+                        const duration = parseInt(entry.duration, 10);
+                        if (!isNaN(enjoyment) && !isNaN(duration) && duration > 0) {
+                            totalWeightedSatisfaction += enjoyment * duration;
+                            totalDuration += duration;
+                        }
+                    });
+                    
+                    const avg = totalDuration > 0 ? totalWeightedSatisfaction / totalDuration : 0;
+                    setAverageSatisfaction(avg);
+                    setAllEntries(entriesByDate);
+                    console.log("Firestore data updated successfully. Average satisfaction:", avg);
+
+                }, (error) => {
+                    console.error("Error fetching Firestore data:", error);
+                });
+
+                // Cleanup the listener on component unmount.
+                return () => unsubscribe();
+            }, [isAuthReady, db, userId]);
+
+            // --- UI and state management functions ---
+
+            // Displays a temporary message to the user.
+            const showMessage = (msg) => {
+                setMessage(msg);
+                setTimeout(() => setMessage(''), 3000);
+            };
+
+            // Handles starting the questionnaire for a specific date.
+            const handleDayClick = (date) => {
+                setSelectedDate(date);
+                setCurrentEntry({});
+                setCurrentQuestionIndex(0);
+                setEditingEntryId(null);
+                setCurrentView('questionnaire');
+            };
+
+            // Handles updating the input field for the current question.
+            const handleInputChange = (event) => {
+                const { name, value } = event.target;
+                setCurrentEntry(prev => ({
+                    ...prev,
+                    [name]: value,
+                }));
+            };
+
+            // Handles moving to the next question.
+            const handleNextClick = () => {
+                const currentQ = questions[currentQuestionIndex];
+                if (currentEntry[currentQ.id] === undefined || currentEntry[currentQ.id] === '') {
+                    showMessage("Please answer the question before proceeding.");
+                    return;
+                }
+                setCurrentQuestionIndex(prev => prev + 1);
+            };
+
+            // Handles submitting the completed questionnaire (or updating an entry).
+            const handleSubmit = async () => {
+                if (!db || !userId) {
+                    showMessage("Error: Database not initialized. Please try again.");
+                    return;
+                }
+
+                try {
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                    const entriesCollectionRef = collection(db, `/artifacts/${appId}/users/${userId}/intercourse_surveys`);
+                    
+                    if (editingEntryId) {
+                        const docRef = doc(entriesCollectionRef, editingEntryId);
+                        await setDoc(docRef, {
+                            ...currentEntry,
+                            date: selectedDate.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+                            timestamp: selectedDate.toISOString(),
+                        });
+                    } else {
+                        await addDoc(entriesCollectionRef, {
+                            ...currentEntry,
+                            date: selectedDate.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+                            timestamp: selectedDate.toISOString(),
+                        });
+                    }
+
+                    showMessage("Entry saved successfully!");
+                    setCurrentView('calendar');
+                    setCurrentEntry({});
+                    setEditingEntryId(null);
+                } catch (e) {
+                    console.error("Error adding/updating document: ", e);
+                    showMessage("Error saving entry. Please try again.");
+                }
+            };
+
+            // Handles switching back to the calendar view.
+            const handleBackToCalendar = () => {
+                setCurrentView('calendar');
+            };
+
+            // Handles viewing existing entries for a specific day.
+            const handleViewEntries = (date) => {
+                setSelectedDate(date);
+                const dateKey = date.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                const entries = allEntries[dateKey] || [];
+                setViewableEntries(entries);
+                setCurrentView('viewEntries');
+            };
+
+            // Handles deleting an entry.
+            const handleDelete = async (entryId) => {
+                if (!db || !userId) {
+                    showMessage("Error: Database not initialized.");
+                    return;
+                }
+                try {
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                    const docRef = doc(db, `/artifacts/${appId}/users/${userId}/intercourse_surveys/${entryId}`);
+                    await deleteDoc(docRef);
+                    showMessage("Entry deleted successfully!");
+                } catch (e) {
+                    console.error("Error deleting document: ", e);
+                    showMessage("Error deleting entry. Please try again.");
+                }
+            };
+
+            // Handles editing an entry.
+            const handleEditClick = (entry) => {
+                setEditingEntryId(entry.id);
+                setSelectedDate(new Date(entry.timestamp));
+                setCurrentEntry(entry);
+                setCurrentQuestionIndex(0);
+                setCurrentView('questionnaire');
+            };
+
+            const handlePreviousMonth = () => {
+                setCurrentMonth(prevMonth => {
+                    if (prevMonth === 0) {
+                        setCurrentYear(prevYear => prevYear - 1);
+                        return 11;
+                    }
+                    return prevMonth - 1;
+                });
+            };
+
+            const handleNextMonth = () => {
+                setCurrentMonth(prevMonth => {
+                    if (prevMonth === 11) {
+                        setCurrentYear(prevYear => prevYear + 1);
+                        return 0;
+                    }
+                    return prevMonth + 1;
+                });
+            };
+            
+            // --- UI components rendering ---
+
+            // Renders the calendar view.
+            const renderCalendar = () => {
+                const today = new Date();
+                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+                const firstDayOfWeek = new Date(currentYear, currentMonth, 1).getDay();
+                const calendarDays = [];
+
+                // Add empty cells for the days before the first day of the month.
+                for (let i = 0; i < firstDayOfWeek; i++) {
+                    calendarDays.push(<div key={`empty-${i}`} className="w-1/7 aspect-square"></div>);
+                }
+
+                // Add a heart icon for a given number of entries.
+                const renderHearts = (count) => {
+                    const hearts = [];
+                    for(let i = 0; i < count; i++) {
+                        hearts.push(<span key={i} className="text-pink-400 text-4xl">&#10084;</span>);
+                    }
+                    return hearts;
+                }
+
+                // Add days of the month with data.
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const day = i;
+                    const date = new Date(currentYear, currentMonth, day);
+                    const dateKey = date.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                    const entries = allEntries[dateKey] || [];
+                    const hasEntries = entries.length > 0;
+                    
+                    const isToday = date.toDateString() === today.toDateString();
+
+                    calendarDays.push(
+                        <div 
+                            key={day} 
+                            className={`w-1/7 aspect-square flex flex-col items-center justify-center p-1 cursor-pointer transition-colors duration-200 ease-in-out border rounded-md border-violet-300/20
+                                ${hasEntries ? 'bg-rose-100 hover:bg-rose-200 border-2 border-rose-400' : 'bg-pink-100 hover:bg-pink-200'}
+                                ${isToday ? 'bg-pink-200 border-violet-400' : ''}
+                            `}
+                            onClick={() => hasEntries ? handleViewEntries(date) : handleDayClick(date)}
+                        >
+                            <span className="font-bold text-lg text-violet-800 vt323-font">{day}</span>
+                            <div className="mt-1">
+                                {renderHearts(entries.length)}
+                            </div>
+                        </div>
+                    );
+                }
+
+                return (
+                    <div className="p-4 sm:p-8 md:p-12">
+                        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-4 vt323-font text-violet-900">
+                            {new Date(currentYear, currentMonth).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                        </h2>
+                        <div className="flex justify-between items-center mb-4">
+                            <button
+                                onClick={handlePreviousMonth}
+                                className="px-4 py-2 bg-violet-200 text-violet-800 rounded-md hover:bg-violet-300 transition-colors duration-200 vt323-font"
+                            >
+                                &lt; Previous
+                            </button>
+                            <button
+                                onClick={handleNextMonth}
+                                className="px-4 py-2 bg-violet-200 text-violet-800 rounded-md hover:bg-violet-300 transition-colors duration-200 vt323-font"
+                            >
+                                Next &gt;
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-7 gap-2 text-center">
+                            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                                <div key={day} className="text-violet-500 vt323-font">{day}</div>
+                            ))}
+                            {calendarDays}
+                        </div>
+                        <p className="mt-8 text-center text-violet-600 vt323-font text-sm">
+                            Click on a day to add an entry, or on a day with a heart to view past entries.
+                        </p>
+                    </div>
+                );
+            };
+
+            // Renders the questionnaire view.
+            const renderQuestionnaire = () => {
+                const currentQuestion = questions[currentQuestionIndex];
+                const isLastQuestion = currentQuestionIndex === questions.length - 1;
+                const isEditing = editingEntryId !== null;
+
+                // Handle the enjoyment scale input
+                const renderEnjoymentScale = () => {
+                    const handleSelect = (value) => {
+                        handleInputChange({ target: { name: 'enjoyment', value: String(value) } });
+                    };
+
+                    const colors = [
+                        'bg-pink-100', 'bg-pink-200', 'bg-pink-300', 'bg-pink-400', 'bg-pink-500', 
+                        'bg-pink-600', 'bg-pink-700', 'bg-pink-800', 'bg-pink-900', 'bg-rose-900'
+                    ];
+
+                    return (
+                        <div className="grid grid-cols-5 gap-2 sm:grid-cols-10 sm:gap-4">
+                            {Array.from({ length: 10 }, (_, i) => i + 1).map(number => (
+                                <div 
+                                    key={number}
+                                    onClick={() => handleSelect(number)}
+                                    className={`
+                                        flex items-center justify-center p-4 aspect-square rounded-md shadow-md
+                                        cursor-pointer transition-all duration-200 ease-in-out
+                                        ${colors[number - 1]}
+                                        ${currentEntry.enjoyment == number ? 'ring-4 ring-offset-2 ring-violet-500' : ''}
+                                    `}
+                                >
+                                    <span className="font-bold text-lg text-white vt323-font">
+                                        {number}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    );
+                };
+
+                return (
+                    <div className="p-4 sm:p-8 md:p-12">
+                        <h2 className="text-xl sm:text-2xl font-bold text-center mb-4 text-violet-700 vt323-font">
+                            {isEditing ? 'Edit Entry' : 'New Entry'} for {selectedDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                        </h2>
+                        <div className="bg-pink-100 p-6 sm:p-8 rounded-lg shadow-lg border border-violet-200">
+                            <p className="text-lg sm:text-xl text-violet-900 mb-4 vt323-font">
+                                {currentQuestion.question}
+                            </p>
+                            <div className="mb-4">
+                                {currentQuestion.type === 'text' && (
+                                    <textarea
+                                        name={currentQuestion.id}
+                                        value={currentEntry[currentQuestion.id] || ''}
+                                        onChange={handleInputChange}
+                                        className="w-full p-2 rounded-md bg-white border border-violet-300 text-violet-900 focus:outline-none focus:ring-2 focus:ring-pink-300 vt323-font"
+                                        rows="4"
+                                    ></textarea>
+                                )}
+                                {currentQuestion.type === 'number' && (
+                                    <input
+                                        type="number"
+                                        name={currentQuestion.id}
+                                        value={currentEntry[currentQuestion.id] || ''}
+                                        onChange={handleInputChange}
+                                        className="w-full p-2 rounded-md bg-white border border-violet-300 text-violet-900 focus:outline-none focus:ring-2 focus:ring-pink-300 vt323-font"
+                                    />
+                                )}
+                                {currentQuestion.type === 'time' && (
+                                    <input
+                                        type="time"
+                                        name={currentQuestion.id}
+                                        value={currentEntry[currentQuestion.id] || ''}
+                                        onChange={handleInputChange}
+                                        className="w-full p-2 rounded-md bg-white border border-violet-300 text-violet-900 focus:outline-none focus:ring-2 focus:ring-pink-300 vt323-font"
+                                    />
+                                )}
+                                {currentQuestion.type === 'enjoyment-scale' && renderEnjoymentScale()}
+                            </div>
+                            <div className="flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0 sm:space-x-4">
+                                <button
+                                    onClick={handleBackToCalendar}
+                                    className="w-full sm:w-auto px-6 py-2 bg-rose-400 text-white font-bold rounded-md hover:bg-rose-500 transition-colors duration-200 vt323-font"
+                                >
+                                    Cancel
+                                </button>
+                                {isLastQuestion ? (
+                                    <button
+                                        onClick={handleSubmit}
+                                        className="w-full sm:w-auto px-6 py-2 bg-pink-400 text-white font-bold rounded-md hover:bg-pink-500 transition-colors duration-200 vt323-font"
+                                    >
+                                        {isEditing ? 'Update' : 'Submit'}
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={handleNextClick}
+                                        className="w-full sm:w-auto px-6 py-2 bg-violet-400 text-white font-bold rounded-md hover:bg-violet-500 transition-colors duration-200 vt323-font"
+                                    >
+                                        Next
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            // Renders the view for past entries.
+            const renderViewEntries = () => {
+                return (
+                    <div className="p-4 sm:p-8 md:p-12">
+                        <h2 className="text-xl sm:text-2xl font-bold text-center mb-4 text-violet-700 vt323-font">
+                            Entries for {selectedDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                        </h2>
+                        <div className="space-y-4">
+                            {viewableEntries.length > 0 ? (
+                                viewableEntries.map((entry, index) => (
+                                    <div key={index} className="bg-pink-100 p-6 rounded-lg shadow-lg border border-violet-200 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                                        <div className="flex-1 mb-4 sm:mb-0 text-violet-900">
+                                            <p className="text-md mb-2 vt323-font">
+                                                <span className="font-bold text-violet-500">Time:</span> {entry.time}
+                                            </p>
+                                            <p className="text-md mb-2 vt323-font">
+                                                <span className="font-bold text-violet-500">Duration:</span> {entry.duration} mins
+                                            </p>
+                                            <p className="text-md mb-2 vt323-font">
+                                                <span className="font-bold text-violet-500">Enjoyment:</span> {entry.enjoyment}/10
+                                            </p>
+                                            <p className="text-md mb-2 vt323-font">
+                                                <span className="font-bold text-violet-500">Atmosphere:</span> {entry.atmosphere}
+                                            </p>
+                                            {entry.notes && (
+                                                <p className="text-md vt323-font">
+                                                    <span className="font-bold text-violet-500">Notes:</span> {entry.notes}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                                            <button
+                                                onClick={() => handleEditClick(entry)}
+                                                className="px-4 py-2 bg-violet-400 text-white font-bold rounded-md hover:bg-violet-500 transition-colors duration-200 vt323-font text-sm"
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(entry.id)}
+                                                className="px-4 py-2 bg-rose-400 text-white font-bold rounded-md hover:bg-rose-500 transition-colors duration-200 vt323-font text-sm"
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-center text-violet-700 vt323-font">No entries for this day.</p>
+                            )}
+                        </div>
+                        <div className="flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-4 mt-6">
+                            <button
+                                onClick={() => handleDayClick(selectedDate)}
+                                className="px-6 py-2 bg-pink-400 text-white font-bold rounded-md hover:bg-pink-500 transition-colors duration-200 vt323-font"
+                            >
+                                Add Another Entry
+                            </button>
+                            <button
+                                onClick={handleBackToCalendar}
+                                className="px-6 py-2 bg-violet-400 text-white font-bold rounded-md hover:bg-violet-500 transition-colors duration-200 vt323-font"
+                            >
+                                Back to Calendar
+                            </button>
+                        </div>
+                    </div>
+                );
+            };
+
+            // Main render logic based on the current view state.
+            return (
+                <div className="min-h-screen bg-slate-100 text-violet-900 font-sans flex flex-col items-center">
+                    {/* The main container of the application */}
+                    <div className="w-full max-w-4xl p-4">
+                        {/* Header */}
+                        <header className="text-center py-6 sm:py-8 md:py-10 bg-pink-200 rounded-b-lg shadow-xl border border-violet-300">
+                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-violet-800 vt323-font">
+                                ムンジュ満足ゲージ
+                            </h1>
+                            <p className="text-sm sm:text-md text-violet-500 vt323-font mt-2">
+                                A private diary of our special moments.
+                            </p>
+                            {/* Average Satisfaction Gauge */}
+                            <div className="w-full max-w-sm mx-auto mt-4">
+                                <div className="text-sm text-center text-violet-600 vt323-font mb-2">
+                                    Average Satisfaction: {averageSatisfaction.toFixed(1)} / 10
+                                </div>
+                                <div className="w-full bg-pink-200 rounded-full h-4">
+                                    <div 
+                                        className="bg-pink-400 h-full rounded-full transition-all duration-500 ease-in-out"
+                                        style={{ width: `${(averageSatisfaction / 10) * 100}%` }}
+                                    ></div>
+                                </div>
+                            </div>
+                        </header>
+
+                        {/* Message box for user feedback */}
+                        {message && (
+                            <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-violet-400 text-white px-4 py-2 rounded-md shadow-lg z-50 animate-bounce">
+                                {message}
+                            </div>
+                        )}
+
+                        {/* Conditional rendering based on the current view */}
+                        <main className="mt-8 bg-pink-200 rounded-lg shadow-xl border border-violet-300">
+                            {!isAuthReady ? (
+                                <div className="p-12 text-center text-lg text-violet-700 vt323-font">
+                                    Loading... Please wait.
+                                </div>
+                            ) : (
+                                <>
+                                    {currentView === 'calendar' && renderCalendar()}
+                                    {currentView === 'questionnaire' && renderQuestionnaire()}
+                                    {currentView === 'viewEntries' && renderViewEntries()}
+                                </>
+                            )}
+                        </main>
+                    </div>
+                </div>
+            );
+        };
+
+        // Render the App component into the root div.
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+
+    </script>
+</body>
+</html>
