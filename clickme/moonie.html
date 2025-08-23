@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Moonju</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d1a;
+            color: white;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            background-color: #0d0d1a;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
+
+<div class="relative w-full h-screen">
+    <canvas id="loveCanvas" class="absolute inset-0 z-10"></canvas>
+    <div class="absolute inset-0 flex flex-col items-center justify-center z-20">
+        <h1 id="title" class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center drop-shadow-lg opacity-0"></h1>
+    </div>
+</div>
+
+<script>
+    // Use window.onload to ensure the canvas and elements are loaded before the script runs.
+    window.onload = function() {
+        // Get the canvas and its 2D drawing context
+        const canvas = document.getElementById('loveCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set up a variable to hold the mouse position
+        let mouse = { x: null, y: null };
+
+        // The text we want to display
+        const targetText = "I LOVEEE YOU MOONJU";
+
+        // The number of particles to use
+        const numParticles = 10000;
+
+        // The font size and font style for the text to be mapped to particles
+        const fontSize = 100;
+        const fontStyle = 'Inter';
+
+        let particles = [];
+        let textCoordinates = [];
+
+        // Class to represent a single particle
+        class Particle {
+            constructor(targetX, targetY) {
+                // Current position (starts randomly)
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+
+                // Target position (where the particle should go)
+                this.targetX = targetX;
+                this.targetY = targetY;
+
+                // Size of the particle
+                this.size = Math.random() * 2;
+
+                // Color of the particle
+                this.color = '#ff6b81'; // A lovely pinkish-red
+
+                // Velocity for movement
+                this.vx = 0;
+                this.vy = 0;
+
+                // A small random offset to make the movement look more natural
+                this.offset = Math.random() * 20 - 10;
+            }
+
+            // Draw the particle on the canvas
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            // Update the particle's position
+            update() {
+                // Calculate the distance to the target position
+                const dx = this.targetX - this.x;
+                const dy = this.targetY - this.y;
+
+                // Calculate the distance to the mouse cursor
+                const mouseDx = mouse.x - this.x;
+                const mouseDy = mouse.y - this.y;
+                const mouseDistance = Math.sqrt(mouseDx * mouseDx + mouseDy * mouseDy);
+
+                // If the mouse is close, repel the particles
+                if (mouseDistance < 100) {
+                    const repelForce = 500 / mouseDistance;
+                    this.vx -= (mouseDx / mouseDistance) * repelForce;
+                    this.vy -= (mouseDy / mouseDistance) * repelForce;
+                }
+
+                // A spring-like force to move towards the target
+                const spring = 0.05;
+                this.vx += (dx * spring) + (Math.sin(Date.now() * 0.001 + this.offset) * 0.1);
+                this.vy += (dy * spring) + (Math.cos(Date.now() * 0.001 + this.offset) * 0.1);
+
+                // Apply some friction to slow the particle down
+                const friction = 0.95;
+                this.vx *= friction;
+                this.vy *= friction;
+
+                // Update the position based on velocity
+                this.x += this.vx;
+                this.y += this.vy;
+            }
+        }
+
+        // Function to handle canvas resize
+        function handleResize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // Recalculate and re-map particles on resize
+            getCoordinates();
+        }
+
+        // Function to get the pixel coordinates of the target text
+        function getCoordinates() {
+            // Create an off-screen canvas to draw the text on
+            const offscreenCanvas = document.createElement('canvas');
+            const offscreenCtx = offscreenCanvas.getContext('2d');
+            offscreenCanvas.width = canvas.width;
+            offscreenCanvas.height = canvas.height;
+
+            // Set the text style
+            offscreenCtx.fillStyle = 'white';
+            offscreenCtx.textAlign = 'center';
+            offscreenCtx.textBaseline = 'middle';
+            offscreenCtx.font = `bold ${fontSize}px ${fontStyle}`;
+
+            // Draw the text on the off-screen canvas
+            offscreenCtx.fillText(targetText, offscreenCanvas.width / 2, offscreenCanvas.height / 2);
+
+            // Get the pixel data from the off-screen canvas
+            const data = offscreenCtx.getImageData(0, 0, offscreenCanvas.width, offscreenCanvas.height).data;
+
+            textCoordinates = [];
+            // Loop through the pixel data and store the coordinates of non-transparent pixels
+            // We'll only sample every few pixels to reduce the number of points
+            for (let y = 0; y < offscreenCanvas.height; y += 4) {
+                for (let x = 0; x < offscreenCanvas.width; x += 4) {
+                    // Check the alpha channel of the pixel (every 4th value)
+                    const index = (y * offscreenCanvas.width + x) * 4;
+                    if (data[index + 3] > 128) {
+                        textCoordinates.push({ x: x, y: y });
+                    }
+                }
+            }
+
+            // Clear the particles array
+            particles = [];
+            // Create new particles and assign them a target coordinate
+            for (let i = 0; i < numParticles; i++) {
+                const target = textCoordinates[i % textCoordinates.length];
+                particles.push(new Particle(target.x, target.y));
+            }
+        }
+
+        // The main animation loop
+        function animate() {
+            // Clear the canvas with a slight transparency to create a trailing effect
+            ctx.fillStyle = 'rgba(13, 13, 26, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Update and draw each particle
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+
+            // Call the next animation frame
+            requestAnimationFrame(animate);
+        }
+
+        // Add event listeners for mouse movement and window resizing
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+
+        window.addEventListener('resize', handleResize);
+
+        // Initial setup
+        handleResize();
+        // Start the animation loop
+        animate();
+    };
+</script>
+</body>
+</html>
