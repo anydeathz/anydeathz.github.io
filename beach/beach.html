@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hayashizaki Matsue Beach Party</title>
+<meta property="og:title" content="Hayashizaki Matsue Beach Party!">
+<meta property="og:description" content="A day of sun, sea, and good company with a price calculator to plan your costs.">
+<meta property="og:image" content="https://placehold.co/1200x630/e0f2fe/1e40af?text=Beach+Party">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://example.com/beach-party">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Hayashizaki Matsue Beach Party!">
+<meta name="twitter:description" content="A day of sun, sea, and good company with a price calculator to plan your costs.">
+<meta name="twitter:image" content="https://placehold.co/1200x630/e0f2fe/1e40af?text=Beach+Party">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body {
+font-family: 'Inter', sans-serif;
+background: linear-gradient(to bottom right, #e0f2fe, #bfdbfe);
+}
+.container-card {
+background-color: white;
+border-radius: 1.5rem;
+box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+animation: fadeIn 1s ease-out;
+}
+.card-item {
+cursor: pointer;
+transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+.card-item:hover {
+transform: translateY(-5px);
+box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+.card-item.selected {
+border: 2px solid #2563eb;
+}
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+.fade-in {
+animation: fadeIn 1s ease-out;
+}
+</style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+<div class="container-card max-w-4xl w-full p-6 sm:p-8">
+<header class="text-center mb-10 fade-in">
+<h1 class="text-4xl sm:text-5xl font-extrabold text-blue-900 mb-2 tracking-tight">
+Hayashizaki Matsue Beach Party!
+</h1>
+<p class="text-lg text-gray-600 font-medium">A day of sun, sea, and good company.</p>
+</header>
+
+<section class="mb-10 p-6 bg-blue-50 rounded-2xl shadow-inner fade-in">
+<h2 class="text-2xl font-bold text-blue-800 mb-5">General Information</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="flex items-center space-x-4 p-4 bg-white rounded-xl shadow-md">
+<i class="fas fa-umbrella-beach text-3xl text-blue-500"></i>
+<div>
+<p class="text-sm text-gray-500 font-medium">Beach Name</p>
+<p class="text-lg font-semibold text-gray-800">Hayashizaki Matsue</p>
+</div>
+</div>
+<div class="flex items-center space-x-4 p-4 bg-white rounded-xl shadow-md">
+<i class="fas fa-map-marker-alt text-3xl text-blue-500"></i>
+<div>
+<p class="text-sm text-gray-500 font-medium">Location</p>
+<p class="text-lg font-semibold text-gray-800">Kobe / Akashi</p>
+</div>
+</div>
+<div class="flex items-center space-x-4 p-4 bg-white rounded-xl shadow-md">
+<i class="fas fa-map-marked-alt text-3xl text-blue-500"></i>
+<div>
+<p class="text-sm text-gray-500 font-medium">Google Maps</p>
+<a href="https://maps.app.goo.gl/7f6o8BGrV96FywTz5" target="_blank" class="text-lg font-semibold text-blue-800 hover:underline">Click for directions</a>
+</div>
+</div>
+<div class="flex items-center space-x-4 p-4 bg-white rounded-xl shadow-md">
+<i class="fas fa-subway text-3xl text-blue-500"></i>
+<div>
+<p class="text-sm text-gray-500 font-medium">Public Transport</p>
+<p class="text-lg font-semibold text-gray-800 flex flex-col items-start">
+<span>Accessible</span>
+<span class="text-xs text-gray-400 font-normal mt-1">Around 20 minutes walking from station</span>
+</p>
+</div>
+</div>
+<div class="flex items-center space-x-4 p-4 bg-white rounded-xl shadow-md">
+<i class="fas fa-yen-sign text-3xl text-blue-500"></i>
+<div>
+<p class="text-sm text-gray-500 font-medium">Fee</p>
+<p class="text-lg font-semibold text-gray-800">Free</p>
+</div>
+</div>
+<div class="flex items-center space-x-4 p-4 bg-white rounded-xl shadow-md">
+<i class="fas fa-utensils text-3xl text-blue-500"></i>
+<div>
+<p class="text-sm text-gray-500 font-medium">BBQ</p>
+<p class="text-lg font-semibold text-gray-800">Allowed</p>
+</div>
+</div>
+<div class="flex items-center space-x-4 p-4 bg-white rounded-xl shadow-md">
+<i class="fas fa-music text-3xl text-blue-500"></i>
+<div>
+<p class="text-sm text-gray-500 font-medium">Music</p>
+<p class="text-lg font-semibold text-gray-800">Allowed</p>
+</div>
+</div>
+<div class="flex items-center space-x-4 p-4 bg-white rounded-xl shadow-md">
+<i class="fas fa-water text-3xl text-blue-500"></i>
+<div>
+<p class="text-sm text-gray-500 font-medium">Water</p>
+<p class="text-lg font-semibold text-gray-800 flex flex-col items-start">
+<span>Clean</span>
+<span class="text-xs text-gray-400 font-normal mt-1">Shore side rocky. Quite deep. Kinda green water.</span>
+</p>
+</div>
+</div>
+<div class="flex items-center space-x-4 p-4 bg-white rounded-xl shadow-md">
+<i class="fas fa-shoe-prints text-3xl text-blue-500"></i>
+<div>
+<p class="text-sm text-gray-500 font-medium">Beach Sand</p>
+<p class="text-lg font-semibold text-gray-800 flex flex-col items-start">
+<span>Clean</span>
+<span class="text-xs text-gray-400 font-normal mt-1">Rocky sand. Weeds are minimal.</span>
+</p>
+</div>
+</div>
+<div class="flex items-center space-x-4 p-4 bg-white rounded-xl shadow-md">
+<i class="fas fa-info-circle text-3xl text-blue-500"></i>
+<div>
+<p class="text-sm text-gray-500 font-medium">Additional</p>
+<p class="text-lg font-semibold text-gray-800">No changing cabins available.</p>
+</div>
+</div>
+<div class="flex items-center space-x-4 p-4 bg-white rounded-xl shadow-md">
+<i class="fas fa-clock text-3xl text-blue-500"></i>
+<div>
+<p class="text-sm text-gray-500 font-medium">Planned Time</p>
+<p class="text-lg font-semibold text-gray-800">9:00 - 18:00</p>
+</div>
+</div>
+</div>
+</section>
+
+<section class="fade-in">
+<h2 class="text-2xl font-bold text-blue-800 mb-5">Pricelist Options</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+<div>
+<h3 class="text-xl font-bold text-orange-600 mb-3">Food</h3>
+<div class="flex flex-col space-y-4">
+<label for="no-bbq" class="card-item p-4 bg-orange-50 rounded-xl shadow-md flex items-center justify-between transition-colors">
+<input type="radio" name="food" id="no-bbq" data-price-per-person="1500" data-shared="false" class="hidden">
+<div class="flex items-center space-x-3">
+<span class="text-orange-500 font-bold">●</span>
+<span class="font-semibold text-gray-800">No BBQ (Konbini Bento)</span>
+</div>
+<span class="text-lg font-bold text-orange-600">1,500 JPY/P</span>
+</label>
+<label for="bbq-meat" class="card-item p-4 bg-orange-50 rounded-xl shadow-md flex items-center justify-between transition-colors">
+<input type="radio" name="food" id="bbq-meat" data-price-per-person="2000" data-shared="false" class="hidden">
+<div class="flex items-center space-x-3">
+<span class="text-orange-500 font-bold">●</span>
+<span class="font-semibold text-gray-800">BBQ Meat</span>
+</div>
+<span class="text-lg font-bold text-orange-600">2,000 JPY/P</span>
+</label>
+<label for="drinks" class="card-item p-4 bg-orange-50 rounded-xl shadow-md flex items-center justify-between transition-colors">
+<input type="checkbox" id="drinks" data-price-per-person="1000" data-shared="false" class="hidden">
+<div class="flex items-center space-x-3">
+<span class="text-orange-500 font-bold">●</span>
+<span class="font-semibold text-gray-800">Drinks (Alc, Non-Alc)</span>
+</div>
+<span class="text-lg font-bold text-orange-600">1,000 JPY/P</span>
+</label>
+</div>
+</div>
+
+<div>
+<h3 class="text-xl font-bold text-yellow-600 mb-3">Amenities</h3>
+<div class="flex flex-col space-y-4">
+<label for="tent1" class="card-item p-4 bg-yellow-50 rounded-xl shadow-md flex items-center justify-between transition-colors">
+<input type="checkbox" id="tent1" data-price="13000" data-multiplier="2" data-shared="true" class="hidden">
+<div class="flex items-center space-x-3">
+<span class="text-yellow-500 font-bold">●</span>
+<span class="font-semibold text-gray-800">
+Beach Tent (x2)
+<a href="https://www.kohnan-eshop.com/shop/g/g4522831166077/" target="_blank" class="text-gray-400 hover:text-blue-500 transition-colors ml-1">
+<i class="fas fa-external-link-alt text-sm"></i>
+</a>
+</span>
+</div>
+<span class="text-lg font-bold text-yellow-600">26,000 JPY</span>
+</label>
+<label for="tent-panel" class="card-item p-4 bg-yellow-50 rounded-xl shadow-md flex items-center justify-between transition-colors">
+<input type="checkbox" id="tent-panel" data-price="2200" data-multiplier="2" data-shared="true" class="hidden">
+<div class="flex items-center space-x-3">
+<span class="text-yellow-500 font-bold">●</span>
+<span class="font-semibold text-gray-800">
+Tent Side Panel (x2)
+<a href="https://www.kohnan-eshop.com/shop/g/g4522831166107/" target="_blank" class="text-gray-400 hover:text-blue-500 transition-colors ml-1">
+<i class="fas fa-external-link-alt text-sm"></i>
+</a>
+</span>
+</div>
+<span class="text-lg font-bold text-yellow-600">4,400 JPY</span>
+</label>
+<label for="table" class="card-item p-4 bg-yellow-50 rounded-xl shadow-md flex items-center justify-between transition-colors">
+<input type="checkbox" id="table" data-price="8900" data-multiplier="2" data-shared="true" class="hidden">
+<div class="flex items-center space-x-3">
+<span class="text-yellow-500 font-bold">●</span>
+<span class="font-semibold text-gray-800">
+Table, Chair Set (x2)
+<a href="https://www.amazon.co.jp/-/en/Outdoor-Aluminum-Included-Assembly-Foldable/dp/B0D4QP6BCZ/" target="_blank" class="text-gray-400 hover:text-blue-500 transition-colors ml-1">
+<i class="fas fa-external-link-alt text-sm"></i>
+</a>
+</span>
+</div>
+<span class="text-lg font-bold text-yellow-600">17,800 JPY</span>
+</label>
+<label for="icebox" class="card-item p-4 bg-yellow-50 rounded-xl shadow-md flex items-center justify-between transition-colors">
+<input type="checkbox" id="icebox" data-price="4200" data-multiplier="2" data-shared="true" class="hidden">
+<div class="flex items-center space-x-3">
+<span class="text-yellow-500 font-bold">●</span>
+<span class="font-semibold text-gray-800">
+Icebox 28L (x2)
+<a href="https://www.amazon.co.jp/Captain-Stag-UE-101-Charman-Cooler/dp/B0CQZJKH7X/" target="_blank" class="text-gray-400 hover:text-blue-500 transition-colors ml-1">
+<i class="fas fa-external-link-alt text-sm"></i>
+</a>
+</span>
+</div>
+<span class="text-lg font-bold text-yellow-600">8,400 JPY</span>
+</label>
+<label for="misc" class="card-item p-4 bg-yellow-50 rounded-xl shadow-md flex items-center justify-between transition-colors">
+<input type="checkbox" id="misc" data-price-per-person="1000" data-shared="false" class="hidden">
+<div class="flex items-center space-x-3">
+<span class="text-yellow-500 font-bold">●</span>
+<span class="font-semibold text-gray-800">Utensils & Misc.</span>
+</div>
+<span class="text-lg font-bold text-yellow-600">1,000 JPY/P</span>
+</label>
+</div>
+</div>
+<div>
+<h3 class="text-xl font-bold text-red-600 mb-3">BBQ Equipment</h3>
+<div class="flex flex-col space-y-4">
+<label for="bbq-grill" class="card-item p-4 bg-red-50 rounded-xl shadow-md flex items-center justify-between transition-colors">
+<input type="checkbox" id="bbq-grill" data-price="3700" data-multiplier="1" data-shared="true" class="hidden">
+<div class="flex items-center space-x-3">
+<span class="text-red-500 font-bold">●</span>
+<span class="font-semibold text-gray-800">
+BBQ Grill
+<a href="https://www.amazon.co.jp/-/en/Barbecue-Foldable-Charcoal-Stainless-Seasoning/dp/B0CCN4C4VW/" target="_blank" class="text-gray-400 hover:text-blue-500 transition-colors ml-1">
+<i class="fas fa-external-link-alt text-sm"></i>
+</a>
+</span>
+</div>
+<span class="text-lg font-bold text-red-600">3,700 JPY</span>
+</label>
+<label for="bbq-sticks" class="card-item p-4 bg-red-50 rounded-xl shadow-md flex items-center justify-between transition-colors">
+<input type="checkbox" id="bbq-sticks" data-price="1100" data-multiplier="1" data-shared="true" class="hidden">
+<div class="flex items-center space-x-3">
+<span class="text-red-500 font-bold">●</span>
+<span class="font-semibold text-gray-800">
+Meat Sticks (x13)
+<a href="https://www.amazon.co.jp/Captain-UG-3500-Skewer-Cutter-13-Piece/dp/B08338L4VS" target="_blank" class="text-gray-400 hover:text-blue-500 transition-colors ml-1">
+<i class="fas fa-external-link-alt text-sm"></i>
+</a>
+</span>
+</div>
+<span class="text-lg font-bold text-red-600">1,100 JPY</span>
+</label>
+<label for="firestarter" class="card-item p-4 bg-red-50 rounded-xl shadow-md flex items-center justify-between transition-colors">
+<input type="checkbox" id="firestarter" data-price="1000" data-multiplier="1" data-shared="true" class="hidden">
+<div class="flex items-center space-x-3">
+<span class="text-red-500 font-bold">●</span>
+<span class="font-semibold text-gray-800">
+Firestarter
+<a href="https://www.amazon.co.jp/17612/dp/B0167A9FBQ/" target="_blank" class="text-gray-400 hover:text-blue-500 transition-colors ml-1">
+<i class="fas fa-external-link-alt text-sm"></i>
+</a>
+</span>
+</div>
+<span class="text-lg font-bold text-red-600">1,000 JPY</span>
+</label>
+<label for="bbq-coal" class="card-item p-4 bg-red-50 rounded-xl shadow-md flex items-center justify-between transition-colors">
+<input type="checkbox" id="bbq-coal" data-price="1800" data-multiplier="1" data-shared="true" class="hidden">
+<div class="flex items-center space-x-3">
+<span class="text-red-500 font-bold">●</span>
+<span class="font-semibold text-gray-800">
+BBQ Coal
+<a href="https://www.amazon.co.jp/18486-Barbecue-Charcoal-Briquette-Environment/dp/B0BYJD9Z97" target="_blank" class="text-gray-400 hover:text-blue-500 transition-colors ml-1">
+<i class="fas fa-external-link-alt text-sm"></i>
+</a>
+</span>
+</div>
+<span class="text-lg font-bold text-red-600">1,800 JPY</span>
+</label>
+</div>
+</div>
+
+<div>
+<h3 class="text-xl font-bold text-green-600 mb-3">Transportation</h3>
+<div class="flex flex-col space-y-4">
+<label for="train" class="card-item p-4 bg-green-50 rounded-xl shadow-md flex items-center justify-between transition-colors">
+<input type="checkbox" id="train" data-price-per-person="3000" data-shared="false" class="hidden">
+<div class="flex items-center space-x-3">
+<span class="text-green-500 font-bold">●</span>
+<span class="font-semibold text-gray-800 flex flex-col items-start">
+<span>Train Transport</span>
+<span class="text-xs text-gray-400 font-normal mt-1">Price depends on your location.</span>
+</span>
+</div>
+<span class="text-lg font-bold text-green-600">3,000 JPY/P</span>
+</label>
+<label for="car-parking" class="card-item p-4 bg-green-50 rounded-xl shadow-md flex items-center justify-between transition-colors">
+<input type="checkbox" id="car-parking" data-price="2500" data-multiplier="1" data-shared="true" class="hidden">
+<div class="flex items-center space-x-3">
+<span class="text-green-500 font-bold">●</span>
+<span class="font-semibold text-gray-800 flex flex-col items-start">
+<span>Car Parking + Gasoline</span>
+<span class="text-xs text-gray-400 font-normal mt-1">for carrying items</span>
+</span>
+</div>
+<span class="text-lg font-bold text-green-600">2,500 JPY</span>
+</label>
+</div>
+</div>
+</div>
+</section>
+
+<section class="mt-10 p-6 bg-blue-50 rounded-2xl shadow-inner fade-in">
+<h2 class="text-2xl font-bold text-blue-800 mb-5">Price Calculator</h2>
+<div class="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-4">
+<div class="w-full sm:w-1/2">
+<label for="participants" class="block text-gray-700 font-semibold mb-2">Total Participants</label>
+<input type="number" id="participants" value="11" min="1" class="w-full p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors">
+<p class="text-sm text-gray-500 mt-1">Note: Default is 11 (5 Women☕️).</p>
+</div>
+<div class="w-full sm:w-1/2">
+<p class="text-lg font-semibold text-gray-700 mb-2">Estimated Cost Per Person</p>
+<div class="w-full p-4 bg-blue-200 rounded-lg text-center">
+<span id="total-price" class="text-3xl font-extrabold text-blue-800">0</span>
+<span class="text-xl font-bold text-blue-700 ml-1">JPY</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+const items = document.querySelectorAll('.card-item input[type="checkbox"], .card-item input[type="radio"]');
+const participantsInput = document.getElementById('participants');
+const totalPriceDisplay = document.getElementById('total-price');
+
+const bbqRadios = document.querySelectorAll('input[name="food"]');
+const bbqItems = ['bbq-grill', 'bbq-sticks', 'firestarter', 'bbq-coal'];
+
+const updateItemState = (checkbox, isChecked) => {
+const parent = checkbox.closest('.card-item');
+if (isChecked) {
+parent.classList.add('selected');
+} else {
+parent.classList.remove('selected');
+}
+};
+
+const calculatePrice = () => {
+let perPersonCost = 0;
+let sharedCost = 0;
+const participants = parseInt(participantsInput.value, 10) || 0;
+
+items.forEach(item => {
+const isSelected = item.checked;
+updateItemState(item, isSelected);
+
+if (isSelected) {
+if (item.dataset.shared === 'false') {
+perPersonCost += parseInt(item.dataset.pricePerPerson, 10);
+} else {
+const basePrice = parseInt(item.dataset.price, 10);
+const multiplier = parseInt(item.dataset.multiplier, 10) || 1;
+sharedCost += basePrice * multiplier;
+}
+}
+});
+
+const totalPerPerson = perPersonCost + (participants > 0 ? sharedCost / participants : 0);
+totalPriceDisplay.textContent = Math.round(totalPerPerson).toLocaleString();
+};
+
+items.forEach(item => {
+item.addEventListener('change', () => {
+if (item.type === 'radio') {
+// Handle BBQ exclusivity
+if (item.id === 'no-bbq') {
+bbqItems.forEach(bbqId => {
+const bbqCheckbox = document.getElementById(bbqId);
+if (bbqCheckbox) {
+bbqCheckbox.checked = false;
+updateItemState(bbqCheckbox, false);
+bbqCheckbox.closest('.card-item').classList.add('opacity-50', 'pointer-events-none');
+}
+});
+} else {
+bbqItems.forEach(bbqId => {
+const bbqCheckbox = document.getElementById(bbqId);
+if (bbqCheckbox) {
+bbqCheckbox.closest('.card-item').classList.remove('opacity-50', 'pointer-events-none');
+}
+});
+}
+}
+calculatePrice();
+});
+});
+
+participantsInput.addEventListener('input', calculatePrice);
+// Initial calculation
+calculatePrice();
+});
+</script>
+</body>
+</html>
