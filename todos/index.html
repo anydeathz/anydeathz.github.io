@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My To-Do List</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+    <style>
+        /* FIX: Apply background to the whole html/body to ensure it covers scrollable content */
+        html, body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .text-glow { text-shadow: 0 0 8px currentColor, 0 0 12px rgba(255, 255, 255, 0.3); }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(8, 217, 214, 0.4); border-radius: 10px; }
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0.8); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .item-enter-animate { animation: fadeIn 0.3s ease-out forwards; }
+
+        /* Custom Styles for Quill RTE */
+        .ql-toolbar { border-radius: 0.5rem 0.5rem 0 0 !important; background: #1f2937 !important; border-color: #374151 !important; padding: 12px 8px !important; }
+        .ql-container.ql-snow { border-radius: 0 0 0.5rem 0.5rem !important; background: rgba(17, 24, 39, 0.8) !important; border-color: #374151 !important; color: #e2e8f0; font-size: 1rem; }
+        .ql-editor { min-height: 80px; }
+        .ql-editor p { margin: 0; }
+        .rendered-content .ql-editor { min-height: 0; padding: 0; word-break: break-word; }
+        .rendered-content .ql-editor p { line-height: 1.6; }
+        .rendered-content a { color: #22d3ee; text-decoration: underline; }
+        .ql-snow .ql-stroke, .ql-snow .ql-fill { stroke: #9ca3af; }
+        .ql-snow .ql-picker-label { color: #9ca3af; }
+        .ql-snow .ql-picker.ql-expanded .ql-picker-options { background: #1f2937 !important; border-color: #374151 !important; }
+        .ql-snow .ql-picker-options .ql-picker-item:hover { color: #08d9d6 !important; }
+        .ql-snow .ql-picker-item.ql-selected, .ql-snow .ql-picker-item:hover .ql-stroke-selected { color: #08d9d6 !important; stroke: #08d9d6 !important;}
+        .ql-snow.ql-toolbar button:hover, .ql-snow .ql-toolbar button:focus, .ql-snow.ql-toolbar button.ql-active { color: #08d9d6 !important; }
+        .ql-snow.ql-toolbar button:hover .ql-stroke, .ql-snow .ql-toolbar button:focus .ql-stroke, .ql-snow.ql-toolbar button.ql-active .ql-stroke { stroke: #08d9d6 !important; }
+        .ql-snow .ql-picker-label:hover .ql-stroke, .ql-active .ql-picker-label .ql-stroke { stroke: #08d9d6 !important; }
+    </style>
+</head>
+<body class="bg-gray-900 text-slate-200 min-h-screen bg-gradient-to-br from-[#0c0a1f] via-[#05070d] to-[#12051a]">
+
+<div id="login-overlay" class="fixed inset-0 bg-gray-900 z-50 flex flex-col items-center justify-center transition-opacity duration-500 p-4">
+    <div class="w-full max-w-sm text-center">
+        <h1 class="text-4xl sm:text-5xl font-bold text-white text-glow mb-4" style="color: #08d9d6;">Welcome</h1>
+        <p class="text-cyan-400/80 mb-8">Enter a username to load your list.</p>
+        <form id="login-form" class="space-y-4">
+            <input type="text" id="username-input" placeholder="e.g. anydeath" class="w-full text-center text-lg bg-slate-800/70 border border-slate-700 rounded-md p-4 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 focus:outline-none transition">
+            <button type="submit" class="w-full flex items-center justify-center gap-2 bg-cyan-500 text-black font-bold py-3 px-4 rounded-md hover:bg-cyan-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-cyan-400 transition-all duration-200 transform hover:scale-105">
+                <span>Access List</span>
+            </button>
+        </form>
+        <p class="text-xs text-slate-500 mt-4">Usernames are public and not password protected.</p>
+    </div>
+</div>
+
+<div id="app-content" class="hidden">
+    <div class="container mx-auto max-w-3xl p-4 md:p-8">
+        <header class="text-center my-8">
+            <h1 class="text-4xl sm:text-5xl font-bold text-white text-glow" style="color: #08d9d6;">My Tasks</h1>
+            <div class="flex items-center justify-center gap-3">
+                <p class="text-cyan-400/80 mt-2">List for: <strong id="display-username" class="text-cyan-300"></strong></p>
+                <button id="logout-button" class="mt-2 text-xs text-slate-500 hover:text-cyan-400 transition-colors">(change)</button>
+            </div>
+        </header>
+
+        <div id="add-task-card" class="bg-black/50 backdrop-blur-lg border border-cyan-500/30 rounded-xl p-6 mb-8 shadow-2xl">
+            <div id="add-toolbar">
+                    <span class="ql-formats">
+                        <button class="ql-bold"></button><button class="ql-italic"></button><button class="ql-underline"></button><button class="ql-strike"></button>
+                    </span>
+                <span class="ql-formats">
+                        <select class="ql-color"></select><select class="ql-background"></select>
+                    </span>
+            </div>
+            <div id="add-editor"></div>
+            <div class="space-y-4 mt-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <input type="date" id="task-date" class="w-full bg-slate-800/70 border border-slate-700 rounded-md p-3 focus:ring-2 focus:ring-cyan-400 focus:outline-none transition">
+                    <input type="time" id="task-time" class="w-full bg-slate-800/70 border border-slate-700 rounded-md p-3 focus:ring-2 focus:ring-cyan-400 focus:outline-none transition">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <input type="text" id="task-location" placeholder="Location (e.g., Kyoto Station)" class="w-full bg-slate-800/70 border border-slate-700 rounded-md p-3 focus:ring-2 focus:ring-cyan-400 focus:outline-none transition">
+                    <input type="url" id="task-url" placeholder="URL (e.g., https://...)" class="w-full bg-slate-800/70 border border-slate-700 rounded-md p-3 focus:ring-2 focus:ring-cyan-400 focus:outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Border Color</label>
+                    <div id="add-border-color-palette" class="flex flex-wrap gap-3"></div>
+                </div>
+                <button id="add-task-button" class="w-full flex items-center justify-center gap-2 bg-cyan-500 text-black font-bold py-3 px-4 rounded-md hover:bg-cyan-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-cyan-400 transition-all duration-200 transform hover:scale-105">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                    <span>Add Task</span>
+                </button>
+            </div>
+        </div>
+        <div id="task-list-container" class="space-y-4"></div>
+    </div>
+</div>
+
+<div id="edit-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="edit-modal-content" class="item-enter-animate w-full max-w-2xl bg-gray-900/70 backdrop-blur-xl border border-cyan-500/40 rounded-2xl shadow-2xl">
+        <div class="p-6">
+            <h2 class="text-2xl font-bold text-white mb-4">Edit Task</h2>
+            <div id="edit-toolbar">
+                    <span class="ql-formats">
+                        <button class="ql-bold"></button><button class="ql-italic"></button><button class="ql-underline"></button><button class="ql-strike"></button>
+                    </span>
+                <span class="ql-formats">
+                        <select class="ql-color"></select><select class="ql-background"></select>
+                    </span>
+            </div>
+            <div id="edit-editor"></div>
+            <div class="space-y-4 mt-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <input type="date" id="edit-date" class="w-full bg-slate-800/70 border border-slate-700 rounded-md p-3 focus:ring-2 focus:ring-cyan-400 focus:outline-none transition">
+                    <input type="time" id="edit-time" class="w-full bg-slate-800/70 border border-slate-700 rounded-md p-3 focus:ring-2 focus:ring-cyan-400 focus:outline-none transition">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <input type="text" id="edit-location" placeholder="Location" class="w-full bg-slate-800/70 border border-slate-700 rounded-md p-3 focus:ring-2 focus:ring-cyan-400 focus:outline-none transition">
+                    <input type="url" id="edit-url" placeholder="URL" class="w-full bg-slate-800/70 border border-slate-700 rounded-md p-3 focus:ring-2 focus:ring-cyan-400 focus:outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Border Color</label>
+                    <div id="edit-border-color-palette" class="flex flex-wrap gap-3"></div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-black/50 px-6 py-4 flex justify-end gap-3 rounded-b-2xl">
+            <button id="cancel-edit" class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 font-semibold transition">Cancel</button>
+            <button id="save-edit" class="px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-black font-semibold transition">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDrWCHmSHWYwWNjDYYqbV1lASEiJbXeT8U",
+        authDomain: "personal-dashboard-e8c8f.firebaseapp.com",
+        projectId: "personal-dashboard-e8c8f",
+        storageBucket: "personal-dashboard-e8c8f.firebasestorage.app",
+        messagingSenderId: "906260519522",
+        appId: "1:906260519522:web:f7d2e9666e3ee20d260f3b"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginOverlay = document.getElementById('login-overlay');
+        const loginForm = document.getElementById('login-form');
+        const usernameInput = document.getElementById('username-input');
+        const appContent = document.getElementById('app-content');
+        const displayUsername = document.getElementById('display-username');
+        const logoutButton = document.getElementById('logout-button');
+        const taskDateInput = document.getElementById('task-date');
+        const taskTimeInput = document.getElementById('task-time');
+        const taskLocationInput = document.getElementById('task-location');
+        const taskUrlInput = document.getElementById('task-url');
+        const taskListContainer = document.getElementById('task-list-container');
+        const addBorderColorPalette = document.getElementById('add-border-color-palette');
+        const addTaskButton = document.getElementById('add-task-button');
+        const editModal = document.getElementById('edit-modal');
+        const editDateInput = document.getElementById('edit-date');
+        const editTimeInput = document.getElementById('edit-time');
+        const editLocationInput = document.getElementById('edit-location');
+        const editUrlInput = document.getElementById('edit-url');
+        const editBorderColorPalette = document.getElementById('edit-border-color-palette');
+        const saveEditBtn = document.getElementById('save-edit');
+        const cancelEditBtn = document.getElementById('cancel-edit');
+
+        let currentlyEditingId = null;
+        const colors = ['#ffffff', '#08d9d6', '#ff2e63', '#f8b400', '#76ff03', '#9d00ff', '#ffff00'];
+        const DEFAULT_BORDER_COLOR = colors[1]; // Cyan
+        let tasksCollection;
+        let unsubscribe;
+        let addEditor, editEditor;
+
+        // --- Login and Initialization Flow ---
+        function initializeAppForUser(username) {
+            if (!addEditor) {
+                const quillToolbarOptions = {
+                    container: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'color': colors }, { 'background': [] }],
+                    ]
+                };
+                addEditor = new Quill('#add-editor', { theme: 'snow', modules: { toolbar: '#add-toolbar' } });
+                editEditor = new Quill('#edit-editor', { theme: 'snow', modules: { toolbar: '#edit-toolbar' } });
+            }
+
+            tasksCollection = db.collection('lists').doc(username).collection('tasks');
+            displayUsername.textContent = username;
+            loginOverlay.classList.add('hidden');
+            appContent.classList.remove('hidden');
+
+            const now = new Date();
+            taskDateInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            taskTimeInput.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            renderBorderColorPalette(addBorderColorPalette, DEFAULT_BORDER_COLOR);
+            addEditor.focus();
+
+            if (unsubscribe) unsubscribe();
+            unsubscribe = tasksCollection.orderBy("datetime", "asc").onSnapshot(snapshot => {
+                const tasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderTasks(tasks);
+            }, error => console.error("Error listening to tasks:", error));
+        }
+
+        // FIX: Don't auto-login. Pre-fill username instead.
+        const savedUsername = localStorage.getItem('todoUsername');
+        if (savedUsername) {
+            usernameInput.value = savedUsername;
+        }
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = usernameInput.value.trim().toLowerCase();
+            if (username) {
+                localStorage.setItem('todoUsername', username);
+                initializeAppForUser(username);
+            }
+        });
+
+        logoutButton.addEventListener('click', () => {
+            if (unsubscribe) unsubscribe();
+            localStorage.removeItem('todoUsername');
+            location.reload(); // FIX: Reload the page to cleanly go back to login screen.
+        });
+
+        const renderTasks = (tasks) => {
+            taskListContainer.innerHTML = '';
+            if (tasks.length === 0) {
+                taskListContainer.innerHTML = `<div class="text-center py-12 bg-black/30 backdrop-blur-lg border border-dashed border-cyan-500/20 rounded-xl"><svg class="mx-auto h-12 w-12 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><h3 class="mt-2 text-lg font-medium text-slate-300">All Tasks Completed</h3><p class="mt-1 text-sm text-slate-500">Add a new task to begin.</p></div>`;
+                return;
+            }
+            tasks.forEach(task => {
+                const taskElement = document.createElement('div');
+                taskElement.className = `task-item bg-black/50 backdrop-blur-lg border border-slate-700/50 rounded-xl p-4 flex flex-col gap-4 transition-all duration-300 ${task.completed ? 'opacity-40' : ''}`;
+                taskElement.dataset.id = task.id;
+                if (!task.completed) taskElement.style.borderLeft = `4px solid ${task.borderColor || DEFAULT_BORDER_COLOR}`;
+
+                const taskDate = new Date(task.datetime);
+                const formattedDate = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(taskDate);
+                const formattedTime = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).format(taskDate);
+
+                let linksHTML = '';
+                if (task.location || task.url) {
+                    linksHTML += '<div class="mt-3 pt-3 border-t border-slate-700/50 flex flex-wrap gap-x-6 gap-y-2 text-sm">';
+                    if (task.location) {
+                        const mapUrl = `http://googleusercontent.com/maps.google.com/3{encodeURIComponent(task.location)}`;
+                        linksHTML += `<a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-slate-400 hover:text-cyan-400 transition-colors"><svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>${task.location}</a>`;
+                    }
+                    if (task.url) {
+                        const isGoogleMaps = task.url.includes("google.com/maps");
+                        const icon = isGoogleMaps
+                            ? `<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>`
+                            : `<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>`;
+                        linksHTML += `<a href="${task.url}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-slate-400 hover:text-cyan-400 transition-colors">${icon}Visit Link</a>`;
+                    }
+                    linksHTML += '</div>';
+                }
+
+                taskElement.innerHTML = `
+                        <div class="flex items-start gap-4 w-full">
+                            <input type="checkbox" ${task.completed ? 'checked' : ''} class="task-checkbox h-6 w-6 mt-1 bg-transparent border-slate-600 rounded-md text-cyan-400 focus:ring-cyan-400 cursor-pointer shrink-0">
+                            <div class="flex-grow min-w-0">
+                                <div class="rendered-content ql-snow"><div class="ql-editor ${task.completed ? 'opacity-60 line-through' : ''}">${task.content}</div></div>
+                                <p class="text-sm text-cyan-400/80 mt-2">${formattedDate} at ${formattedTime}</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row items-center gap-1">
+                                <button class="edit-task p-2 rounded-full hover:bg-cyan-500/20 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500 hover:text-cyan-400"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></button>
+                                <button class="delete-task p-2 rounded-full hover:bg-pink-500/20 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500 hover:text-pink-500"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+                            </div>
+                        </div>
+                        ${linksHTML}
+                    `;
+                taskListContainer.appendChild(taskElement);
+            });
+        };
+
+        const addTask = () => {
+            if (!tasksCollection || addEditor.getLength() <= 1) return;
+            const content = addEditor.root.innerHTML;
+            const selectedSwatch = addBorderColorPalette.querySelector('.color-swatch.ring-2');
+            const borderColor = selectedSwatch ? selectedSwatch.dataset.color : DEFAULT_BORDER_COLOR;
+            tasksCollection.add({ content, datetime: `${taskDateInput.value}T${taskTimeInput.value}`, location: taskLocationInput.value.trim(), url: taskUrlInput.value.trim(), completed: false, borderColor, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+                .then(() => {
+                    addEditor.setText('');
+                    taskLocationInput.value = '';
+                    taskUrlInput.value = '';
+                    addEditor.focus();
+                });
+        };
+        const toggleTask = (id) => { if (!tasksCollection) return; const taskRef = tasksCollection.doc(id); taskRef.get().then(doc => { if (doc.exists) taskRef.update({ completed: !doc.data().completed }); }); };
+        const deleteTask = (id) => tasksCollection.doc(id).delete();
+        const handleEditSave = () => {
+            const content = editEditor.root.innerHTML;
+            const selectedSwatch = editBorderColorPalette.querySelector('.color-swatch.ring-2');
+            const borderColor = selectedSwatch ? selectedSwatch.dataset.color : DEFAULT_BORDER_COLOR;
+            if (editEditor.getLength() <= 1) return;
+            tasksCollection.doc(currentlyEditingId).update({ content, datetime: `${editDateInput.value}T${editTimeInput.value}`, location: editLocationInput.value.trim(), url: editUrlInput.value.trim(), borderColor }).then(closeEditModal);
+        };
+
+        const openEditModal = (id) => {
+            const taskRef = tasksCollection.doc(id);
+            taskRef.get().then(doc => {
+                if (doc.exists) {
+                    const task = doc.data();
+                    currentlyEditingId = id;
+                    editEditor.root.innerHTML = task.content;
+                    const [date, time] = task.datetime.split('T');
+                    editDateInput.value = date;
+                    editTimeInput.value = time.substring(0, 5);
+                    editLocationInput.value = task.location || '';
+                    editUrlInput.value = task.url || '';
+                    renderBorderColorPalette(editBorderColorPalette, task.borderColor || DEFAULT_BORDER_COLOR);
+                    editModal.classList.remove('hidden');
+                }
+            });
+        };
+        const closeEditModal = () => { currentlyEditingId = null; editModal.classList.add('hidden'); };
+        const renderBorderColorPalette = (paletteContainer, activeColor) => {
+            paletteContainer.innerHTML = '';
+            colors.forEach(color => {
+                const swatch = document.createElement('button');
+                swatch.type = 'button';
+                swatch.className = `color-swatch w-8 h-8 rounded-full transition-all duration-200 border-2 border-transparent`;
+                swatch.style.backgroundColor = color;
+                swatch.dataset.color = color;
+                if (color === activeColor) swatch.classList.add('ring-2', 'ring-offset-2', 'ring-cyan-400', 'ring-offset-gray-900');
+                paletteContainer.appendChild(swatch);
+            });
+        };
+        function handlePaletteClick(e) { if (e.target.classList.contains('color-swatch')) { this.querySelector('.color-swatch.ring-2')?.classList.remove('ring-2', 'ring-offset-2', 'ring-cyan-400', 'ring-offset-gray-900'); e.target.classList.add('ring-2', 'ring-offset-2', 'ring-cyan-400', 'ring-offset-gray-900'); } }
+
+        addTaskButton.addEventListener('click', addTask);
+        taskListContainer.addEventListener('click', (e) => {
+            const taskElement = e.target.closest('.task-item');
+            if (!taskElement) return;
+            const taskId = taskElement.dataset.id;
+            if (e.target.closest('.task-checkbox')) toggleTask(taskId);
+            if (e.target.closest('.delete-task')) deleteTask(taskId);
+            if (e.target.closest('.edit-task')) openEditModal(taskId);
+        });
+        addBorderColorPalette.addEventListener('click', handlePaletteClick);
+        editBorderColorPalette.addEventListener('click', handlePaletteClick);
+        saveEditBtn.addEventListener('click', handleEditSave);
+        cancelEditBtn.addEventListener('click', closeEditModal);
+        editModal.addEventListener('click', (e) => { if (e.target === editModal) closeEditModal(); });
+    });
+</script>
+</body>
+</html>
