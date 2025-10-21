@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<meta name="applicable-device" content="mobile">
+<meta name="format-detection" content="telephone=no" />
+<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+
+<meta name="author" content="GainHive">
+<meta name="copyright" content="GainHive">
+<meta name="keywords" content="---------!" />
+
+<title>GainHive</title>
+
+<meta name="description" content="A grand strategy game.">
+<meta property="og:description" content="A grand strategy game that lets you explore uncharted hexagons and claim your rewards from them via battle or harvest.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gainhive.game">
+<meta property="og:image" content="../images/gainhive_social.png">
+
+<meta name="twitter:title" content="gainhive.game | Home">
+<meta name="twitter:description" content="A grand strategy game that lets you explore uncharted hexagons and claim your rewards from them via battle or harvest.">
+<meta name="twitter:site" content="@GainHive_game">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="../images/gainhive_social.png">
+
+<script>
+function browserRedirect(){
+    var isiPad = (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 0) || navigator.platform === 'iPad';
+    var isMobile = /(iPhone|iPad|iPod|iOS|Android|Windows Phone|BlackBerry|SymbianOS)/i.test(navigator.userAgent);
+    if (isMobile || isiPad) {
+    } else {
+      window.location.href= 'index.html';
+    }
+}
+browserRedirect();
+(function (win, doc) {
+   if (!win.addEventListener) return;
+   var html = document.documentElement;
+   function setFont() {
+        var html = document.documentElement;
+        var k = 750;
+        html.style.fontSize = html.clientWidth / k * 100 + "px";
+   }
+   setFont();
+   setTimeout(function () {setFont(); }, 300);
+   doc.addEventListener('DOMContentLoaded', setFont, false);
+   win.addEventListener('resize', setFont, false);
+   win.addEventListener('load', setFont, false);
+
+
+   window.WebFontConfig = {
+     google: {
+       families: ["Noto+Sans+KR"],
+     },
+     active: function () {
+       sessionStorage.fonts = true;
+     }
+   };
+   var wf = document.createElement('script');
+   wf.src = 'js//webfont.js';
+   wf.type = 'text/javascript';
+   wf.async = 'true';
+   var s = document.getElementsByTagName('script')[0];
+   s.parentNode.insertBefore(wf, s);
+})(window, document);
+</script>
+
+<link rel="stylesheet" type="text/css" href="css/swiper.min.css">
+<link rel="stylesheet" type="text/css" href="css/stylem3137.css">
+<link rel="stylesheet" type="text/css" href="css/hexagon.css">
+<link rel="stylesheet" type="text/css" href="css/partnersm.css">
+
+<!-- Hotjar Tracking Code for https://gainhive.game -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:3184422,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+<script type="text/javascript">function OptanonWrapper() { }</script>
+<script src="https://kit.fontawesome.com/385440cedc.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+<!-- top nav -->
+<div class="anydeath_tnv">
+    <a href="javascript:;" class="anydeath_logo" title></a>
+    <a href="javascript:;" class="anydeath_menu" title></a>
+    <div class="anydeath_tnv_drawer">
+        <a href="javascript:;" class="anydeath_menu_close"></a>
+        <div class="anydeath_nvlist cn1">
+          <a href="https://gainhive.game/demo/"><i class="fa-solid fa-ticket fa-2x"></i> | Early Adopter NFT</a>
+          <a href="https://gainhive.game/demo/"><i class="fa-regular fa-chess-knight fa-2x"></i> | Multiplayer Demo</a>
+          <a href="https://gainhive.game/development/"><i class="fa-regular fa-floppy-disk fa-2x"></i> | Development Diary</a>
+          <a href="https://gainhive.game/investor_pitchdeck/"><i class="fa-regular fa-file-pdf fa-2x"></i> | Investor Pitchdeck</a>
+          <a href="https://gainhive.gitbook.io/gainhive-whitepaper/"><i class="fa-regular fa-newspaper fa-2x"></i> | Whitepaper</a>
+          <a href="https://www.youtube.com/watch?v=5tPiLQ8TesQ&t=1s"><i class="fa-regular fa-circle-play fa-2x"></i> | Reveal Trailer</a>
+          <a href="https://gainhive.game/one-page/"><i class="fa-regular fa-bookmark fa-2x"></i> | One Pager</a>
+            <span class="anydeath_nvline"></span>
+        </div>
+        <div class="anydeath_rlink">
+            <a href="https://medium.com/@gainhive" target="_blank" class="fce" title="facebook">facebook</a>
+            <a href="https://t.me/gainhive" target="_blank" class="ytb" title="ytb">ytb</a>
+            <a href="https://twitter.com/gainhivegame" target="_blank" class="twer" title="twitter">twitter</a>
+        </div>
+    </div>
+</div>
+<div class="anydeath_wrap swiper-h">
+    <div class="anydeath_in swiper-wrapper">
+        <!-- head -->
+        <div class="anydeath_head swiper-slide">
+            <div class="zomc">
+                <!--<a href="javascript:videoPlay.showVideo('5tPiLQ8TesQ',true);" class="anydeath_hvideo_btn" title></a>-->
+                <span class="anydeath_shift"></span>
+                <!--<span class="anydeath_shiftm"></span>
+                <div class="anydeath_scroll"><span></span></div>
+                <a href="https://gainhive.game/investor_pitchdeck/" target="_blank" class="anydeath_cbt_btn" title>
+                    <div class="cbt_box">
+                        <span class="cbt_tx1">CLICK TO VIEW PITCHDECK</span>
+                        <span class="cbt_jt"></span>
+                    </div>-->
+                </a>
+            </div>
+            <video src="media/anydeath-1921.mp4" class="video_bgboxm" playsinline autoplay loop muted></video>
+        </div>
+        <!-- vision -->
+        <div class="anydeath_cont cbg1 swiper-slide">
+          <div class="anydeath_cont_cbg7">
+            <div class="zomc">
+                <div class="anydeath_visition swiper-v">
+                    <ul class="swiper-wrapper">
+                        <li class="swiper-slide nke_vision_item2">
+                            <span class="anydeath-p2-kv anydeath_p2_kv1"></span>
+                            <p class="nke_p1">GainHive: Entertaining & Lucrative WEB3 MMORPG/Strategy Game</p>
+                        </li>
+                        <li class="swiper-slide nke_vision_item2">
+                            <span class="anydeath-p2-kv anydeath_p2_kv2"></span>
+                            <p class="nke_p1">Adventure the dynamic & yield-bearing hexagons and earn the precious $GHIVE and in-game NFTs!</p>
+                        </li>
+                        <li class="swiper-slide nke_vision_item3">
+                            <span class="anydeath-p2-kv anydeath_p2_kv3"></span>
+                            <p class="nke_p1">Defeat the enemies, grab your loot and conquer the territory!</p>
+                        </li>
+                        <li class="swiper-slide nke_vision_item4">
+                            <span class="anydeath-p2-kv anydeath_p2_kv4"></span>
+                            <p class="nke_p1">Rent and upgrade your unique HEX to make it a passive income generator and a marketing tool!</p>
+                        </li>
+                        <li class="swiper-slide nke_vision_item5">
+                            <span class="anydeath-p2-kv anydeath_p2_kv5"></span>
+                            <p class="nke_p1">Three inventories, one for you, one for bounties, one for the one… who killed you!</p>
+                        </li>
+                        <li class="swiper-slide nke_vision_item6">
+                            <span class="anydeath-p2-kv anydeath_p2_kv6"></span>
+                            <p class="nke_p1">Collect attributes, customize your own NFT Character and make it rare!</p>
+                        </li>
+                        <li class="swiper-slide nke_vision_item7">
+                            <span class="anydeath-p2-kv anydeath_p2_kv7"></span>
+                            <p class="nke_p1">Create your clan, build your empire and rule the Gainverse!</p>
+                        </li>
+                        <a href="javascript:;" class="anydeath_role_prev" title=""></a>
+                        <a href="javascript:;" class="anydeath_role_next" title=""></a>
+
+                    </ul>
+                    <div class="anydeath_vis_prg"></div>
+                    <div class="anydeath_vis_cirprg"></div>
+                </div>
+            </div>
+          </div>
+        </div>
+        <!-- character -->
+        <div class="anydeath_cont swiper-slide">
+            <div class="anydeath_cont_cbg2">
+                <div class="zomc">
+                    <div class="anydeath_char_side">
+                        <a href="javascript:;" class="cur" title><span class="anydeath_char_logo1"></span></a>
+                        <a href="javascript:;" title><span class="anydeath_char_logo2"></span></a>
+                        <a href="javascript:;" title><span class="anydeath_char_logo4"></span></a>
+                        <a href="javascript:;" title><span class="anydeath_char_logo3"></span></a>
+                    </div>
+                    <div class="anydeath_char_ct anydeath_char_ct1 show">
+                        <div class="anydeath_char_woman">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide">
+                                    <p class="anydeath-char anydeath_woman1"></p>
+                                    <div class="rolechange cur">
+                                        <span class="anydeath_role_hline"></span>
+                                        <span class="anydeath_role_sline"></span>
+                                        <div class="anydeath_rolename">
+                                            <strong class="anydeath_rolenamep">EAGLE</strong>
+                                            <div class="anydeath_rolecv" data-cv="rapi">
+                                                <span class="anydeath_rolecv_icon"></span>
+                                            </div>
+                                        </div>
+                                        <p class="anydeath_counters">CHARACTER</p>
+                                        <p class="anydeath_rolems">Eagles await to rule the world of GainHive with their vision and fearless nature. The eagle's target is higher than anyone could have imagined. Strong winds do not frighten him, he knows his destination and continues on his way there.</a>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <p class="anydeath-char anydeath_woman2"></p>
+                                    <div class="rolechange cur">
+                                        <span class="anydeath_role_hline"></span>
+                                        <span class="anydeath_role_sline"></span>
+                                        <div class="anydeath_rolename">
+                                            <strong class="anydeath_rolenamep">HORSE</strong>
+                                            <div class="anydeath_rolecv" data-cv="neon">
+                                                <span class="anydeath_rolecv_icon"></span>
+                                            </div>
+                                        </div>
+                                        <p class="anydeath_counters">CHARACTER</p>
+                                        <p class="anydeath_rolems">Their sensitive spirits distinguish horses from others. No one can underestimate the greed of a horse. They chase their opponents with their endless energy. Horses are waiting to defeat their enemies to rule the GainHive universe...</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="javascript:;" class="anydeath_role_prev" title=""></a>
+                            <a href="javascript:;" class="anydeath_role_next" title=""></a>
+                        </div>
+                        <div class="anydeath_rolechange_wp">
+                            <div class="anydeath_rolechange swiper-v">
+                                <ul class="swiper-wrapper">
+                                    <li class="swiper-slide"><div class="anydeath_rolehd"><img src="images/role_ihd1.jpg"></div></li>
+                                    <li class="swiper-slide"><div class="anydeath_rolehd"><img src="images/role_ihd3.jpg"></div></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="anydeath_char_ct anydeath_char_ct2">
+                        <div class="anydeath_char_woman">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide">
+                                    <p class="anydeath-char anydeath_woman1"></p>
+                                    <div class="rolechange cur">
+                                        <span class="anydeath_role_hline"></span>
+                                        <span class="anydeath_role_sline"></span>
+                                        <div class="anydeath_rolename">
+                                            <strong class="anydeath_rolenamep">LION</strong>
+                                            <div class="anydeath_rolecv" data-cv="maxwell">
+                                                <span class="anydeath_rolecv_icon"></span>
+                                            </div>
+                                        </div>
+                                        <p class="anydeath_counters">CHARACTER</p>
+                                        <p class="anydeath_rolems">DETAILS WILL BE REVEALED SOON<br>
+                                        ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ</p>                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <p class="anydeath-char anydeath_woman2"></p>
+                                    <div class="rolechange cur">
+                                        <span class="anydeath_role_hline"></span>
+                                        <span class="anydeath_role_sline"></span>
+                                        <div class="anydeath_rolename">
+                                            <strong class="anydeath_rolenamep">BEAR</strong>
+                                            <div class="anydeath_rolecv" data-cv="drake">
+                                                <span class="anydeath_rolecv_icon"></span>
+                                            </div>
+                                        </div>
+                                        <p class="anydeath_counters">CHARACTER</p>
+                                        <p class="anydeath_rolems">DETAILS WILL BE REVEALED SOON<br>
+                                        ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ</p>                                    </div>
+                                </div>
+                            </div>
+                            <a href="javascript:;" class="anydeath_role_prev" title=""></a>
+                            <a href="javascript:;" class="anydeath_role_next" title=""></a>
+                        </div>
+                        <div class="anydeath_rolechange_wp">
+                            <div class="anydeath_rolechange swiper-v">
+                                <ul class="swiper-wrapper">
+                                    <li class="swiper-slide"><div class="anydeath_rolehd"><img src="images/role_ihd2.jpg"></div></li>
+                                    <li class="swiper-slide"><div class="anydeath_rolehd"><img src="images/role_ihd4.jpg"></div></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="anydeath_char_ct anydeath_char_ct3">
+                        <div class="anydeath_char_woman">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide">
+                                    <p class="anydeath-char anydeath_woman1"></p>
+                                    <div class="rolechange cur">
+                                        <span class="anydeath_role_hline"></span>
+                                        <span class="anydeath_role_sline"></span>
+                                        <div class="anydeath_rolename">
+                                            <strong class="anydeath_rolenamep">BULL</strong>
+                                            <div class="anydeath_rolecv" data-cv="alice">
+                                                <span class="anydeath_rolecv_icon"></span>
+                                            </div>
+                                        </div>
+                                        <p class="anydeath_counters">CHARACTER</p>
+                                        <p class="anydeath_rolems">DETAILS WILL BE REVEALED SOON<br>
+                                        ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ</p>                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <p class="anydeath-char anydeath_woman2"></p>
+                                    <div class="rolechange cur">
+                                        <span class="anydeath_role_hline"></span>
+                                        <span class="anydeath_role_sline"></span>
+                                        <div class="anydeath_rolename">
+                                            <strong class="anydeath_rolenamep">SNAKE</strong>
+                                            <div class="anydeath_rolecv" data-cv="exia">
+                                                <span class="anydeath_rolecv_icon"></span>
+                                            </div>
+                                        </div>
+                                        <p class="anydeath_counters">CHARACTER</p>
+                                        <p class="anydeath_rolems">DETAILS WILL BE REVEALED SOON<br>
+                                        ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ</p>                                    </div>
+                                </div>
+                            </div>
+                            <a href="javascript:;" class="anydeath_role_prev" title=""></a>
+                            <a href="javascript:;" class="anydeath_role_next" title=""></a>
+                        </div>
+                        <div class="anydeath_rolechange_wp">
+                            <div class="anydeath_rolechange swiper-v">
+                                <ul class="swiper-wrapper">
+                                    <li class="swiper-slide"><div class="anydeath_rolehd"><img src="images/role_ihd5.jpg"></div></li>
+                                    <li class="swiper-slide"><div class="anydeath_rolehd"><img src="images/role_ihd6.jpg"></div></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="anydeath_char_ct anydeath_char_ct4">
+                        <div class="anydeath_char_woman">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide">
+                                    <p class="anydeath-char anydeath_woman1"></p>
+                                    <div class="rolechange cur">
+                                        <span class="anydeath_role_hline"></span>
+                                        <span class="anydeath_role_sline"></span>
+                                        <div class="anydeath_rolename">
+                                            <strong class="anydeath_rolenamep">MOSQUITO</strong>
+                                            <div class="anydeath_rolecv" data-cv="snowwhite">
+                                                <span class="anydeath_rolecv_icon"></span>
+                                            </div>
+                                        </div>
+                                        <p class="anydeath_counters">MERCENARY</p>
+                                        <p class="anydeath_rolems">DETAILS WILL BE REVEALED SOON<br>
+                                        ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ</p>                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <p class="anydeath-char anydeath_woman2"></p>
+                                    <div class="rolechange cur">
+                                        <span class="anydeath_role_hline"></span>
+                                        <span class="anydeath_role_sline"></span>
+                                        <div class="anydeath_rolename">
+                                            <strong class="anydeath_rolenamep">LIZZARD</strong>
+                                            <div class="anydeath_rolecv" data-cv="hongryeor">
+                                                <span class="anydeath_rolecv_icon"></span>
+                                            </div>
+                                        </div>
+                                        <p class="anydeath_counters">MERCENARY</p>
+                                        <p class="anydeath_rolems">DETAILS WILL BE REVEALED SOON<br>
+                                        ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ</p>                                    </div>
+                                </div>
+                            </div>
+                            <a href="javascript:;" class="anydeath_role_prev" title=""></a>
+                            <a href="javascript:;" class="anydeath_role_next" title=""></a>
+                        </div>
+                        <div class="anydeath_rolechange_wp">
+                            <div class="anydeath_rolechange swiper-v">
+                                <ul class="swiper-wrapper">
+                                    <li class="swiper-slide"><div class="anydeath_rolehd"><img src="images/role_ihd7.jpg"></div></li>
+                                    <li class="swiper-slide"><div class="anydeath_rolehd"><img src="images/role_ihd8.jpg"></div></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- boss -->
+        <div class="anydeath_cont swiper-slide">
+          <div class="anydeath_cont_cbg6">
+            <div class="zomc">
+                <!--<ul class="anydeath_bos clearfix">
+                    <li class="nbs1">
+                        <div class="nbsbox_light"></div>
+                        <div class="nbs_mask">
+                            <span class="anydeath_bos_name"> </span>
+                            <span class="anydeath_box_namepara">View</span>
+                        </div>
+                    </li>
+                    <li class="nbs2">
+                        <div class="nbsbox_light"></div>
+                        <div class="nbs_mask">
+                            <span class="anydeath_bos_name"> </span>
+                        </div>
+                    </li>
+                    <li class="nbs3">
+                        <div class="nbsbox_light"></div>
+                        <div class="nbs_mask">
+                            <span class="anydeath_bos_name"> </span>
+                        </div>
+                    </li>
+                    <li class="nbs4">
+                        <div class="nbsbox_light"></div>
+                        <div class="nbs_mask">
+                            <span class="anydeath_bos_name"> </span>
+                        </div>
+                    </li>
+                    <li class="nbs5">
+                        <div class="nbsbox_light"></div>
+                        <div class="nbs_mask">
+                            <span class="anydeath_bos_name"> </span>
+                        </div>
+                    </li>
+                    <li class="nbs6">
+                        <div class="nbsbox_light"></div>
+                        <div class="nbs_mask">
+                            <span class="anydeath_bos_name"> </span>
+                        </div>
+                    </li>
+                </ul>-->
+            </div>
+          </div>
+            <!-- boss detail -->
+            <!--<div class="anydeath_detail_box">
+                <div class="zomc anydeath_detail_zindex">
+                    <div class="anydeath_detail_bos swiper-v">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide">
+                                <img src="images/m/d_bos5.png" class="anydeath_bos_img">
+                                <div class="anydeath_det_pbox">
+                                    <span class="anydeath_vert_line"></span>
+                                    <span class="anydeath_trans_line"></span>
+                                    <strong class="anydeath_det_bosname">ETHYLYNE</strong>
+                                    <p class="anydeath_det_para"><span class="space"></span> rrrrrrrrrrrrrrorttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.</p>
+                                </div>
+                            </div>
+                            <div class="swiper-slide">
+                                <img src="images/m/d_bos5.png" class="anydeath_bos_img">
+                                <div class="anydeath_det_pbox">
+                                    <span class="anydeath_vert_line"></span>
+                                    <span class="anydeath_trans_line"></span>
+                                    <strong class="anydeath_det_bosname">ETHYLYNE</strong>
+                                    <p class="anydeath_det_para"><span class="space"></span> Vfffffffffffffffffffitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.</p>
+                                </div>
+                            </div>
+                            <div class="swiper-slide">
+                                <img src="images/m/d_bos5.png" class="anydeath_bos_img">
+                                <div class="anydeath_det_pbox">
+                                    <span class="anydeath_vert_line"></span>
+                                    <span class="anydeath_trans_line"></span>
+                                    <strong class="anydeath_det_bosname">ETHYLYNE</strong>
+                                    <p class="anydeath_det_para"><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.</p>
+                                </div>
+                            </div>
+                            <div class="swiper-slide">
+                                <img src="images/m/d_bos5.png" class="anydeath_bos_img">
+                                <div class="anydeath_det_pbox">
+                                    <span class="anydeath_vert_line"></span>
+                                    <span class="anydeath_trans_line"></span>
+                                    <strong class="anydeath_det_bosname">ETHYLYNE</strong>
+                                    <p class="anydeath_det_para"><span class="space"></span> awdawdawdtor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.</p>
+                                </div>
+                            </div>
+                            <div class="swiper-slide">
+                                <img src="images/m/d_bos5.png" class="anydeath_bos_img">
+                                <div class="anydeath_det_pbox">
+                                    <span class="anydeath_vert_line"></span>
+                                    <span class="anydeath_trans_line"></span>
+                                    <strong class="anydeath_det_bosname">ETHYLYNE</strong>
+                                    <p class="anydeath_det_para"><span class="space"></span> aaaaaaaaaaaainia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.</p>
+                                </div>
+                            </div>
+                            <div class="swiper-slide">
+                                <img src="images/m/d_bos5.png" class="anydeath_bos_img">
+                                <div class="anydeath_det_pbox">
+                                    <span class="anydeath_vert_line"></span>
+                                    <span class="anydeath_trans_line"></span>
+                                    <strong class="anydeath_det_bosname">ETHYLYNE</strong>
+                                    <p class="anydeath_det_para"><span class="space"></span> dddddddddddddddddddddr porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.<br><span class="space"></span> Vivamus mattis justo lacinia porttitor porttitor. Vivamus ac ipsum quis felis feugiat rhoncus. Pellentesque sit amet pulvinar nisl.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="javascript:;" class="anydeath_bos_back" title="">BACK <span class="anydeath_bck_icon"></span></a>
+                        <a href="javascript:;" class="anydeath_bos_prev" title=""></a>
+                        <a href="javascript:;" class="anydeath_bos_next" title=""></a>
+                    </div>
+                </div>
+                <div class="anydeath_det_bgbox">
+                    <div class="zomc">
+                        <div class="anydeath_det_left ndg1"></div>
+                        <div class="anydeath_bot_ct"></div>
+                        <div class="anydeath_det_right ndg1"></div>
+                    </div>
+                </div>
+            </div>-->
+        </div>
+
+        <div class="anydeath_cont swiper-slide">
+          <div class="anydeath_cont_cbg9">
+            <div class="zomc">
+                <!--<ul class="anydeath_bos clearfix">
+                    <li class="nbs7">
+                        <div class="nbsbox_light"></div>
+                        <div class="nbs_mask">
+                            <span class="anydeath_bos_name">-</span>
+                        </div>
+                    </li>
+                    <li class="nbs8">
+                        <div class="nbsbox_light"></div>
+                        <div class="nbs_mask">
+                            <span class="anydeath_bos_name">-</span>
+                        </div>
+                    </li>
+                    <li class="nbs9">
+                        <div class="nbsbox_light"></div>
+                        <div class="nbs_mask">
+                            <span class="anydeath_bos_name">-</span>
+                        </div>
+                    </li>
+                    <li class="nbs10">
+                        <div class="nbsbox_light"></div>
+                        <div class="nbs_mask">
+                            <span class="anydeath_bos_name">-</span>
+                        </div>
+                    </li>
+                    <li class="nbs11">
+                        <div class="nbsbox_light"></div>
+                        <div class="nbs_mask">
+                            <span class="anydeath_bos_name">-</span>
+                        </div>
+                    </li>
+                    <li class="nbs12">
+                        <div class="nbsbox_light"></div>
+                        <div class="nbs_mask">
+                            <span class="anydeath_bos_name">-</span>
+                        </div>
+                    </li>
+                </ul>-->
+            </div>
+          </div>
+        </div>
+
+        <div class="anydeath_cont swiper-slide">
+          <div class="anydeath_cont_cbg3">
+
+            <div class="focus_c6"><strong class="anydeath_det_bosname1">TEAM EXPERIENCE</strong></div>
+            <div class="focus_c3">
+              <div class="card rgb">
+                <div class="card-image card5" ></div>
+              </div>
+              <div class="card rgb">
+                <div class="card-image card6" ></div>
+              </div>
+              <div class="card rgb">
+                <div class="card-image card7" ></div>
+              </div>
+              <!--<div class="card rgb">
+                <div class="card-image card8" ></div>
+              </div>-->
+            </div>
+        </div>
+      </div>
+
+        <!-- media -->
+        <div class="anydeath_cont swiper-slide">
+          <div class="focus_c6"><strong class="anydeath_det_bosname1">LIMITED SPOT FOR EARLY INVESTORS!</strong></div>
+          <div class="anydeath_cont_cbg4">
+            <div class="zomc">
+                <div class="focus_c2">
+                  <div class="focus_swip">
+                    <ul class="swiper-wrapper">
+                      <li class="swiper-slide">
+                        <div class="focus_img">
+                          <img src="images/focus_img1.jpg">
+                          <span class="focus_mask"></span>
+                        </div>
+                      </li>
+                      <li class="swiper-slide">
+                        <div class="focus_img">
+                          <img src="images/focus_img2.jpg">
+                          <span class="focus_mask"></span>
+                        </div>
+                      </li>
+                      <li class="swiper-slide">
+                        <div class="focus_img">
+                          <img src="images/focus_img3.jpg">
+                          <span class="focus_mask"></span>
+                        </div>
+                      </li>
+                      <li class="swiper-slide">
+                        <div class="focus_img">
+                          <img src="images/focus_img4.jpg">
+                          <span class="focus_mask"></span>
+                        </div>
+                      </li>
+                      <li class="swiper-slide">
+                        <div class="focus_img">
+                          <img src="images/focus_img5.jpg">
+                          <span class="focus_mask"></span>
+                        </div>
+                      </li>
+                    </ul>
+                    <a href="javascript:;" class="prev_btn" title=""></a>
+                    <a href="javascript:;" class="next_btn" title=""></a>
+                    <div class="focus_prg"></div>
+                  </div>
+                </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="anydeath_cont swiper-slide">
+          <div class="anydeath_cont_cbg8">
+            <div class="focus_c6">
+              <strong class="anydeath_det_bosname1">CONTACT US</strong>
+                <div class="focus_c4">
+              <a href="mailto:business@gainhive.game"><button class="button-49" role="button">HIT ME UP!</button></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- footer -->
+        <div class="anydeath_cont footer swiper-slide">
+            <div class="footer_in">
+                <span class="footer_logo footer_logo2"></span>
+            </div>
+        </div>
+    </div>
+    <div class="anydeath_rpg"></div>
+</div>
+
+<!-- popups -->
+<div class="dav_box" id="videobox" style="display: none">
+    <div class="dav_in">
+        <a href="javascript:videoPlay.closeVideo();" class="dav_close" title>&times;</a>
+        <video src id="audio" preload controls class="video_bd"></video>
+        <div class="video_in" id="videoytb"></div>
+    </div>
+</div>
+<div class="dia" id="d1" style="display: none;">
+    <div class="dia_in">
+        <a href="javascript:dialog.closeDialog();" class="dav_close dia_close" title>&times;</a>
+        <p class="dia_para"><span class="dia_para_ct">COMING SOON</span></p>
+    </div>
+</div>
+
+<script src="js/vanilla-tilt.min.js"></script>
+<script>
+  VanillaTilt.init(document.querySelectorAll(".card"),{
+    glare: true,
+    reverse: true,
+    "max-glare": 0.5
+  });
+</script>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/swiper-bundle.min.js"></script>
+<script type="text/javascript" src="js/indexm3137.js"></script>
+</body>
+
+</html>
