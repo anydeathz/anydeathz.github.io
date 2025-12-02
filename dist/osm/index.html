@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Furkan ve Melis Sohbeti (İyileştirilmiş)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e5ddd5; /* WhatsApp benzeri arka plan rengi */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+        .chat-container {
+            width: 100%;
+            max-width: 700px;
+            padding: 20px 10px;
+            background-color: #ffffff; /* Ana sohbet alanı */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            min-height: 100vh;
+        }
+        .message-box {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .message-content {
+            padding: 10px 12px;
+            border-radius: 8px;
+            max-width: 80%;
+            position: relative;
+            font-size: 15px;
+            line-height: 1.4;
+            box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
+        }
+        .furkan .message-box {
+            justify-content: flex-end; /* Sağ tarafa hizalama */
+        }
+        .furkan .message-content {
+            background-color: #dcf8c6; /* Açık yeşil/Mavi-Yeşil tonu */
+            color: #000;
+            border-bottom-right-radius: 0;
+        }
+        .melis .message-box {
+            justify-content: flex-start; /* Sol tarafa hizalama */
+        }
+        .melis .message-content {
+            background-color: #ffffff; /* Beyaz/Açık Gri tonu */
+            color: #000;
+            border: 1px solid #ccc;
+            border-bottom-left-radius: 0;
+        }
+        .sender-name {
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 2px;
+            display: block;
+            /* Furkan için daha belirgin renk */
+            color: #0088cc;
+        }
+        .melis .sender-name {
+            /* Melis için daha yumuşak renk */
+            color: #6c757d;
+        }
+        .message-text {
+            display: block;
+            word-wrap: break-word;
+        }
+        .timestamp {
+            font-size: 11px;
+            color: #888;
+            margin-top: 5px;
+            text-align: right;
+            display: block;
+        }
+        /* Köşedeki küçük ok */
+        .message-content::before {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+        /* Melis (Sol Ok) */
+        .melis .message-content::before {
+            border-width: 0 10px 10px 0;
+            border-color: transparent #fff transparent transparent;
+            left: -9px;
+            top: 0;
+        }
+        /* Furkan (Sağ Ok) */
+        .furkan .message-content::before {
+            border-width: 10px 0 0 10px;
+            border-color: transparent transparent transparent #dcf8c6;
+            right: -9px;
+            top: 0;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">Evdeydik, beraber yaptigimiz bir gunluk uygulamasi var tamam mi, en basta o gunluk yaziyordu, ben de ona websitesi hazirlamistim oraya yazarsin diye, sonra o da sen de buraya yaz birbirimizinkini okuruz dedi</span>
+                <span class="timestamp">14:53</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="melis">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Melis</span>
+                <span class="message-text">Ee</span>
+                <span class="timestamp">14:53</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">ben de siteyi benim de yazabilecegim sekilde duzenlemistim, ama ben gunluk yazmamis biriyim hayatimda, dolayisiyla yazdigim gunler ve yazmadigim gunler oluyordu</span>
+                <span class="timestamp">14:53</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="melis">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Melis</span>
+                <span class="message-text">ee</span>
+                <span class="timestamp">14:53</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">o da cok hevesliymis surekli bakiyormus, benim yazmadigimi gorunce morali dusuyormus</span>
+                <span class="timestamp">14:53</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">neyse, dun aksam sordu iste neden yazmiyon diye, ben de suan biraz depresifim yazasim gelmiyor demistim</span>
+                <span class="timestamp">14:54</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">bunu sebebi de surekli yeni bir is plani arayip para kazanmaya calisiyor olmam</span>
+                <span class="timestamp">14:54</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">ayni zamanda is yerinde japonca vs okuyamayip yazamayinca da moralman dusuyorum</span>
+                <span class="timestamp">14:54</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">son 1 aydir boyle, surekli yeni is plani dusun, harekete gecirmeye calis sonra basarisiz ol veya burdan is cikmaz diyip biraktim</span>
+                <span class="timestamp">14:55</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">en az 5 tane falan plani</span>
+                <span class="timestamp">14:55</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">neyse, bunlardan dolayi moralim dusuk dedim iste, ondan yazasim yok dedim, moonju da bana he yani yazmak istemiyorsun diyip konusmayi birakti</span>
+                <span class="timestamp">14:55</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="melis">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Melis</span>
+                <span class="message-text">Buna mi takilmis</span>
+                <span class="timestamp">14:56</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">bu gun yine konustuk, dun sen yazasim gelmiyor diyince cok moralim bozuldu cok kotu oldum dedi</span>
+                <span class="timestamp">14:56</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">sen benimle birseyler yapmak istemiyorsun o zaman dedi.</span>
+                <span class="timestamp">14:56</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="melis">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Melis</span>
+                <span class="message-text">Ya abiii</span>
+                <span class="timestamp">14:56</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="melis">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Melis</span>
+                <span class="message-text">Ne alaka aw</span>
+                <span class="timestamp">14:56</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">ben de dedim, moral olarak dusuk bir durumdayim, ondan dolayli dedim seninle bir alakasi yok dedim</span>
+                <span class="timestamp">14:56</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="melis">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Melis</span>
+                <span class="message-text">Hayatta her sey seninle ilgili degil moonji</span>
+                <span class="timestamp">14:56</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">sonra, bana sadece bunu soylersen senin bahane urettigini dusunurum dedi</span>
+                <span class="timestamp">14:56</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">acip siteye 2 kelam yazicaksin nekadar zor olabilir dedi</span>
+                <span class="timestamp">14:57</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">sonra ben sana hep yaz diyorum dedi, sen kendin acip yazmiyorsun dedi</span>
+                <span class="timestamp">14:57</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">ben bunu sana soylerken sanki sana kiziyormus, gorev veriyormus gibi hissediyourm, bu benim kotu hissetmemi sagliyor dedi</span>
+                <span class="timestamp">14:57</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="melis">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Melis</span>
+                <span class="message-text">Sen niye zaten böyle bi site yapiyosun en basta</span>
+                <span class="timestamp">14:57</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">dur</span>
+                <span class="timestamp">14:57</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">sonra konu devam etti, dedim iste mental olarak sende de olmustur bazen evi toplamazsin,bulasik yikamazsin dedim</span>
+                <span class="timestamp">14:58</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">mesela dun veya ondan onceki gun kitap okudun mu dedim (genelde her aksam okuyor) hayir dedi. dedim o zaman sen kitap okumak istemiyor musun</span>
+                <span class="timestamp">14:58</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">dedi evet istemiyorum</span>
+                <span class="timestamp">14:58</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">ben de dedim, hayir sen kitap okumayi seviyorsun istiyorsun, ama su oldu bu oldu 2 gundur okumuyorsun</span>
+                <span class="timestamp">14:59</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">bu senin kitap okumayi sevmedigin veya istemedigin anlamina gelmiyor</span>
+                <span class="timestamp">14:59</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">o da dedi, kitap okumayi istemedigim icin okumadim</span>
+                <span class="timestamp">14:59</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">devam etmeyince orda kesitm ben</span>
+                <span class="timestamp">14:59</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">moonju devam etti, furkan hep boylesin dedi</span>
+                <span class="timestamp">14:59</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">su ise baslayacagim bu ise baslayacagim diy eplanlar kuruyorsun ama sonra devamini getirmiyorsiun</span>
+                <span class="timestamp">15:00</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">biraz yapip, veya arkadaslarinla konusup dusunup birakiyorsun</span>
+                <span class="timestamp">15:00</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">surekli yeni planlar kurup hicbirini devam ettirmiyorsun</span>
+                <span class="timestamp">15:00</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">eskiden furkan dedigini dusundugunu yapan biri diye dusunuyordum fakat suanda furkan sadece soz erkegi olarak dusunuyorum dedi</span>
+                <span class="timestamp">15:00</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">senin amacin sadece birseyler ypaip para kazanmak olursa bu zaten devami gelmez dedi</span>
+                <span class="timestamp">15:01</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">neden bir amacin, yapmak istedigin bir hedefin gorevin yok dedi</span>
+                <span class="timestamp">15:01</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">bunlar olmazsa tabiki kendini bozgun, dargin hissedersin depresif olursun dedi</span>
+                <span class="timestamp">15:01</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">benim gordugum furkan surekli oyun oynayip telefonda takiliyor dedi</span>
+                <span class="timestamp">15:01</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">boyle biriyle gelecedk dusunemem ben dedi</span>
+                <span class="timestamp">15:01</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">dun de mesela sana linked in ac demistim bnei direk reddetmistin dedi</span>
+                <span class="timestamp">15:02</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">sonra eve gelince acmistin linked in hesabini dedi</span>
+                <span class="timestamp">15:02</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">ve yeni seyler farkedip nasil mutlu olmustun dedi</span>
+                <span class="timestamp">15:02</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">ama sirf ben dedim diye linkedin acarsan bunun da bir anlami yok dedi.</span>
+                <span class="timestamp">15:02</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">sen kendin hedefler koyup calisip o hedeflere yurumen lazim vs</span>
+                <span class="timestamp">15:02</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">burada yine sadece oyun oynayip tlf da gezdigime dokundu</span>
+                <span class="timestamp">15:03</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">ben de sustum</span>
+                <span class="timestamp">15:03</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">ne dusunuyorsun</span>
+                <span class="timestamp">15:03</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="melis">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Melis</span>
+                <span class="message-text">Moonji dedi djye kestirip attigin seyler oldu mu</span>
+                <span class="timestamp">15:03</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">nasil yani</span>
+                <span class="timestamp">15:04</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="melis">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Melis</span>
+                <span class="message-text">Linkedn mesela ilk başta o dediginde ise yaramaz demişsin sonra begenmissin ya</span>
+                <span class="timestamp">15:04</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="melis">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Melis</span>
+                <span class="message-text">Bunlar cok oluyor mu</span>
+                <span class="timestamp">15:05</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">simdi soyle, linkedin i benim de yapasim vardi. yapacaktim ama 1 hafta onceden beri yapicam diyordum</span>
+                <span class="timestamp">15:05</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">sonra o da bahsetti. sonra ben de evde o varken oyun oynamayayim diyip onu yapmistim</span>
+                <span class="timestamp">15:05</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">yani reddetim diye yazdim ama reddetmemistim aslinda</span>
+                <span class="timestamp">15:05</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">ve evet bu kiz evdeyken korkudan oyun oynayamiyorum</span>
+                <span class="timestamp">15:06</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="furkan">
+        <div class="message-box">
+            <div class="message-content">
+                <span class="sender-name">Furkan</span>
+                <span class="message-text">ve evet kiz evde degilken oyun oynuyorum</span>
+                <span class="timestamp">15:06</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
