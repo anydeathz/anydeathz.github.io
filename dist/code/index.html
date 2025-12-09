@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Code & Text Sharer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b; /* slate-800 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569; /* slate-600 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b; /* slate-500 */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Style for code blocks */
+        pre {
+            font-family: 'Fira Code', monospace;
+            background-color: #0f172a; /* slate-900 */
+            color: #e2e8f0; /* slate-200 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-300 flex flex-col h-screen">
+
+    <!-- Header -->
+    <header class="bg-slate-800/50 backdrop-blur-sm p-3 border-b border-slate-700 shadow-md sticky top-0 z-10">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold text-white">Code & Text Sharer</h1>
+            <div class="text-right">
+                <p class="text-xs text-slate-400">Your User ID (Share with others to identify you):</p>
+                <p id="userIdDisplay" class="font-mono text-sm bg-slate-700 px-2 py-1 rounded text-white"></p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Chat Area -->
+    <main id="chat-container" class="flex-1 overflow-y-auto p-4">
+        <div id="messages" class="max-w-4xl mx-auto space-y-4">
+            <!-- Messages will be dynamically inserted here -->
+            <div id="loading" class="text-center py-10">
+                <p class="text-slate-400">Connecting to the session...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Message Input Form -->
+    <footer class="bg-slate-800 p-4 border-t border-slate-700 sticky bottom-0">
+        <div class="max-w-4xl mx-auto">
+            <form id="message-form" class="flex flex-col sm:flex-row items-start gap-3">
+                <div class="flex-1 w-full">
+                    <textarea id="message-input" class="w-full bg-slate-700 text-slate-200 rounded-md p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition resize-none disabled:opacity-50" rows="2" placeholder="Connecting..." disabled></textarea>
+                    <div id="edit-controls" class="hidden mt-2 flex gap-2">
+                         <button type="button" id="save-edit-btn" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200">Save</button>
+                         <button type="button" id="cancel-edit-btn" class="px-4 py-2 bg-slate-600 text-white rounded-md hover:bg-slate-700 transition duration-200">Cancel</button>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2 w-full sm:w-auto">
+                    <button type="submit" id="send-btn" class="w-full px-5 py-3 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition duration-200 shadow-lg flex items-center justify-center gap-2 disabled:bg-indigo-400 disabled:cursor-not-allowed" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        Send
+                    </button>
+                    <div class="flex items-center justify-center bg-slate-700 rounded-md px-3 py-1">
+                        <input id="is-code-checkbox" type="checkbox" class="h-4 w-4 rounded bg-slate-600 border-slate-500 text-indigo-600 focus:ring-indigo-500">
+                        <label for="is-code-checkbox" class="ml-2 text-sm text-slate-300">Format as code</label>
+                    </div>
+                </div>
+            </form>
+            <div id="toast" class="fixed bottom-20 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-xl translate-x-[120%] transition-transform duration-300">
+                Copied to clipboard!
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        // -------------------------------------------
+        // Firebase SDK Imports
+        // -------------------------------------------
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, doc, updateDoc, setLogLevel, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // -------------------------------------------
+        // Firebase Configuration and Initialization
+        // -------------------------------------------
+        const defaultConfig = {
+            apiKey: "AIzaSyD8gz9CUwiM5GlvIi88LOE33nCYMA5XYGo",
+            authDomain: "chat-f26b4.firebaseapp.com",
+            projectId: "chat-f26b4",
+            storageBucket: "chat-f26b4.firebasestorage.app",
+            messagingSenderId: "479898349306",
+            appId: "1:479898349306:web:4daac91ead80c86d3be343",
+            measurementId: "G-GPC5PPTDBB"
+        };
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : JSON.stringify(defaultConfig));
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-public-chat';
+        
+        let app, auth, db, userId, unsubscribe;
+
+        // A variable to track the message being edited
+        let editingMessageId = null;
+
+        // DOM Element References
+        const messagesContainer = document.getElementById('messages');
+        const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message-input');
+        const isCodeCheckbox = document.getElementById('is-code-checkbox');
+        const userIdDisplay = document.getElementById('userIdDisplay');
+        const loadingIndicator = document.getElementById('loading');
+        const sendBtn = document.getElementById('send-btn');
+        const saveEditBtn = document.getElementById('save-edit-btn');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        const editControls = document.getElementById('edit-controls');
+        const toast = document.getElementById('toast');
+        const chatContainer = document.getElementById('chat-container');
+
+        // -------------------------------------------
+        // Main Application Logic
+        // -------------------------------------------
+        function initializeFirebase() {
+             if (Object.keys(firebaseConfig).length === 0 || !firebaseConfig.apiKey) {
+                console.error("Firebase config is not available.");
+                loadingIndicator.textContent = "Error: Firebase configuration is missing. Cannot connect.";
+                return;
+            }
+            try {
+                app = initializeApp(firebaseConfig);
+                const analytics = getAnalytics(app);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                setLogLevel('debug'); // Enable detailed logging for debugging
+                handleAuthentication();
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+                loadingIndicator.textContent = "Error initializing the application.";
+            }
+        }
+
+        function handleAuthentication() {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    // User is signed in.
+                    userId = user.uid;
+                    userIdDisplay.textContent = userId;
+
+                    // Enable form now that we are authenticated
+                    messageInput.disabled = false;
+                    sendBtn.disabled = false;
+                    messageInput.placeholder = "Type your message or paste code here...";
+
+                    // Now that we have a user, listen for messages
+                    listenForMessages();
+                } else {
+                    // User is signed out. Attempt to sign in.
+                    try {
+                        const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                        if (token) {
+                            await signInWithCustomToken(auth, token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (error) {
+                        console.error("Authentication failed:", error);
+                        loadingIndicator.textContent = "Authentication failed. Please refresh.";
+                        messageInput.placeholder = "Authentication failed.";
+                    }
+                }
+            });
+        }
+
+        function listenForMessages() {
+            const messagesCollectionPath = `artifacts/${appId}/public/data/sharer_messages`;
+            const messagesRef = collection(db, messagesCollectionPath);
+            const q = query(messagesRef, orderBy("timestamp"));
+
+            if (unsubscribe) unsubscribe(); // Unsubscribe from previous listener if it exists
+
+            unsubscribe = onSnapshot(q, (snapshot) => {
+                loadingIndicator.style.display = 'none';
+                const messages = [];
+                snapshot.forEach(doc => {
+                    messages.push({ id: doc.id, ...doc.data() });
+                });
+                
+                renderMessages(messages);
+            }, (error) => {
+                console.error("Error fetching messages: ", error);
+                loadingIndicator.style.display = 'none';
+                messagesContainer.innerHTML = `
+                    <div class="bg-red-900/50 border border-red-500/50 text-red-300 p-4 rounded-lg text-left max-w-2xl mx-auto">
+                        <h3 class="font-bold text-red-200">Error Loading Messages</h3>
+                        <p class="mt-2 text-sm">Could not connect to the message session. This is almost always caused by incorrect Firebase Security Rules.</p>
+                        <p class="mt-2 text-sm">Please go to your Firestore Database rules in the Firebase Console and ensure they allow public read access for the collection.</p>
+                        <div class="mt-3 font-mono text-xs bg-slate-800 p-2 rounded space-y-1">
+                           <p><strong>Required Path:</strong></p>
+                           <p class="break-all">/artifacts/${appId}/public/data/sharer_messages/{messageId}</p>
+                           <p class="pt-2"><strong>Example Rule:</strong></p>
+                           <p>"allow read: if true;"</p>
+                        </div>
+                        <hr class="border-red-500/50 my-3">
+                        <p class="text-xs text-red-400"><strong>Detailed Error:</strong> ${escapeHtml(error.message)}</p>
+                    </div>
+                `;
+            });
+        }
+        
+        function renderMessages(messages) {
+            messagesContainer.innerHTML = ''; // Clear existing messages
+            if (messages.length === 0) {
+                 messagesContainer.innerHTML = `<div class="text-center py-10"><p class="text-slate-400">No messages yet. Be the first to say something!</p></div>`;
+            } else {
+                messages.forEach(msg => {
+                    const msgElement = createMessageElement(msg);
+                    messagesContainer.appendChild(msgElement);
+                });
+                // Scroll to the latest message
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
+
+        function createMessageElement(msg) {
+            const isAuthor = msg.userId === userId;
+            const div = document.createElement('div');
+            
+            // Generate a color based on the userId
+            const userColor = getUserColor(msg.userId);
+
+            div.className = 'flex flex-col';
+            div.id = `msg-${msg.id}`;
+
+            const contentHTML = msg.isCode 
+                ? `<pre><code class="language-plaintext">${escapeHtml(msg.text)}</code></pre>`
+                : `<p class="text-slate-200 whitespace-pre-wrap">${escapeHtml(msg.text)}</p>`;
+
+            div.innerHTML = `
+                <div class="text-xs mb-1 flex items-center">
+                    <span class="font-semibold" style="color: ${userColor};">${msg.userId ? msg.userId.substring(0, 8) : 'anon'}...</span>
+                    <span class="ml-2 text-slate-500">${msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString() : ''}</span>
+                </div>
+                <div class="bg-slate-800 rounded-lg p-1 group relative">
+                     ${contentHTML}
+                     <div class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button data-action="copy" data-text="${escapeHtml(msg.text)}" class="p-1.5 bg-slate-700 hover:bg-slate-600 rounded-md">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 8a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2A.5.5 0 0 1-1 8z"/></svg>
+                        </button>
+                        ${isAuthor ? `
+                        <button data-action="edit" data-id="${msg.id}" data-text="${escapeHtml(msg.text)}" data-is-code="${msg.isCode}" class="p-1.5 bg-slate-700 hover:bg-slate-600 rounded-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/><path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/></svg>
+                        </button>` : ''}
+                     </div>
+                </div>
+            `;
+            return div;
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            const text = messageInput.value.trim();
+            if (text === '') return;
+            
+            const messagesCollectionPath = `artifacts/${appId}/public/data/sharer_messages`;
+            console.log(`Attempting to send message to: ${messagesCollectionPath} with userId: ${userId}`);
+
+            try {
+                const docRef = await addDoc(collection(db, messagesCollectionPath), {
+                    userId: userId,
+                    text: text,
+                    isCode: isCodeCheckbox.checked,
+                    timestamp: serverTimestamp()
+                });
+                console.log("Message sent successfully with ID: ", docRef.id);
+                messageInput.value = '';
+                isCodeCheckbox.checked = false;
+                messageInput.style.height = 'auto'; // Reset height after send
+                messageInput.focus();
+            } catch (error) {
+                console.error("Error sending message:", error);
+                showToast("Could not send message. Please try again.", true);
+            }
+        }
+        
+        function handleMessageActions(e) {
+            const target = e.target.closest('button');
+            if (!target) return;
+
+            const action = target.dataset.action;
+            if (action === 'copy') {
+                copyToClipboard(target.dataset.text);
+            } else if (action === 'edit') {
+                startEditing(target.dataset);
+            }
+        }
+        
+        function startEditing(data) {
+             if (editingMessageId) {
+                // If already editing, cancel the previous one
+                cancelEditing();
+            }
+
+            editingMessageId = data.id;
+            messageInput.value = data.text;
+            isCodeCheckbox.checked = data.isCode === 'true';
+
+            // Hide send button and show edit controls
+            sendBtn.style.display = 'none';
+            isCodeCheckbox.parentElement.style.display = 'none';
+            editControls.classList.remove('hidden');
+
+            // Hide the original message
+            document.getElementById(`msg-${editingMessageId}`).style.display = 'none';
+            messageInput.focus();
+            autoResizeTextarea();
+        }
+
+        async function saveEdit() {
+            const newText = messageInput.value.trim();
+            if (!editingMessageId || newText === '') return;
+
+            const docRef = doc(db, `artifacts/${appId}/public/data/sharer_messages`, editingMessageId);
+            try {
+                await updateDoc(docRef, {
+                    text: newText,
+                    isCode: isCodeCheckbox.checked
+                });
+            } catch (error) {
+                console.error("Error updating document: ", error);
+                showToast("Failed to save changes.", true);
+            } finally {
+                cancelEditing(); // Reset UI regardless of success
+            }
+        }
+        
+        function cancelEditing() {
+            if (editingMessageId) {
+                 document.getElementById(`msg-${editingMessageId}`).style.display = 'flex';
+            }
+            editingMessageId = null;
+            messageInput.value = '';
+            isCodeCheckbox.checked = false;
+            
+            sendBtn.style.display = 'flex';
+            isCodeCheckbox.parentElement.style.display = 'flex';
+            editControls.classList.add('hidden');
+            messageInput.style.height = 'auto';
+        }
+
+        // -------------------------------------------
+        // Helper Functions
+        // -------------------------------------------
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast("Copied to clipboard!");
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                showToast("Failed to copy!", true);
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function showToast(message, isError = false) {
+            toast.textContent = message;
+            toast.className = `fixed bottom-20 right-5 text-white py-2 px-4 rounded-lg shadow-xl translate-x-0 transition-transform duration-300 ${isError ? 'bg-red-500' : 'bg-green-500'}`;
+            setTimeout(() => {
+                toast.style.transform = 'translateX(120%)';
+            }, 2000);
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+        
+        function autoResizeTextarea() {
+            messageInput.style.height = 'auto'; // Reset height
+            messageInput.style.height = (messageInput.scrollHeight) + 'px';
+        }
+        
+        function getUserColor(id) {
+            if (!id) return '#94a3b8'; // slate-400
+            let hash = 0;
+            for (let i = 0; i < id.length; i++) {
+                hash = id.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            let color = '#';
+            for (let i = 0; i < 3; i++) {
+                let value = (hash >> (i * 8)) & 0xFF;
+                // Make colors brighter
+                value = Math.floor((value + 255) / 2);
+                color += ('00' + value.toString(16)).substr(-2);
+            }
+            return color;
+        }
+
+        // -------------------------------------------
+        // Event Listeners
+        // -------------------------------------------
+        messageForm.addEventListener('submit', handleFormSubmit);
+        messagesContainer.addEventListener('click', handleMessageActions);
+        messageInput.addEventListener('input', autoResizeTextarea);
+        
+        saveEditBtn.addEventListener('click', saveEdit);
+        cancelEditBtn.addEventListener('click', cancelEditing);
+        
+        // Allow sending with Enter, but new line with Shift+Enter
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if(editingMessageId) {
+                    saveEditBtn.click();
+                } else {
+                    messageForm.requestSubmit();
+                }
+            }
+        });
+
+        // Initialize the application on load
+        document.addEventListener('DOMContentLoaded', initializeFirebase);
+
+    </script>
+</body>
+</html>
+
+
+
+
+
