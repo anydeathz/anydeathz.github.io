@@ -26,6 +26,12 @@
         body {
             font-family: 'Inter', sans-serif;
         }
+
+        /* Smooth scrolling */
+        #chat-container {
+            scroll-behavior: smooth;
+        }
+
         /* Style for code blocks */
         pre {
             font-family: 'Fira Code', monospace;
@@ -37,20 +43,226 @@
             white-space: pre-wrap;
             word-wrap: break-word;
         }
+
+        /* Message animations */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes buttonClick {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes successPulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+
+        .message-enter {
+            animation: slideInUp 0.4s ease-out;
+        }
+
+        .button-click-animation {
+            animation: buttonClick 0.2s ease-out;
+        }
+
+        .send-success {
+            animation: successPulse 0.6s ease-out;
+        }
+
+        .typing-indicator {
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #64748b;
+            border-radius: 50%;
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        /* Modal animations */
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: scale(0.9) translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-backdrop {
+            animation: modalFadeIn 0.2s ease-out;
+        }
+
+        .modal-content {
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        /* Search highlight */
+        .search-highlight {
+            background-color: #fbbf24;
+            color: #1e293b;
+            padding: 2px 4px;
+            border-radius: 2px;
+            font-weight: 600;
+        }
+
+        /* Collapsed message */
+        .message-collapsed {
+            max-height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .message-collapsed::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(to bottom, transparent, #1e293b);
+        }
+
+        /* Search container animations */
+        @keyframes slideDown {
+            from {
+                max-height: 0;
+                opacity: 0;
+            }
+            to {
+                max-height: 100px;
+                opacity: 1;
+            }
+        }
+
+        .search-container {
+            animation: slideDown 0.3s ease-out;
+        }
+
+        /* Scroll to bottom button */
+        .scroll-to-bottom {
+            transition: all 0.3s ease;
+        }
+
+        .scroll-to-bottom.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px);
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-300 flex flex-col h-screen">
 
     <!-- Header -->
-    <header class="bg-slate-800/50 backdrop-blur-sm p-3 border-b border-slate-700 shadow-md sticky top-0 z-10">
-        <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold text-white">Code & Text Sharer</h1>
-            <div class="text-right">
-                <p class="text-xs text-slate-400">Your User ID (Share with others to identify you):</p>
-                <p id="userIdDisplay" class="font-mono text-sm bg-slate-700 px-2 py-1 rounded text-white"></p>
+    <header class="bg-slate-800/50 backdrop-blur-sm border-b border-slate-700 shadow-md sticky top-0 z-10">
+        <div class="max-w-4xl mx-auto p-3">
+            <div class="flex justify-between items-center">
+                <h1 class="text-xl font-bold text-white">Code & Text Sharer</h1>
+                <div class="flex items-center gap-3">
+                    <!-- Search Button -->
+                    <button id="search-toggle-btn" class="p-2 hover:bg-slate-700 rounded-md transition duration-200" title="Search messages (Ctrl+K)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                        </svg>
+                    </button>
+                    <div class="text-right">
+                        <p class="text-xs text-slate-400">Your User ID:</p>
+                        <p id="userIdDisplay" class="font-mono text-sm bg-slate-700 px-2 py-1 rounded text-white"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Bar (Hidden by default) -->
+            <div id="search-container" class="hidden mt-3 search-container">
+                <div class="flex gap-2">
+                    <input
+                        type="text"
+                        id="search-input"
+                        placeholder="Search messages..."
+                        class="flex-1 bg-slate-700 text-slate-200 rounded-md px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                    />
+                    <button id="export-search-btn" class="hidden px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition duration-200 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                        </svg>
+                        Export
+                    </button>
+                    <button id="search-close-btn" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-md transition duration-200">
+                        Clear
+                    </button>
+                </div>
+                <div id="search-results-info" class="mt-2 text-sm text-slate-400"></div>
             </div>
         </div>
     </header>
+
+    <!-- Typing Indicator -->
+    <div id="typing-indicator-container" class="hidden bg-slate-800/30 px-4 py-2 max-w-4xl mx-auto w-full">
+        <div class="flex items-center gap-2 text-sm text-slate-400">
+            <span id="typing-user-name">Someone</span>
+            <span>is typing</span>
+            <div class="typing-indicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+    </div>
 
     <!-- Main Chat Area -->
     <main id="chat-container" class="flex-1 overflow-y-auto p-4">
@@ -61,6 +273,13 @@
             </div>
         </div>
     </main>
+
+    <!-- Scroll to Bottom Button -->
+    <button id="scroll-to-bottom-btn" class="scroll-to-bottom hidden fixed bottom-32 right-8 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg z-20">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"/>
+        </svg>
+    </button>
 
     <!-- Message Input Form -->
     <footer class="bg-slate-800 p-4 border-t border-slate-700 sticky bottom-0">
@@ -90,6 +309,22 @@
         </div>
     </footer>
 
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 modal-backdrop">
+        <div class="bg-slate-800 rounded-lg p-6 max-w-md w-full mx-4 border border-slate-700 modal-content">
+            <h3 class="text-xl font-bold text-white mb-4">Delete Message</h3>
+            <p class="text-slate-300 mb-6">Are you sure you want to delete this message? This action cannot be undone.</p>
+            <div class="flex gap-3 justify-end">
+                <button id="delete-cancel-btn" class="px-4 py-2 bg-slate-600 text-white rounded-md hover:bg-slate-700 transition duration-200">
+                    Cancel
+                </button>
+                <button id="delete-confirm-btn" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-200">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         // -------------------------------------------
         // Firebase SDK Imports
@@ -97,7 +332,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, doc, updateDoc, setLogLevel, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, doc, updateDoc, deleteDoc, setLogLevel, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // -------------------------------------------
         // Firebase Configuration and Initialization
@@ -113,11 +348,15 @@
         };
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : JSON.stringify(defaultConfig));
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-public-chat';
-        
-        let app, auth, db, userId, unsubscribe;
 
-        // A variable to track the message being edited
+        let app, auth, db, userId, unsubscribe;
         let editingMessageId = null;
+        let messageToDelete = null;
+        let allMessages = [];
+        let searchActive = false;
+        let typingTimeout = null;
+        let isUserAtBottom = true;
+        let currentFilteredMessages = [];
 
         // DOM Element References
         const messagesContainer = document.getElementById('messages');
@@ -132,6 +371,16 @@
         const editControls = document.getElementById('edit-controls');
         const toast = document.getElementById('toast');
         const chatContainer = document.getElementById('chat-container');
+        const deleteModal = document.getElementById('delete-modal');
+        const deleteCancelBtn = document.getElementById('delete-cancel-btn');
+        const deleteConfirmBtn = document.getElementById('delete-confirm-btn');
+        const searchToggleBtn = document.getElementById('search-toggle-btn');
+        const searchContainer = document.getElementById('search-container');
+        const searchInput = document.getElementById('search-input');
+        const searchCloseBtn = document.getElementById('search-close-btn');
+        const searchResultsInfo = document.getElementById('search-results-info');
+        const scrollToBottomBtn = document.getElementById('scroll-to-bottom-btn');
+        const exportSearchBtn = document.getElementById('export-search-btn');
 
         // -------------------------------------------
         // Main Application Logic
@@ -147,7 +396,7 @@
                 const analytics = getAnalytics(app);
                 auth = getAuth(app);
                 db = getFirestore(app);
-                setLogLevel('debug'); // Enable detailed logging for debugging
+                setLogLevel('debug');
                 handleAuthentication();
             } catch (error) {
                 console.error("Error initializing Firebase:", error);
@@ -158,19 +407,15 @@
         function handleAuthentication() {
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
-                    // User is signed in.
                     userId = user.uid;
-                    userIdDisplay.textContent = userId;
+                    userIdDisplay.textContent = userId.substring(0, 12) + '...';
 
-                    // Enable form now that we are authenticated
                     messageInput.disabled = false;
                     sendBtn.disabled = false;
                     messageInput.placeholder = "Type your message or paste code here...";
 
-                    // Now that we have a user, listen for messages
                     listenForMessages();
                 } else {
-                    // User is signed out. Attempt to sign in.
                     try {
                         const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
                         if (token) {
@@ -192,7 +437,7 @@
             const messagesRef = collection(db, messagesCollectionPath);
             const q = query(messagesRef, orderBy("timestamp"));
 
-            if (unsubscribe) unsubscribe(); // Unsubscribe from previous listener if it exists
+            if (unsubscribe) unsubscribe();
 
             unsubscribe = onSnapshot(q, (snapshot) => {
                 loadingIndicator.style.display = 'none';
@@ -200,8 +445,14 @@
                 snapshot.forEach(doc => {
                     messages.push({ id: doc.id, ...doc.data() });
                 });
-                
-                renderMessages(messages);
+
+                allMessages = messages;
+
+                if (searchActive) {
+                    performSearch();
+                } else {
+                    renderMessages(messages);
+                }
             }, (error) => {
                 console.error("Error fetching messages: ", error);
                 loadingIndicator.style.display = 'none';
@@ -222,49 +473,77 @@
                 `;
             });
         }
-        
-        function renderMessages(messages) {
-            messagesContainer.innerHTML = ''; // Clear existing messages
+
+        function renderMessages(messages, highlightTerm = null) {
+            const wasAtBottom = isUserNearBottom();
+
+            messagesContainer.innerHTML = '';
             if (messages.length === 0) {
                  messagesContainer.innerHTML = `<div class="text-center py-10"><p class="text-slate-400">No messages yet. Be the first to say something!</p></div>`;
             } else {
-                messages.forEach(msg => {
-                    const msgElement = createMessageElement(msg);
+                messages.forEach((msg, index) => {
+                    const msgElement = createMessageElement(msg, highlightTerm);
                     messagesContainer.appendChild(msgElement);
+
+                    // Add entrance animation with slight delay for staggered effect
+                    setTimeout(() => {
+                        msgElement.classList.add('message-enter');
+                    }, index * 30);
                 });
-                // Scroll to the latest message
-                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                if (wasAtBottom) {
+                    scrollToBottom(true);
+                }
             }
         }
 
-        function createMessageElement(msg) {
+        function createMessageElement(msg, highlightTerm = null) {
             const isAuthor = msg.userId === userId;
             const div = document.createElement('div');
-            
-            // Generate a color based on the userId
+
             const userColor = getUserColor(msg.userId);
 
             div.className = 'flex flex-col';
             div.id = `msg-${msg.id}`;
 
-            const contentHTML = msg.isCode 
-                ? `<pre><code class="language-plaintext">${escapeHtml(msg.text)}</code></pre>`
-                : `<p class="text-slate-200 whitespace-pre-wrap">${escapeHtml(msg.text)}</p>`;
+            let displayText = escapeHtml(msg.text);
+
+            // Apply search highlighting if a search term is provided
+            if (highlightTerm) {
+                const regex = new RegExp(`(${escapeRegex(highlightTerm)})`, 'gi');
+                displayText = displayText.replace(regex, '<span class="search-highlight">$1</span>');
+            }
+
+            // Check if message is long (more than 500 characters or 10 lines)
+            const isLongMessage = msg.text.length > 500 || msg.text.split('\n').length > 10;
+            const messageClass = isLongMessage ? 'message-collapsed' : '';
+            const messageId = `msg-content-${msg.id}`;
+
+            const contentHTML = msg.isCode
+                ? `<pre id="${messageId}" class="${messageClass}"><code class="language-plaintext">${displayText}</code></pre>`
+                : `<p id="${messageId}" class="text-slate-200 whitespace-pre-wrap ${messageClass}">${displayText}</p>`;
 
             div.innerHTML = `
                 <div class="text-xs mb-1 flex items-center">
                     <span class="font-semibold" style="color: ${userColor};">${msg.userId ? msg.userId.substring(0, 8) : 'anon'}...</span>
                     <span class="ml-2 text-slate-500">${msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString() : ''}</span>
                 </div>
-                <div class="bg-slate-800 rounded-lg p-1 group relative">
+                <div class="bg-slate-800 rounded-lg p-3 group relative">
                      ${contentHTML}
-                     <div class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button data-action="copy" data-text="${escapeHtml(msg.text)}" class="p-1.5 bg-slate-700 hover:bg-slate-600 rounded-md">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 8a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2A.5.5 0 0 1-1 8z"/></svg>
+                     ${isLongMessage ? `
+                     <button data-action="toggle-expand" data-id="${msg.id}" class="mt-2 text-indigo-400 hover:text-indigo-300 text-sm font-medium transition">
+                        Read more
+                     </button>` : ''}
+                     <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button data-action="copy" data-text="${escapeHtml(msg.text)}" class="action-btn p-1.5 bg-slate-700 hover:bg-slate-600 rounded-md transition duration-200" title="Copy">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
                         </button>
                         ${isAuthor ? `
-                        <button data-action="edit" data-id="${msg.id}" data-text="${escapeHtml(msg.text)}" data-is-code="${msg.isCode}" class="p-1.5 bg-slate-700 hover:bg-slate-600 rounded-md">
+                        <button data-action="edit" data-id="${msg.id}" data-text="${escapeHtml(msg.text)}" data-is-code="${msg.isCode}" class="action-btn p-1.5 bg-slate-700 hover:bg-slate-600 rounded-md transition duration-200" title="Edit">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/><path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/></svg>
+                        </button>
+                        <button data-action="delete" data-id="${msg.id}" class="action-btn p-1.5 bg-slate-700 hover:bg-red-600 rounded-md transition duration-200" title="Delete">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>
                         </button>` : ''}
                      </div>
                 </div>
@@ -276,11 +555,17 @@
             e.preventDefault();
             const text = messageInput.value.trim();
             if (text === '') return;
-            
+
             const messagesCollectionPath = `artifacts/${appId}/public/data/sharer_messages`;
             console.log(`Attempting to send message to: ${messagesCollectionPath} with userId: ${userId}`);
 
             try {
+                // Add success animation to send button
+                sendBtn.classList.add('send-success');
+                setTimeout(() => {
+                    sendBtn.classList.remove('send-success');
+                }, 600);
+
                 const docRef = await addDoc(collection(db, messagesCollectionPath), {
                     userId: userId,
                     text: text,
@@ -288,31 +573,59 @@
                     timestamp: serverTimestamp()
                 });
                 console.log("Message sent successfully with ID: ", docRef.id);
+
                 messageInput.value = '';
                 isCodeCheckbox.checked = false;
-                messageInput.style.height = 'auto'; // Reset height after send
+                messageInput.style.height = 'auto';
                 messageInput.focus();
+
+                // Show success toast
+                showToast("Message sent!", false);
+
+                // Scroll to bottom after sending
+                setTimeout(() => scrollToBottom(true), 100);
             } catch (error) {
                 console.error("Error sending message:", error);
                 showToast("Could not send message. Please try again.", true);
             }
         }
-        
+
         function handleMessageActions(e) {
             const target = e.target.closest('button');
             if (!target) return;
 
             const action = target.dataset.action;
+
+            // Add click animation
+            target.classList.add('button-click-animation');
+            setTimeout(() => {
+                target.classList.remove('button-click-animation');
+            }, 200);
+
             if (action === 'copy') {
                 copyToClipboard(target.dataset.text);
             } else if (action === 'edit') {
                 startEditing(target.dataset);
+            } else if (action === 'delete') {
+                showDeleteModal(target.dataset.id);
+            } else if (action === 'toggle-expand') {
+                toggleMessageExpansion(target.dataset.id, target);
             }
         }
-        
+
+        function toggleMessageExpansion(msgId, button) {
+            const content = document.getElementById(`msg-content-${msgId}`);
+            if (content.classList.contains('message-collapsed')) {
+                content.classList.remove('message-collapsed');
+                button.textContent = 'Read less';
+            } else {
+                content.classList.add('message-collapsed');
+                button.textContent = 'Read more';
+            }
+        }
+
         function startEditing(data) {
              if (editingMessageId) {
-                // If already editing, cancel the previous one
                 cancelEditing();
             }
 
@@ -320,13 +633,11 @@
             messageInput.value = data.text;
             isCodeCheckbox.checked = data.isCode === 'true';
 
-            // Hide send button and show edit controls
             sendBtn.style.display = 'none';
             isCodeCheckbox.parentElement.style.display = 'none';
             editControls.classList.remove('hidden');
 
-            // Hide the original message
-            document.getElementById(`msg-${editingMessageId}`).style.display = 'none';
+            document.getElementById(`msg-${editingMessageId}`).style.opacity = '0.5';
             messageInput.focus();
             autoResizeTextarea();
         }
@@ -341,26 +652,190 @@
                     text: newText,
                     isCode: isCodeCheckbox.checked
                 });
+                showToast("Message updated!", false);
             } catch (error) {
                 console.error("Error updating document: ", error);
                 showToast("Failed to save changes.", true);
             } finally {
-                cancelEditing(); // Reset UI regardless of success
+                cancelEditing();
             }
         }
-        
+
         function cancelEditing() {
             if (editingMessageId) {
-                 document.getElementById(`msg-${editingMessageId}`).style.display = 'flex';
+                 const msgElement = document.getElementById(`msg-${editingMessageId}`);
+                 if (msgElement) {
+                     msgElement.style.opacity = '1';
+                 }
             }
             editingMessageId = null;
             messageInput.value = '';
             isCodeCheckbox.checked = false;
-            
+
             sendBtn.style.display = 'flex';
             isCodeCheckbox.parentElement.style.display = 'flex';
             editControls.classList.add('hidden');
             messageInput.style.height = 'auto';
+        }
+
+        function showDeleteModal(msgId) {
+            messageToDelete = msgId;
+            deleteModal.classList.remove('hidden');
+        }
+
+        function hideDeleteModal() {
+            messageToDelete = null;
+            deleteModal.classList.add('hidden');
+        }
+
+        async function confirmDelete() {
+            if (!messageToDelete) return;
+
+            const docRef = doc(db, `artifacts/${appId}/public/data/sharer_messages`, messageToDelete);
+            try {
+                await deleteDoc(docRef);
+                showToast("Message deleted!", false);
+            } catch (error) {
+                console.error("Error deleting document: ", error);
+                showToast("Failed to delete message.", true);
+            } finally {
+                hideDeleteModal();
+            }
+        }
+
+        // -------------------------------------------
+        // Search Functionality
+        // -------------------------------------------
+        function toggleSearch() {
+            if (searchContainer.classList.contains('hidden')) {
+                searchContainer.classList.remove('hidden');
+                searchInput.focus();
+            } else {
+                closeSearch();
+            }
+        }
+
+        function closeSearch() {
+            searchContainer.classList.add('hidden');
+            searchInput.value = '';
+            searchResultsInfo.textContent = '';
+            searchActive = false;
+            currentFilteredMessages = [];
+            exportSearchBtn.classList.add('hidden');
+            renderMessages(allMessages);
+        }
+
+        function performSearch() {
+            const searchTerm = searchInput.value.trim().toLowerCase();
+
+            if (searchTerm === '') {
+                searchActive = false;
+                searchResultsInfo.textContent = '';
+                currentFilteredMessages = [];
+                exportSearchBtn.classList.add('hidden');
+                renderMessages(allMessages);
+                return;
+            }
+
+            searchActive = true;
+            const filteredMessages = allMessages.filter(msg =>
+                msg.text.toLowerCase().includes(searchTerm)
+            );
+
+            currentFilteredMessages = filteredMessages;
+            searchResultsInfo.textContent = `Found ${filteredMessages.length} message${filteredMessages.length !== 1 ? 's' : ''}`;
+
+            if (filteredMessages.length === 0) {
+                exportSearchBtn.classList.add('hidden');
+                messagesContainer.innerHTML = `
+                    <div class="text-center py-10">
+                        <svg class="mx-auto h-12 w-12 text-slate-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <p class="text-slate-400">No messages found for "${escapeHtml(searchTerm)}"</p>
+                    </div>
+                `;
+            } else {
+                exportSearchBtn.classList.remove('hidden');
+                renderMessages(filteredMessages, searchTerm);
+            }
+        }
+
+        function exportSearchResults() {
+            if (currentFilteredMessages.length === 0) {
+                showToast("No messages to export!", true);
+                return;
+            }
+
+            const searchTerm = searchInput.value.trim();
+
+            // Helper function to escape CSV values
+            function escapeCSV(value) {
+                if (value === null || value === undefined) return '';
+                const stringValue = String(value);
+                // If value contains comma, quote, or newline, wrap in quotes and escape internal quotes
+                if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+                    return `"${stringValue.replace(/"/g, '""')}"`;
+                }
+                return stringValue;
+            }
+
+            // Create CSV content
+            let csvContent = 'Message Content,Date\n';
+
+            currentFilteredMessages.forEach((msg) => {
+                const timestamp = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleString() : 'Unknown';
+                const messageContent = msg.text || '';
+
+                csvContent += `${escapeCSV(messageContent)},${escapeCSV(timestamp)}\n`;
+            });
+
+            // Create and download the file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+
+            // Create filename with search term and timestamp
+            const filename = `search_${searchTerm.replace(/[^a-z0-9]/gi, '_')}_${Date.now()}.csv`;
+            link.download = filename;
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showToast(`Exported ${currentFilteredMessages.length} message${currentFilteredMessages.length !== 1 ? 's' : ''} to CSV!`, false);
+        }
+
+        // -------------------------------------------
+        // Scroll Management
+        // -------------------------------------------
+        function scrollToBottom(smooth = true) {
+            if (smooth) {
+                chatContainer.scrollTo({
+                    top: chatContainer.scrollHeight,
+                    behavior: 'smooth'
+                });
+            } else {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
+
+        function isUserNearBottom() {
+            const threshold = 150;
+            return chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < threshold;
+        }
+
+        function handleScroll() {
+            isUserAtBottom = isUserNearBottom();
+
+            // Show/hide scroll to bottom button
+            if (isUserAtBottom) {
+                scrollToBottomBtn.classList.add('hidden');
+            } else {
+                scrollToBottomBtn.classList.remove('hidden');
+            }
         }
 
         // -------------------------------------------
@@ -397,14 +872,18 @@
                  .replace(/"/g, "&quot;")
                  .replace(/'/g, "&#039;");
         }
-        
+
+        function escapeRegex(str) {
+            return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
         function autoResizeTextarea() {
-            messageInput.style.height = 'auto'; // Reset height
+            messageInput.style.height = 'auto';
             messageInput.style.height = (messageInput.scrollHeight) + 'px';
         }
-        
+
         function getUserColor(id) {
-            if (!id) return '#94a3b8'; // slate-400
+            if (!id) return '#94a3b8';
             let hash = 0;
             for (let i = 0; i < id.length; i++) {
                 hash = id.charCodeAt(i) + ((hash << 5) - hash);
@@ -412,7 +891,6 @@
             let color = '#';
             for (let i = 0; i < 3; i++) {
                 let value = (hash >> (i * 8)) & 0xFF;
-                // Make colors brighter
                 value = Math.floor((value + 255) / 2);
                 color += ('00' + value.toString(16)).substr(-2);
             }
@@ -425,10 +903,48 @@
         messageForm.addEventListener('submit', handleFormSubmit);
         messagesContainer.addEventListener('click', handleMessageActions);
         messageInput.addEventListener('input', autoResizeTextarea);
-        
+        chatContainer.addEventListener('scroll', handleScroll);
+
         saveEditBtn.addEventListener('click', saveEdit);
         cancelEditBtn.addEventListener('click', cancelEditing);
-        
+
+        deleteCancelBtn.addEventListener('click', hideDeleteModal);
+        deleteConfirmBtn.addEventListener('click', confirmDelete);
+
+        searchToggleBtn.addEventListener('click', toggleSearch);
+        searchCloseBtn.addEventListener('click', closeSearch);
+        searchInput.addEventListener('input', performSearch);
+        exportSearchBtn.addEventListener('click', exportSearchResults);
+
+        scrollToBottomBtn.addEventListener('click', () => scrollToBottom(true));
+
+        // Click outside modal to close
+        deleteModal.addEventListener('click', (e) => {
+            if (e.target === deleteModal) {
+                hideDeleteModal();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+K or Cmd+K to open search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                toggleSearch();
+            }
+
+            // Escape to close search or modal
+            if (e.key === 'Escape') {
+                if (!searchContainer.classList.contains('hidden')) {
+                    closeSearch();
+                } else if (!deleteModal.classList.contains('hidden')) {
+                    hideDeleteModal();
+                } else if (editingMessageId) {
+                    cancelEditing();
+                }
+            }
+        });
+
         // Allow sending with Enter, but new line with Shift+Enter
         messageInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -447,8 +963,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
