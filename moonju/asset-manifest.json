@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/moonju/static/css/main.feafb5c5.css",
-    "main.js": "/moonju/static/js/main.9c79df62.js",
+    "main.js": "/moonju/static/js/main.c5314267.js",
     "static/js/453.13f4a1e2.chunk.js": "/moonju/static/js/453.13f4a1e2.chunk.js",
     "static/media/brief.svg": "/moonju/static/media/brief.f5a2780d0d62ff673e73594ef0a4d160.svg",
     "static/media/bra.svg": "/moonju/static/media/bra.7eec1c20237b0b50c543f44614882609.svg",
@@ -73,11 +73,11 @@
     "static/media/sailor-shorts.svg": "/moonju/static/media/sailor-shorts.80b84159a6c5e4cf7a4f8afaee00b97b.svg",
     "index.html": "/moonju/index.html",
     "main.feafb5c5.css.map": "/moonju/static/css/main.feafb5c5.css.map",
-    "main.9c79df62.js.map": "/moonju/static/js/main.9c79df62.js.map",
+    "main.c5314267.js.map": "/moonju/static/js/main.c5314267.js.map",
     "453.13f4a1e2.chunk.js.map": "/moonju/static/js/453.13f4a1e2.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.feafb5c5.css",
-    "static/js/main.9c79df62.js"
+    "static/js/main.c5314267.js"
   ]
 }
