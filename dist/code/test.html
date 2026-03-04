@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Code & Text Sharer with File Upload</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b; /* slate-800 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569; /* slate-600 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b; /* slate-500 */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Style for code blocks */
+        pre {
+            font-family: 'Fira Code', monospace;
+            background-color: #0f172a; /* slate-900 */
+            color: #e2e8f0; /* slate-200 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        /* Password overlay */
+        #password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #password-overlay.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-300 flex flex-col h-screen">
+
+    <!-- Password Protection Overlay -->
+    <div id="password-overlay">
+        <div class="bg-slate-800 p-8 rounded-lg shadow-2xl max-w-md w-full mx-4 border border-slate-700">
+            <h2 class="text-2xl font-bold text-white mb-6 text-center">🔒 Protected Session</h2>
+            <form id="password-form" class="space-y-4">
+                <div>
+                    <label for="password-input" class="block text-sm font-medium text-slate-300 mb-2">Enter Password:</label>
+                    <input
+                        type="password"
+                        id="password-input"
+                        class="w-full bg-slate-700 text-white rounded-md p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
+                        placeholder="Enter password"
+                        autocomplete="off"
+                    />
+                </div>
+                <button
+                    type="submit"
+                    class="w-full px-5 py-3 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition duration-200 shadow-lg"
+                >
+                    Unlock
+                </button>
+                <p id="password-error" class="text-red-400 text-sm text-center hidden"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-slate-800/50 backdrop-blur-sm p-3 border-b border-slate-700 shadow-md sticky top-0 z-10">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold text-white">Code & Text Sharer</h1>
+            <div class="text-right">
+                <p class="text-xs text-slate-400">Your User ID (Share with others to identify you):</p>
+                <p id="userIdDisplay" class="font-mono text-sm bg-slate-700 px-2 py-1 rounded text-white"></p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Chat Area -->
+    <main id="chat-container" class="flex-1 overflow-y-auto p-4">
+        <div id="messages" class="max-w-4xl mx-auto space-y-4">
+            <!-- Messages will be dynamically inserted here -->
+            <div id="loading" class="text-center py-10">
+                <p class="text-slate-400">Connecting to the session...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Message Input Form -->
+    <footer class="bg-slate-800 p-4 border-t border-slate-700 sticky bottom-0">
+        <div class="max-w-4xl mx-auto">
+            <form id="message-form" class="flex flex-col sm:flex-row items-start gap-3">
+                <div class="flex-1 w-full">
+                    <textarea id="message-input" class="w-full bg-slate-700 text-slate-200 rounded-md p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition resize-none disabled:opacity-50" rows="2" placeholder="Connecting..." disabled></textarea>
+                    <div id="edit-controls" class="hidden mt-2 flex gap-2">
+                         <button type="button" id="save-edit-btn" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200">Save</button>
+                         <button type="button" id="cancel-edit-btn" class="px-4 py-2 bg-slate-600 text-white rounded-md hover:bg-slate-700 transition duration-200">Cancel</button>
+                    </div>
+                    <div id="file-preview" class="hidden mt-2 bg-slate-700 p-2 rounded-md flex items-center justify-between">
+                        <span id="file-name" class="text-sm text-slate-300"></span>
+                        <button type="button" id="remove-file-btn" class="text-red-400 hover:text-red-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>
+                        </button>
+                    </div>
+                    <div id="upload-progress" class="hidden mt-2 bg-slate-700 rounded-md overflow-hidden">
+                        <div id="progress-bar" class="bg-indigo-600 h-2 transition-all duration-300" style="width: 0%"></div>
+                        <p id="progress-text" class="text-xs text-center py-1 text-slate-300">Uploading...</p>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2 w-full sm:w-auto">
+                    <button type="submit" id="send-btn" class="w-full px-5 py-3 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition duration-200 shadow-lg flex items-center justify-center gap-2 disabled:bg-indigo-400 disabled:cursor-not-allowed" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        Send
+                    </button>
+                    <input type="file" id="file-input" class="hidden" />
+                    <button type="button" id="file-btn" class="w-full px-5 py-3 bg-emerald-600 text-white font-semibold rounded-md hover:bg-emerald-700 transition duration-200 shadow-lg flex items-center justify-center gap-2 disabled:bg-emerald-400 disabled:cursor-not-allowed" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                        Attach File
+                    </button>
+                    <div class="flex items-center justify-center bg-slate-700 rounded-md px-3 py-1">
+                        <input id="is-code-checkbox" type="checkbox" class="h-4 w-4 rounded bg-slate-600 border-slate-500 text-indigo-600 focus:ring-indigo-500">
+                        <label for="is-code-checkbox" class="ml-2 text-sm text-slate-300">Format as code</label>
+                    </div>
+                </div>
+            </form>
+            <div id="toast" class="fixed bottom-20 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-xl translate-x-[120%] transition-transform duration-300">
+                Copied to clipboard!
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        // -------------------------------------------
+        // Firebase SDK Imports
+        // -------------------------------------------
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, doc, updateDoc, setLogLevel, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+
+        // -------------------------------------------
+        // Firebase Configuration and Initialization
+        // -------------------------------------------
+        const defaultConfig = {
+            apiKey: "AIzaSyD8gz9CUwiM5GlvIi88LOE33nCYMA5XYGo",
+            authDomain: "chat-f26b4.firebaseapp.com",
+            projectId: "chat-f26b4",
+            storageBucket: "chat-f26b4.firebasestorage.app",
+            messagingSenderId: "479898349306",
+            appId: "1:479898349306:web:4daac91ead80c86d3be343",
+            measurementId: "G-GPC5PPTDBB"
+        };
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : JSON.stringify(defaultConfig));
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-public-chat';
+
+        // PASSWORD CONFIGURATION - Change this password as needed
+        const CORRECT_PASSWORD = "acn2026";  // ← CHANGE THIS PASSWORD
+
+        let app, auth, db, storage, userId, unsubscribe;
+
+        // A variable to track the message being edited
+        let editingMessageId = null;
+
+        // File upload state
+        let selectedFile = null;
+
+        // DOM Element References
+        const messagesContainer = document.getElementById('messages');
+        const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message-input');
+        const isCodeCheckbox = document.getElementById('is-code-checkbox');
+        const userIdDisplay = document.getElementById('userIdDisplay');
+        const loadingIndicator = document.getElementById('loading');
+        const sendBtn = document.getElementById('send-btn');
+        const saveEditBtn = document.getElementById('save-edit-btn');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        const editControls = document.getElementById('edit-controls');
+        const toast = document.getElementById('toast');
+        const chatContainer = document.getElementById('chat-container');
+        const passwordOverlay = document.getElementById('password-overlay');
+        const passwordForm = document.getElementById('password-form');
+        const passwordInput = document.getElementById('password-input');
+        const passwordError = document.getElementById('password-error');
+        const fileInput = document.getElementById('file-input');
+        const fileBtn = document.getElementById('file-btn');
+        const filePreview = document.getElementById('file-preview');
+        const fileName = document.getElementById('file-name');
+        const removeFileBtn = document.getElementById('remove-file-btn');
+        const uploadProgress = document.getElementById('upload-progress');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+
+        // -------------------------------------------
+        // Main Application Logic
+        // -------------------------------------------
+
+        // Password Protection
+        function checkPassword() {
+            const isUnlocked = sessionStorage.getItem('chatUnlocked') === 'true';
+            if (isUnlocked) {
+                passwordOverlay.classList.add('hidden');
+                initializeFirebase();
+            } else {
+                passwordOverlay.classList.remove('hidden');
+                passwordInput.focus();
+            }
+        }
+
+        passwordForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const enteredPassword = passwordInput.value;
+            if (enteredPassword === CORRECT_PASSWORD) {
+                sessionStorage.setItem('chatUnlocked', 'true');
+                passwordOverlay.classList.add('hidden');
+                passwordError.classList.add('hidden');
+                passwordInput.value = '';
+                initializeFirebase();
+            } else {
+                passwordError.textContent = 'Incorrect password. Please try again.';
+                passwordError.classList.remove('hidden');
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+        });
+
+        function initializeFirebase() {
+             if (Object.keys(firebaseConfig).length === 0 || !firebaseConfig.apiKey) {
+                console.error("Firebase config is not available.");
+                loadingIndicator.textContent = "Error: Firebase configuration is missing. Cannot connect.";
+                return;
+            }
+            try {
+                app = initializeApp(firebaseConfig);
+                const analytics = getAnalytics(app);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                storage = getStorage(app);
+                setLogLevel('debug'); // Enable detailed logging for debugging
+                handleAuthentication();
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+                loadingIndicator.textContent = "Error initializing the application.";
+            }
+        }
+
+        function handleAuthentication() {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    // User is signed in.
+                    userId = user.uid;
+                    userIdDisplay.textContent = userId;
+
+                    // Enable form now that we are authenticated
+                    messageInput.disabled = false;
+                    sendBtn.disabled = false;
+                    fileBtn.disabled = false;
+                    messageInput.placeholder = "Type your message or paste code here...";
+
+                    // Now that we have a user, listen for messages
+                    listenForMessages();
+                } else {
+                    // User is signed out. Attempt to sign in.
+                    try {
+                        const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                        if (token) {
+                            await signInWithCustomToken(auth, token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (error) {
+                        console.error("Authentication failed:", error);
+                        loadingIndicator.textContent = "Authentication failed. Please refresh.";
+                        messageInput.placeholder = "Authentication failed.";
+                    }
+                }
+            });
+        }
+
+        function listenForMessages() {
+            const messagesCollectionPath = `artifacts/${appId}/public/data/sharer_messages`;
+            const messagesRef = collection(db, messagesCollectionPath);
+            const q = query(messagesRef, orderBy("timestamp"));
+
+            if (unsubscribe) unsubscribe(); // Unsubscribe from previous listener if it exists
+
+            unsubscribe = onSnapshot(q, (snapshot) => {
+                loadingIndicator.style.display = 'none';
+                const messages = [];
+                snapshot.forEach(doc => {
+                    messages.push({ id: doc.id, ...doc.data() });
+                });
+                
+                renderMessages(messages);
+            }, (error) => {
+                console.error("Error fetching messages: ", error);
+                loadingIndicator.style.display = 'none';
+                messagesContainer.innerHTML = `
+                    <div class="bg-red-900/50 border border-red-500/50 text-red-300 p-4 rounded-lg text-left max-w-2xl mx-auto">
+                        <h3 class="font-bold text-red-200">Error Loading Messages</h3>
+                        <p class="mt-2 text-sm">Could not connect to the message session. This is almost always caused by incorrect Firebase Security Rules.</p>
+                        <p class="mt-2 text-sm">Please go to your Firestore Database rules in the Firebase Console and ensure they allow public read access for the collection.</p>
+                        <div class="mt-3 font-mono text-xs bg-slate-800 p-2 rounded space-y-1">
+                           <p><strong>Required Path:</strong></p>
+                           <p class="break-all">/artifacts/${appId}/public/data/sharer_messages/{messageId}</p>
+                           <p class="pt-2"><strong>Example Rule:</strong></p>
+                           <p>"allow read: if true;"</p>
+                        </div>
+                        <hr class="border-red-500/50 my-3">
+                        <p class="text-xs text-red-400"><strong>Detailed Error:</strong> ${escapeHtml(error.message)}</p>
+                    </div>
+                `;
+            });
+        }
+        
+        function renderMessages(messages) {
+            messagesContainer.innerHTML = ''; // Clear existing messages
+            if (messages.length === 0) {
+                 messagesContainer.innerHTML = `<div class="text-center py-10"><p class="text-slate-400">No messages yet. Be the first to say something!</p></div>`;
+            } else {
+                messages.forEach(msg => {
+                    const msgElement = createMessageElement(msg);
+                    messagesContainer.appendChild(msgElement);
+                });
+                // Scroll to the latest message
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
+
+        function createMessageElement(msg) {
+            const isAuthor = msg.userId === userId;
+            const div = document.createElement('div');
+
+            // Generate a color based on the userId
+            const userColor = getUserColor(msg.userId);
+
+            div.className = 'flex flex-col';
+            div.id = `msg-${msg.id}`;
+
+            let contentHTML;
+            if (msg.fileURL) {
+                // File message
+                const fileIcon = getFileIcon(msg.fileName);
+                contentHTML = `
+                    <div class="flex items-center gap-3 p-3 bg-slate-700 rounded-md">
+                        <div class="text-3xl">${fileIcon}</div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-slate-200 font-medium truncate">${escapeHtml(msg.fileName)}</p>
+                            <p class="text-slate-400 text-xs">${formatFileSize(msg.fileSize || 0)}</p>
+                        </div>
+                        <a href="${msg.fileURL}" download="${msg.fileName}" target="_blank" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-sm font-medium flex items-center gap-2 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                            Download
+                        </a>
+                    </div>
+                `;
+                if (msg.text && msg.text.trim()) {
+                    contentHTML += `<p class="text-slate-200 whitespace-pre-wrap mt-2 px-1">${escapeHtml(msg.text)}</p>`;
+                }
+            } else if (msg.isCode) {
+                contentHTML = `<pre><code class="language-plaintext">${escapeHtml(msg.text)}</code></pre>`;
+            } else {
+                contentHTML = `<p class="text-slate-200 whitespace-pre-wrap">${escapeHtml(msg.text)}</p>`;
+            }
+
+            div.innerHTML = `
+                <div class="text-xs mb-1 flex items-center">
+                    <span class="font-semibold" style="color: ${userColor};">${msg.userId ? msg.userId.substring(0, 8) : 'anon'}...</span>
+                    <span class="ml-2 text-slate-500">${msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString() : ''}</span>
+                </div>
+                <div class="bg-slate-800 rounded-lg p-1 group relative">
+                     ${contentHTML}
+                     <div class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        ${!msg.fileURL ? `<button data-action="copy" data-text="${escapeHtml(msg.text || '')}" class="p-1.5 bg-slate-700 hover:bg-slate-600 rounded-md">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 8a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2A.5.5 0 0 1-1 8z"/></svg>
+                        </button>` : ''}
+                        ${isAuthor && !msg.fileURL ? `
+                        <button data-action="edit" data-id="${msg.id}" data-text="${escapeHtml(msg.text || '')}" data-is-code="${msg.isCode}" class="p-1.5 bg-slate-700 hover:bg-slate-600 rounded-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/><path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/></svg>
+                        </button>` : ''}
+                     </div>
+                </div>
+            `;
+            return div;
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+
+            // Check if we have a file to upload
+            if (selectedFile) {
+                await uploadFile();
+                return;
+            }
+
+            const text = messageInput.value.trim();
+            if (text === '') return;
+
+            const messagesCollectionPath = `artifacts/${appId}/public/data/sharer_messages`;
+            console.log(`Attempting to send message to: ${messagesCollectionPath} with userId: ${userId}`);
+
+            try {
+                const docRef = await addDoc(collection(db, messagesCollectionPath), {
+                    userId: userId,
+                    text: text,
+                    isCode: isCodeCheckbox.checked,
+                    timestamp: serverTimestamp()
+                });
+                console.log("Message sent successfully with ID: ", docRef.id);
+                messageInput.value = '';
+                isCodeCheckbox.checked = false;
+                messageInput.style.height = 'auto'; // Reset height after send
+                messageInput.focus();
+            } catch (error) {
+                console.error("Error sending message:", error);
+                showToast("Could not send message. Please try again.", true);
+            }
+        }
+
+        async function uploadFile() {
+            if (!selectedFile) return;
+
+            const text = messageInput.value.trim();
+            uploadProgress.classList.remove('hidden');
+            sendBtn.disabled = true;
+            fileBtn.disabled = true;
+
+            try {
+                // Create a unique filename with timestamp
+                const timestamp = Date.now();
+                const sanitizedName = selectedFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+                const storagePath = `sharer_files/${appId}/${userId}/${timestamp}_${sanitizedName}`;
+                const storageReference = ref(storage, storagePath);
+
+                // Upload file with progress monitoring
+                const uploadTask = uploadBytesResumable(storageReference, selectedFile);
+
+                uploadTask.on('state_changed',
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        progressBar.style.width = progress + '%';
+                        progressText.textContent = `Uploading... ${Math.round(progress)}%`;
+                    },
+                    (error) => {
+                        console.error('Upload error:', error);
+                        showToast('File upload failed. Please try again.', true);
+                        uploadProgress.classList.add('hidden');
+                        sendBtn.disabled = false;
+                        fileBtn.disabled = false;
+                    },
+                    async () => {
+                        // Upload completed successfully
+                        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+                        // Save message with file info to Firestore
+                        const messagesCollectionPath = `artifacts/${appId}/public/data/sharer_messages`;
+                        await addDoc(collection(db, messagesCollectionPath), {
+                            userId: userId,
+                            text: text,
+                            fileURL: downloadURL,
+                            fileName: selectedFile.name,
+                            fileSize: selectedFile.size,
+                            timestamp: serverTimestamp()
+                        });
+
+                        // Reset form
+                        messageInput.value = '';
+                        selectedFile = null;
+                        filePreview.classList.add('hidden');
+                        uploadProgress.classList.add('hidden');
+                        sendBtn.disabled = false;
+                        fileBtn.disabled = false;
+                        progressBar.style.width = '0%';
+
+                        showToast('File uploaded successfully!');
+                        messageInput.focus();
+                    }
+                );
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                showToast('File upload failed. Please try again.', true);
+                uploadProgress.classList.add('hidden');
+                sendBtn.disabled = false;
+                fileBtn.disabled = false;
+            }
+        }
+        
+        function handleMessageActions(e) {
+            const target = e.target.closest('button');
+            if (!target) return;
+
+            const action = target.dataset.action;
+            if (action === 'copy') {
+                copyToClipboard(target.dataset.text);
+            } else if (action === 'edit') {
+                startEditing(target.dataset);
+            }
+        }
+        
+        function startEditing(data) {
+             if (editingMessageId) {
+                // If already editing, cancel the previous one
+                cancelEditing();
+            }
+
+            editingMessageId = data.id;
+            messageInput.value = data.text;
+            isCodeCheckbox.checked = data.isCode === 'true';
+
+            // Hide send button and show edit controls
+            sendBtn.style.display = 'none';
+            isCodeCheckbox.parentElement.style.display = 'none';
+            editControls.classList.remove('hidden');
+
+            // Hide the original message
+            document.getElementById(`msg-${editingMessageId}`).style.display = 'none';
+            messageInput.focus();
+            autoResizeTextarea();
+        }
+
+        async function saveEdit() {
+            const newText = messageInput.value.trim();
+            if (!editingMessageId || newText === '') return;
+
+            const docRef = doc(db, `artifacts/${appId}/public/data/sharer_messages`, editingMessageId);
+            try {
+                await updateDoc(docRef, {
+                    text: newText,
+                    isCode: isCodeCheckbox.checked
+                });
+            } catch (error) {
+                console.error("Error updating document: ", error);
+                showToast("Failed to save changes.", true);
+            } finally {
+                cancelEditing(); // Reset UI regardless of success
+            }
+        }
+        
+        function cancelEditing() {
+            if (editingMessageId) {
+                 document.getElementById(`msg-${editingMessageId}`).style.display = 'flex';
+            }
+            editingMessageId = null;
+            messageInput.value = '';
+            isCodeCheckbox.checked = false;
+            
+            sendBtn.style.display = 'flex';
+            isCodeCheckbox.parentElement.style.display = 'flex';
+            editControls.classList.add('hidden');
+            messageInput.style.height = 'auto';
+        }
+
+        // -------------------------------------------
+        // File Handling Functions
+        // -------------------------------------------
+        function getFileIcon(fileName) {
+            const ext = fileName.split('.').pop().toLowerCase();
+            const icons = {
+                // Archives
+                'zip': '📦', 'rar': '📦', '7z': '📦', 'tar': '📦', 'gz': '📦',
+                // Documents
+                'pdf': '📄', 'doc': '📝', 'docx': '📝', 'txt': '📝', 'md': '📝',
+                // Spreadsheets
+                'xls': '📊', 'xlsx': '📊', 'csv': '📊',
+                // Presentations
+                'ppt': '📊', 'pptx': '📊',
+                // Images
+                'jpg': '🖼️', 'jpeg': '🖼️', 'png': '🖼️', 'gif': '🖼️', 'svg': '🖼️', 'bmp': '🖼️',
+                // Videos
+                'mp4': '🎥', 'avi': '🎥', 'mov': '🎥', 'wmv': '🎥', 'flv': '🎥',
+                // Audio
+                'mp3': '🎵', 'wav': '🎵', 'flac': '🎵', 'aac': '🎵',
+                // Code
+                'js': '💻', 'py': '💻', 'java': '💻', 'cpp': '💻', 'c': '💻', 'html': '💻', 'css': '💻',
+                'json': '💻', 'xml': '💻', 'sql': '💻', 'sh': '💻',
+                // Other
+                'exe': '⚙️', 'apk': '📱', 'dmg': '💿'
+            };
+            return icons[ext] || '📄';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        // -------------------------------------------
+        // Helper Functions
+        // -------------------------------------------
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast("Copied to clipboard!");
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                showToast("Failed to copy!", true);
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function showToast(message, isError = false) {
+            toast.textContent = message;
+            toast.className = `fixed bottom-20 right-5 text-white py-2 px-4 rounded-lg shadow-xl translate-x-0 transition-transform duration-300 ${isError ? 'bg-red-500' : 'bg-green-500'}`;
+            setTimeout(() => {
+                toast.style.transform = 'translateX(120%)';
+            }, 2000);
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+        
+        function autoResizeTextarea() {
+            messageInput.style.height = 'auto'; // Reset height
+            messageInput.style.height = (messageInput.scrollHeight) + 'px';
+        }
+        
+        function getUserColor(id) {
+            if (!id) return '#94a3b8'; // slate-400
+            let hash = 0;
+            for (let i = 0; i < id.length; i++) {
+                hash = id.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            let color = '#';
+            for (let i = 0; i < 3; i++) {
+                let value = (hash >> (i * 8)) & 0xFF;
+                // Make colors brighter
+                value = Math.floor((value + 255) / 2);
+                color += ('00' + value.toString(16)).substr(-2);
+            }
+            return color;
+        }
+
+        // -------------------------------------------
+        // Event Listeners
+        // -------------------------------------------
+        messageForm.addEventListener('submit', handleFormSubmit);
+        messagesContainer.addEventListener('click', handleMessageActions);
+        messageInput.addEventListener('input', autoResizeTextarea);
+
+        saveEditBtn.addEventListener('click', saveEdit);
+        cancelEditBtn.addEventListener('click', cancelEditing);
+
+        // File upload listeners
+        fileBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                selectedFile = file;
+                fileName.textContent = file.name + ' (' + formatFileSize(file.size) + ')';
+                filePreview.classList.remove('hidden');
+            }
+        });
+
+        removeFileBtn.addEventListener('click', () => {
+            selectedFile = null;
+            fileInput.value = '';
+            filePreview.classList.add('hidden');
+        });
+
+        // Allow sending with Enter, but new line with Shift+Enter
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if(editingMessageId) {
+                    saveEditBtn.click();
+                } else {
+                    messageForm.requestSubmit();
+                }
+            }
+        });
+
+        // Initialize the application on load
+        document.addEventListener('DOMContentLoaded', checkPassword);
+
+    </script>
+</body>
+</html>
+
+
+
+
+
