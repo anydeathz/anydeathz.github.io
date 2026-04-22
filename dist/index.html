@@ -1,0 +1,1315 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ramazan Furkan AVCI | Data Scientist & Engineer</title>
+    <meta name="description" content="Data Scientist & Engineer specializing in Python, cloud infrastructure, and AI/ML — based in Japan." />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text x='16' y='26' font-family='monospace' font-weight='700' font-size='22' text-anchor='middle' fill='%23b91c1c'>RF</text></svg>">
+
+    <!-- Open Graph / WhatsApp / Social Preview -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://avci.jp/" />
+    <meta property="og:title" content="Ramazan Furkan AVCI | Data Scientist & Engineer" />
+    <meta property="og:description" content="Data Scientist & Engineer specializing in Python, cloud infrastructure, and AI/ML — based in Japan." />
+    <meta property="og:image" content="https://avci.jp/images/me.jpeg" />
+    <meta property="og:image:alt" content="Ramazan Furkan AVCI" />
+    <meta property="og:site_name" content="Ramazan Furkan AVCI" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Ramazan Furkan AVCI | Data Scientist & Engineer" />
+    <meta name="twitter:description" content="Data Scientist & Engineer specializing in Python, cloud infrastructure, and AI/ML — based in Japan." />
+    <meta name="twitter:image" content="https://avci.jp/images/me.jpeg" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;600;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        deep: '#050A14',
+                        glass: 'rgba(255, 255, 255, 0.03)',
+                        crimson: '#b91c1c',
+                        accent: '#f87171',
+                        panel: '#1a1a1d',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        html { overflow-x: hidden; }
+        body {
+            background-color: #0f0f12;
+            background-image:
+                    radial-gradient(circle at 15% 50%, rgba(185, 28, 28, 0.1), transparent 30%),
+                    radial-gradient(circle at 85% 30%, rgba(248, 113, 113, 0.08), transparent 25%),
+                    radial-gradient(circle at 2px 2px, rgba(255,255,255,0.03) 1px, transparent 0);
+            background-size: 100% 100%, 100% 100%, 40px 40px;
+            color: #e2e8f0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050A14; }
+        ::-webkit-scrollbar-thumb { background: #b91c1c; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #991b1b; }
+
+        .glass-panel {
+            background: linear-gradient(145deg, rgba(26, 26, 29, 0.6), rgba(15, 15, 18, 0.6));
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .hex-panel {
+            background: linear-gradient(145deg, #16161a, #0f0f12);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--tw-crimson, #b91c1c);
+            position: relative;
+            box-shadow: 10px 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .hex-panel::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, transparent 50%, #b91c1c 50%);
+        }
+
+        .glow-text {
+            text-shadow: 0 0 30px rgba(248, 113, 113, 0.4), 0 0 15px rgba(185, 28, 28, 0.3);
+        }
+
+        .exp-card:hover {
+            border-color: rgba(185, 28, 28, 0.6);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px -15px rgba(185, 28, 28, 0.3);
+        }
+
+        .tech-card:hover {
+            border-color: rgba(185, 28, 28, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 40px -10px rgba(185, 28, 28, 0.25);
+        }
+
+        .project-card:hover {
+            border-left-color: rgba(185, 28, 28, 0.8);
+            transform: translateX(5px);
+            box-shadow: 0 10px 40px -10px rgba(185, 28, 28, 0.3);
+        }
+
+        .project-gallery {
+            position: relative;
+            height: 320px;
+            width: 100%;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: #000;
+            border-radius: 0.5rem;
+        }
+
+        @media (max-width: 640px) {
+            .project-gallery { height: 250px; }
+        }
+
+        .gallery-img {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gallery-img.active {
+            opacity: 1;
+            z-index: 10;
+        }
+
+        .gallery-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(20%) contrast(1.1) brightness(0.85) sepia(15%) hue-rotate(-5deg);
+            transition: filter 0.3s ease;
+        }
+
+        .gallery-img:hover img {
+            filter: grayscale(5%) contrast(1.15) brightness(0.95) sepia(8%);
+        }
+
+        .profile-img {
+            filter: grayscale(15%) contrast(1.1) brightness(0.9) sepia(12%) hue-rotate(-8deg);
+            transition: filter 0.3s ease;
+        }
+
+        .profile-img:hover {
+            filter: grayscale(0%) contrast(1.15) brightness(1) sepia(5%);
+        }
+
+        .gallery-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a1d 0%, #0f0f12 100%);
+            border: 2px dashed rgba(185, 28, 28, 0.3);
+        }
+
+        .typing::after {
+            content: '|';
+            animation: blink 1s step-start infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .glitch-text:hover {
+            text-shadow: 2px 0 #b91c1c, -2px 0 #4a5568;
+            animation: noise 0.2s infinite;
+        }
+
+        @keyframes noise {
+            0% { transform: translate(0); }
+            50% { transform: translate(-1px, 1px); }
+            100% { transform: translate(1px, -1px); }
+        }
+
+        .scanline {
+            width: 100%;
+            height: 2px;
+            background: rgba(185, 28, 28, 0.15);
+            position: absolute;
+            z-index: 10;
+            animation: scan 4s linear infinite;
+        }
+        @keyframes scan { from { top: 0; } to { top: 100%; } }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 64px;
+            left: 0;
+            right: 0;
+            background: #0f0f12;
+            border-bottom: 1px solid rgba(185, 28, 28, 0.3);
+            padding: 2rem;
+            z-index: 40;
+        }
+        .mobile-menu.active { display: block; }
+
+        .hamburger { display: flex; flex-direction: column; gap: 4px; cursor: pointer; }
+        .hamburger span {
+            width: 24px;
+            height: 2px;
+            background: #e2e8f0;
+            transition: all 0.3s;
+        }
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); background: #b91c1c; }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); background: #b91c1c; }
+
+        .live-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            margin-top: 1.25rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #f87171;
+            background: transparent;
+            border: 1px solid rgba(185, 28, 28, 0.45);
+            border-radius: 0.375rem;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            transition: color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            z-index: 1;
+        }
+
+        .live-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: #b91c1c;
+            transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+        }
+
+        .live-btn:hover::after { left: 0; }
+        .live-btn:hover {
+            color: #ffffff;
+            border-color: #b91c1c;
+            box-shadow: 0 0 24px rgba(185, 28, 28, 0.45);
+        }
+
+        .live-btn .btn-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .live-btn:hover .btn-icon {
+            transform: rotate(12deg) scale(1.1);
+        }
+
+        #lang-toggle-btn {
+            transition: background 0.25s, color 0.25s, border-color 0.25s;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-crimson selection:text-white">
+
+<!-- Navbar -->
+<nav class="fixed top-0 w-full z-50 border-b border-crimson/20 bg-[#0f0f12]/95 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <a href="#" class="text-lg sm:text-xl font-bold tracking-tighter font-mono hover:text-crimson transition-colors glitch-text">
+            &lt;AVCI.SYS /&gt;
+        </a>
+
+        <div class="hidden md:flex space-x-6 lg:space-x-8 text-sm font-mono text-gray-400">
+            <a href="#experience" class="hover:text-white transition-colors" data-i18n="nav-exp"><span class="text-crimson">01.</span> Experience</a>
+            <a href="#projects" class="hover:text-white transition-colors" data-i18n="nav-projects"><span class="text-crimson">02.</span> Projects</a>
+            <a href="#stack" class="hover:text-white transition-colors" data-i18n="nav-stack"><span class="text-crimson">03.</span> Tech Stack</a>
+            <a href="#education" class="hover:text-white transition-colors" data-i18n="nav-edu"><span class="text-crimson">04.</span> Education</a>
+            <a href="#hobbies" class="hover:text-white transition-colors" data-i18n="nav-hobbies"><span class="text-crimson">05.</span> Hobbies</a>
+        </div>
+
+        <div class="flex items-center space-x-3 sm:space-x-4">
+            <button id="lang-toggle-btn" onclick="toggleLanguage()" class="px-4 py-2 text-sm font-bold border border-crimson/60 text-crimson rounded hover:bg-crimson hover:text-white tracking-wider font-mono">
+                日本語
+            </button>
+            <a href="mailto:furkan@avci.jp" class="px-4 py-2 text-sm font-bold bg-crimson text-white rounded hover:bg-white hover:text-black transition-all tracking-wider" data-i18n="btn-contact">
+                CONTACT
+            </a>
+            <button id="mobile-menu-btn" class="md:hidden hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<div id="mobile-menu" class="mobile-menu">
+    <div class="flex flex-col gap-6 font-mono text-base text-gray-400">
+        <a href="#experience" class="hover:text-crimson transition-colors mobile-link" data-i18n="nav-exp"><span class="text-crimson">01.</span> Experience</a>
+        <a href="#projects" class="hover:text-crimson transition-colors mobile-link" data-i18n="nav-projects"><span class="text-crimson">02.</span> Projects</a>
+        <a href="#stack" class="hover:text-crimson transition-colors mobile-link" data-i18n="nav-stack"><span class="text-crimson">03.</span> Tech Stack</a>
+        <a href="#education" class="hover:text-crimson transition-colors mobile-link" data-i18n="nav-edu"><span class="text-crimson">04.</span> Education</a>
+        <a href="#hobbies" class="hover:text-crimson transition-colors mobile-link" data-i18n="nav-hobbies"><span class="text-crimson">05.</span> Hobbies</a>
+    </div>
+</div>
+
+<!-- Hero Section -->
+<main class="pt-24 sm:pt-32 pb-16 sm:pb-20 px-4 sm:px-6 relative overflow-hidden">
+    <div class="scanline"></div>
+    <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
+
+        <!-- Text Content -->
+        <div class="order-2 md:order-1">
+            <div class="mb-4 flex items-center gap-2 text-sm text-gray-400 font-mono">
+                <i class="fa-solid fa-location-dot text-crimson"></i>
+                <span data-i18n="hero-location">Osaka, Japan</span>
+                <span class="mx-2">•</span>
+                <span>28</span>
+                <span class="mx-2">•</span>
+                <span data-i18n="hero-gender">Male</span>
+            </div>
+
+            <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black tracking-tight mb-6 leading-[1.1] italic uppercase">
+                <span class="block glow-text glitch-text">Ramazan</span>
+                <span class="block glow-text glitch-text">Furkan</span>
+                <span class="block text-crimson glitch-text">AVCI</span>
+            </h1>
+
+            <div class="h-20 sm:h-24 md:h-20">
+                <p class="text-lg sm:text-xl md:text-2xl text-gray-400 font-mono typing uppercase tracking-wider" id="typing-text"></p>
+            </div>
+
+            <div class="mt-6 text-base sm:text-lg text-gray-300 leading-relaxed" data-i18n="hero-bio">
+                Data Scientist at TECHNOPRO DESIGN, specializing in Python automation, cloud infrastructure,
+                and AI/ML solutions. Master's graduate from Osaka Sangyo University with expertise in GIS
+                and machine learning.
+            </div>
+
+            <div class="mt-10 flex flex-wrap gap-4">
+                <a href="https://github.com/anydeathz" target="_blank" class="group px-6 py-3 hex-panel hover:border-crimson/50 transition-all">
+                    <i class="fa-brands fa-github text-gray-400 group-hover:text-crimson transition-colors"></i>
+                    <span class="ml-2 font-bold text-sm">GitHub</span>
+                </a>
+                <a href="https://linkedin.com/in/furkavc" target="_blank" class="group px-6 py-3 hex-panel hover:border-crimson/50 transition-all">
+                    <i class="fa-brands fa-linkedin text-blue-400 group-hover:text-crimson transition-colors"></i>
+                    <span class="ml-2 font-bold text-sm">LinkedIn</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Visual/Avatar -->
+        <div class="order-1 md:order-2 flex flex-col items-center justify-center relative">
+            <div class="absolute top-1/4 w-64 h-64 bg-crimson/20 rounded-full blur-3xl -z-10 animate-pulse-slow"></div>
+
+            <div class="relative w-72 h-72 md:w-96 md:h-96 hex-panel rounded-2xl p-4 hover:rotate-0 transition-transform duration-500 animate-float">
+                <div class="w-full h-full bg-gradient-to-br from-gray-900 to-black rounded-xl overflow-hidden relative border border-crimson/20">
+                    <img src="images/me.jpeg" alt="Ramazan Furkan AVCI" class="profile-img w-full h-full object-cover" />
+                    <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
+                        <div class="text-sm font-mono text-crimson flex items-center justify-center gap-2">
+                            <span class="w-2 h-2 bg-crimson rounded-full animate-pulse"></span>
+                            SYSTEM_ONLINE
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="mt-8 w-72 md:w-96 hex-panel p-5 rounded-xl hover:border-crimson/60 transition-colors shadow-lg">
+                <h4 class="text-xs font-mono text-crimson mb-4 uppercase tracking-widest" data-i18n="quick-stats-title">// Quick_Stats</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="border-l-2 border-crimson/50 pl-3">
+                        <div class="text-xs text-gray-500 font-mono uppercase">TOEIC</div>
+                        <div class="text-3xl font-bold text-white">955</div>
+                        <div class="text-xs text-gray-500 mt-1">/ 990</div>
+                    </div>
+                    <div class="border-l-2 border-accent/50 pl-3">
+                        <div class="text-xs text-gray-500 font-mono uppercase" data-i18n="stat-lang-label">Languages</div>
+                        <div class="text-sm font-bold text-white mt-1" data-i18n="stat-english">English</div>
+                        <div class="text-sm font-bold text-white" data-i18n="stat-japanese">Japanese</div>
+                        <div class="text-sm font-bold text-white" data-i18n="stat-turkish">Turkish</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Experience Section -->
+<section id="experience" class="py-16 sm:py-20 px-4 sm:px-6 border-t border-crimson/20">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex items-center gap-4 mb-12">
+            <h2 class="text-3xl sm:text-4xl font-black italic uppercase text-white" data-i18n="sec-exp-title">Deployment_History</h2>
+            <div class="h-[2px] bg-crimson/30 flex-grow"></div>
+        </div>
+
+        <div class="grid gap-6">
+            <!-- TECHNOPRO DESIGN -->
+            <div class="glass-panel p-6 sm:p-8 rounded-xl exp-card transition-all duration-300 border-l-4 border-crimson">
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">
+                    <div>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-white uppercase tracking-wide" data-i18n="job1-company">TECHNOPRO DESIGN</h3>
+                        <p class="text-lg sm:text-xl text-crimson font-mono mt-2" data-i18n="job1-role">Data Scientist</p>
+                        <p class="text-sm text-gray-400 mt-1" data-i18n="job1-location"><i class="fa-solid fa-location-dot mr-1"></i> Osaka, Japan</p>
+                    </div>
+                    <div class="text-sm sm:text-base font-mono text-crimson font-bold" data-i18n="job1-date">
+                        APR 2025 – PRESENT
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <span class="text-xs px-3 py-1 rounded bg-crimson/10 border border-crimson/30 text-accent font-mono">Python</span>
+                    <span class="text-xs px-3 py-1 rounded bg-crimson/10 border border-crimson/30 text-accent font-mono">Pandas</span>
+                    <span class="text-xs px-3 py-1 rounded bg-crimson/10 border border-crimson/30 text-accent font-mono">React</span>
+                    <span class="text-xs px-3 py-1 rounded bg-crimson/10 border border-crimson/30 text-accent font-mono">AWS</span>
+                    <span class="text-xs px-3 py-1 rounded bg-crimson/10 border border-crimson/30 text-accent font-mono">OpenSearch</span>
+                    <span class="text-xs px-3 py-1 rounded bg-crimson/10 border border-crimson/30 text-accent font-mono">Linux</span>
+                </div>
+
+                <ul class="space-y-3 text-base sm:text-lg text-gray-300 leading-relaxed">
+                    <li class="flex gap-3">
+                        <i class="fa-solid fa-caret-right text-crimson mt-1.5 flex-shrink-0"></i>
+                        <span data-i18n="job1-bullet1">Achieved <strong class="text-white">80% reduction</strong> in processing time for 1M+ records using parallel VPC architecture and Python automation</span>
+                    </li>
+                    <li class="flex gap-3">
+                        <i class="fa-solid fa-caret-right text-crimson mt-1.5 flex-shrink-0"></i>
+                        <span data-i18n="job1-bullet2">Built automation scripts that accelerated manual data workflows by <strong class="text-white">50%</strong>, improving operational efficiency across teams</span>
+                    </li>
+                    <li class="flex gap-3">
+                        <i class="fa-solid fa-caret-right text-crimson mt-1.5 flex-shrink-0"></i>
+                        <span data-i18n="job1-bullet3">Enhanced conversation bot with <strong class="text-white">page-level PDF referencing</strong> using OpenSearch and local LLM integration</span>
+                    </li>
+                </ul>
+
+                <!-- LLM Experience Sub-section -->
+                <div class="mt-6 border border-violet-500/25 rounded-xl p-5 bg-gradient-to-br from-violet-900/10 to-purple-900/5 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-violet-500/5 rounded-full blur-2xl -z-0"></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-1.5 h-1.5 bg-violet-400 rounded-full animate-pulse"></div>
+                                <div class="w-1.5 h-1.5 bg-violet-400/60 rounded-full animate-pulse" style="animation-delay:0.3s"></div>
+                                <div class="w-1.5 h-1.5 bg-violet-400/30 rounded-full animate-pulse" style="animation-delay:0.6s"></div>
+                            </div>
+                            <span class="text-xs font-mono text-violet-400 uppercase tracking-widest font-bold" data-i18n="llm-title">// LLM_Experience</span>
+                            <div class="h-px bg-violet-500/20 flex-grow"></div>
+                            <span class="text-xs font-mono text-violet-500/60 bg-violet-500/10 px-2 py-0.5 rounded border border-violet-500/20">GenAI</span>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2 mb-5">
+                            <span class="text-xs px-3 py-1 rounded bg-violet-500/10 border border-violet-500/30 text-violet-300 font-mono">RAG</span>
+                            <span class="text-xs px-3 py-1 rounded bg-violet-500/10 border border-violet-500/30 text-violet-300 font-mono">LM Studio</span>
+                            <span class="text-xs px-3 py-1 rounded bg-violet-500/10 border border-violet-500/30 text-violet-300 font-mono">GPT-4o Mini</span>
+                            <span class="text-xs px-3 py-1 rounded bg-violet-500/10 border border-violet-500/30 text-violet-300 font-mono">ngrok</span>
+                            <span class="text-xs px-3 py-1 rounded bg-violet-500/10 border border-violet-500/30 text-violet-300 font-mono">OCR</span>
+                            <span class="text-xs px-3 py-1 rounded bg-violet-500/10 border border-violet-500/30 text-violet-300 font-mono">Prompt Engineering</span>
+                            <span class="text-xs px-3 py-1 rounded bg-violet-500/10 border border-violet-500/30 text-violet-300 font-mono">Vector Search</span>
+                        </div>
+
+                        <ul class="space-y-3 text-base sm:text-lg text-gray-300 leading-relaxed">
+                            <li class="flex gap-3 bg-white/3 p-3 rounded-lg border-l-2 border-violet-500/40">
+                                <i class="fa-solid fa-magnifying-glass text-violet-400 mt-1.5 flex-shrink-0"></i>
+                                <span data-i18n="llm-bullet1">Built a local <strong class="text-white">RAG search engine</strong> for OCR-processed PDFs, using LLM to do keyword search and intelligent document finding</span>
+                            </li>
+                            <li class="flex gap-3 bg-white/3 p-3 rounded-lg border-l-2 border-violet-500/40">
+                                <i class="fa-solid fa-robot text-violet-400 mt-1.5 flex-shrink-0"></i>
+                                <span data-i18n="llm-bullet2">Developed a local <strong class="text-white">GenAI chatbot platform</strong> by connecting LM Studio with ngrok, built a chat app and used it to demonstrate LLM capabilities to new graduates</span>
+                            </li>
+                            <li class="flex gap-3 bg-white/3 p-3 rounded-lg border-l-2 border-violet-500/40">
+                                <i class="fa-solid fa-tags text-violet-400 mt-1.5 flex-shrink-0"></i>
+                                <span data-i18n="llm-bullet3">Improved product category accuracy assignment by <strong class="text-white">40%</strong> using GPT-4o Mini and created new scripts for more detailed labeling of inventory data</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GAINHIVE -->
+            <div class="glass-panel p-6 sm:p-8 rounded-xl exp-card transition-all duration-300 border-l-4 border-accent">
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">
+                    <div>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-white uppercase tracking-wide">GAINHIVE</h3>
+                        <p class="text-lg sm:text-xl text-accent font-mono mt-2" data-i18n="job2-role">Co-founder & Technical Lead</p>
+                        <p class="text-sm text-gray-400 mt-1" data-i18n="job2-location"><i class="fa-solid fa-location-dot mr-1"></i> Remote</p>
+                    </div>
+                    <div class="text-sm sm:text-base font-mono text-gray-400">
+                        2021 – 2023
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <span class="text-xs px-3 py-1 rounded bg-white/5 border border-white/10 text-gray-300 font-mono">Unity</span>
+                    <span class="text-xs px-3 py-1 rounded bg-white/5 border border-white/10 text-gray-300 font-mono">C#</span>
+                    <span class="text-xs px-3 py-1 rounded bg-white/5 border border-white/10 text-gray-300 font-mono">Web3</span>
+                    <span class="text-xs px-3 py-1 rounded bg-white/5 border border-white/10 text-gray-300 font-mono">Node.js</span>
+                    <span class="text-xs px-3 py-1 rounded bg-white/5 border border-white/10 text-gray-300 font-mono">Firebase</span>
+                </div>
+
+                <ul class="space-y-3 text-base sm:text-lg text-gray-300 leading-relaxed">
+                    <li class="flex gap-3">
+                        <i class="fa-solid fa-caret-right text-accent mt-1.5 flex-shrink-0"></i>
+                        <span data-i18n="job2-bullet1">Created web portal and administrative dashboard using modern frameworks, reducing administrative overhead by <strong class="text-white">50%+</strong></span>
+                    </li>
+                    <li class="flex gap-3">
+                        <i class="fa-solid fa-caret-right text-accent mt-1.5 flex-shrink-0"></i>
+                        <span data-i18n="job2-bullet2">Led development team for Web3 mobile game built on Unity, overseeing product lifecycle from concept to alpha release</span>
+                    </li>
+                    <li class="flex gap-3">
+                        <i class="fa-solid fa-caret-right text-accent mt-1.5 flex-shrink-0"></i>
+                        <span data-i18n="job2-bullet3">Produced 3D/2D assets and presentation materials, establishing brand identity for user acquisition and <strong class="text-white">venture capital</strong></span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- FREELANCE -->
+            <div class="glass-panel p-6 sm:p-8 rounded-xl exp-card transition-all duration-300 border-l-4 border-gray-600">
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">
+                    <div>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-white uppercase tracking-wide" data-i18n="job3-title">FREELANCE PROJECTS</h3>
+                        <p class="text-lg sm:text-xl text-gray-400 font-mono mt-2" data-i18n="job3-role">Full-Stack Developer & Consultant</p>
+                        <p class="text-sm text-gray-400 mt-1" data-i18n="job3-location"><i class="fa-solid fa-location-dot mr-1"></i> Remote</p>
+                    </div>
+                    <div class="text-sm sm:text-base font-mono text-gray-400">
+                        2018 – 2025
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <span class="text-xs px-3 py-1 rounded bg-white/5 border border-white/10 text-gray-300 font-mono">Python</span>
+                    <span class="text-xs px-3 py-1 rounded bg-white/5 border border-white/10 text-gray-300 font-mono">React</span>
+                    <span class="text-xs px-3 py-1 rounded bg-white/5 border border-white/10 text-gray-300 font-mono">Firebase</span>
+                    <span class="text-xs px-3 py-1 rounded bg-white/5 border border-white/10 text-gray-300 font-mono">Cloud</span>
+                </div>
+
+                <ul class="space-y-3 text-base sm:text-lg text-gray-300 leading-relaxed">
+                    <li class="flex gap-3">
+                        <i class="fa-solid fa-caret-right text-gray-400 mt-1.5 flex-shrink-0"></i>
+                        <span data-i18n="job3-bullet1">Built salary tracking, inventory management, and transaction systems for manufacturing facility, reducing manual labor by <strong class="text-white">50%+</strong></span>
+                    </li>
+                    <li class="flex gap-3">
+                        <i class="fa-solid fa-caret-right text-gray-400 mt-1.5 flex-shrink-0"></i>
+                        <span data-i18n="job3-bullet2">Migrated business operations from on-premise PC to cloud infrastructure, enabling multi-device access across organization</span>
+                    </li>
+                    <li class="flex gap-3">
+                        <i class="fa-solid fa-caret-right text-gray-400 mt-1.5 flex-shrink-0"></i>
+                        <span data-i18n="job3-bullet3">Provided technical consulting on blockchain integration, cloud infrastructure, and web development for digital transformation</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Projects Section -->
+<section id="projects" class="py-16 sm:py-20 px-4 sm:px-6 bg-black/20 border-t border-crimson/20">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex items-center gap-4 mb-12">
+            <h2 class="text-3xl sm:text-4xl font-black italic uppercase text-white" data-i18n="sec-proj-title">Featured_Projects</h2>
+            <div class="h-[2px] bg-crimson/30 flex-grow"></div>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+            <!-- Project 1: Habit Tracker -->
+            <div class="hex-panel p-6 rounded-xl project-card transition-all duration-300">
+                <div class="project-gallery mb-6">
+                    <div class="gallery-img active">
+                        <img src="images/goals.png" alt="Habit Tracker App" class="w-full h-full object-cover" />
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 mb-3">
+                    <i class="fa-solid fa-calendar-days text-crimson text-xl"></i>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white uppercase tracking-wide" data-i18n="proj1-title">Habit Tracker</h3>
+                </div>
+
+                <p class="text-base text-gray-300 leading-relaxed mb-4" data-i18n="proj1-desc">
+                    A comprehensive diary and habit tracking application featuring daily journaling, yearly habit visualization,
+                    streak tracking, and mood analytics. Built with React and Firebase for real-time synchronization across devices.
+                </p>
+
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-xs px-2 py-1 rounded bg-crimson/10 border border-crimson/30 text-accent font-mono">React</span>
+                    <span class="text-xs px-2 py-1 rounded bg-crimson/10 border border-crimson/30 text-accent font-mono">Firebase</span>
+                    <span class="text-xs px-2 py-1 rounded bg-crimson/10 border border-crimson/30 text-accent font-mono">Vite</span>
+                </div>
+
+                <div class="pt-4 border-t border-white/10">
+                    <div class="text-sm text-gray-400">
+                        <div class="mb-2" data-i18n="proj1-feat-title"><strong class="text-white">Features:</strong></div>
+                        <ul class="space-y-1 text-sm">
+                            <li class="flex gap-2"><span class="text-crimson">•</span> <span data-i18n="proj1-feat1">Daily habit tracking with streaks</span></li>
+                            <li class="flex gap-2"><span class="text-crimson">•</span> <span data-i18n="proj1-feat2">Yearly visualization & analytics</span></li>
+                            <li class="flex gap-2"><span class="text-crimson">•</span> <span data-i18n="proj1-feat3">Mood tracking & journaling</span></li>
+                            <li class="flex gap-2"><span class="text-crimson">•</span> <span data-i18n="proj1-feat4">Cloud sync across devices</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <a href="https://avci.jp/goaltest" target="_blank" rel="noopener noreferrer" class="live-btn">
+                    <i class="fa-solid fa-arrow-up-right-from-square btn-icon text-xs"></i>
+                    <span data-i18n="live-site-btn">LIVE SITE</span>
+                </a>
+            </div>
+
+            <!-- Project 2: Factory Management -->
+            <div class="hex-panel p-6 rounded-xl project-card transition-all duration-300">
+                <div class="project-gallery mb-6">
+                    <div class="gallery-img active">
+                        <img src="images/factory.png" alt="Factory Management System" class="w-full h-full object-cover" />
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 mb-3">
+                    <i class="fa-solid fa-boxes-stacked text-crimson text-xl"></i>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white uppercase tracking-wide" data-i18n="proj2-title">Factory Manager</h3>
+                </div>
+
+                <p class="text-base text-gray-300 leading-relaxed mb-4" data-i18n="proj2-desc">
+                    Enterprise-grade management system for manufacturing operations. Comprehensive solution for inventory control,
+                    order processing, customer relationship management, and employee administration. Reduced manual workload by 50%.
+                </p>
+
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-xs px-2 py-1 rounded bg-crimson/10 border border-crimson/30 text-accent font-mono">Python</span>
+                    <span class="text-xs px-2 py-1 rounded bg-crimson/10 border border-crimson/30 text-accent font-mono">React</span>
+                    <span class="text-xs px-2 py-1 rounded bg-crimson/10 border border-crimson/30 text-accent font-mono">Firebase</span>
+                    <span class="text-xs px-2 py-1 rounded bg-crimson/10 border border-crimson/30 text-accent font-mono">Cloud</span>
+                </div>
+
+                <div class="pt-4 border-t border-white/10">
+                    <div class="text-sm text-gray-400">
+                        <div class="mb-2" data-i18n="proj2-feat-title"><strong class="text-white">Modules:</strong></div>
+                        <ul class="space-y-1 text-sm">
+                            <li class="flex gap-2"><span class="text-crimson">•</span> <span data-i18n="proj2-feat1">Real-time stock management</span></li>
+                            <li class="flex gap-2"><span class="text-crimson">•</span> <span data-i18n="proj2-feat2">Order tracking & fulfillment</span></li>
+                            <li class="flex gap-2"><span class="text-crimson">•</span> <span data-i18n="proj2-feat3">Customer database & CRM</span></li>
+                            <li class="flex gap-2"><span class="text-crimson">•</span> <span data-i18n="proj2-feat4">Employee management portal</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <a href="https://avci.jp/ihsanv2" target="_blank" rel="noopener noreferrer" class="live-btn">
+                    <i class="fa-solid fa-arrow-up-right-from-square btn-icon text-xs"></i>
+                    <span data-i18n="live-site-btn">LIVE SITE</span>
+                </a>
+            </div>
+
+            <!-- Project 3: Junwa Sustain -->
+            <div class="hex-panel p-6 rounded-xl project-card transition-all duration-300">
+                <div class="project-gallery mb-6">
+                    <div class="gallery-img active">
+                        <img src="images/moonju.png" alt="Junwa Sustain Website" class="w-full h-full object-cover" />
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 mb-3">
+                    <i class="fa-solid fa-leaf text-crimson text-xl"></i>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white uppercase tracking-wide">Junwa Sustain</h3>
+                </div>
+
+                <p class="text-base text-gray-300 leading-relaxed mb-4" data-i18n="proj3-desc">
+                    Full-stack development of corporate website and integrated event management system for junwasustain.site.
+                    Dual-purpose platform serving both as company presentation and event coordination tool with real-time updates.
+                </p>
+
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-xs px-2 py-1 rounded bg-crimson/10 border border-crimson/30 text-accent font-mono">React</span>
+                    <span class="text-xs px-2 py-1 rounded bg-crimson/10 border border-crimson/30 text-accent font-mono">Node.js</span>
+                    <span class="text-xs px-2 py-1 rounded bg-crimson/10 border border-crimson/30 text-accent font-mono">Firebase</span>
+                    <span class="text-xs px-2 py-1 rounded bg-crimson/10 border border-crimson/30 text-accent font-mono">Tailwind</span>
+                </div>
+
+                <div class="pt-4 border-t border-white/10">
+                    <div class="text-sm text-gray-400">
+                        <div class="mb-2" data-i18n="proj3-feat-title"><strong class="text-white">Capabilities:</strong></div>
+                        <ul class="space-y-1 text-sm">
+                            <li class="flex gap-2"><span class="text-crimson">•</span> <span data-i18n="proj3-feat1">Corporate website & portfolio</span></li>
+                            <li class="flex gap-2"><span class="text-crimson">•</span> <span data-i18n="proj3-feat2">Event creation & management</span></li>
+                            <li class="flex gap-2"><span class="text-crimson">•</span> <span data-i18n="proj3-feat3">Registration & attendance tracking</span></li>
+                            <li class="flex gap-2"><span class="text-crimson">•</span> <span data-i18n="proj3-feat4">Admin dashboard with analytics</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <a href="https://junwasustain.site/" target="_blank" rel="noopener noreferrer" class="live-btn">
+                    <i class="fa-solid fa-arrow-up-right-from-square btn-icon text-xs"></i>
+                    <span data-i18n="live-site-btn">LIVE SITE</span>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Technical Stack -->
+<section id="stack" class="py-16 sm:py-20 px-4 sm:px-6 border-t border-crimson/20">
+    <div class="max-w-7xl mx-auto">
+        <h2 class="text-2xl sm:text-3xl font-bold mb-8 font-mono" data-i18n="stack-title">
+            <span class="text-crimson">~/</span> technical_stack
+        </h2>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div class="hex-panel p-4 sm:p-5 flex items-center gap-3 hover:border-crimson/50 transition-all tech-card">
+                <i class="fa-brands fa-python text-yellow-400 text-2xl sm:text-3xl"></i>
+                <div>
+                    <div class="font-bold text-sm sm:text-base">Python</div>
+                    <div class="text-xs text-gray-500 font-mono" data-i18n="tech-python-label">PRIMARY</div>
+                </div>
+            </div>
+            <div class="hex-panel p-4 sm:p-5 flex items-center gap-3 hover:border-crimson/50 transition-all tech-card">
+                <i class="fa-brands fa-js text-yellow-300 text-2xl sm:text-3xl"></i>
+                <div>
+                    <div class="font-bold text-sm sm:text-base">JavaScript</div>
+                    <div class="text-xs text-gray-500 font-mono" data-i18n="tech-js-label">FULL-STACK</div>
+                </div>
+            </div>
+            <div class="hex-panel p-4 sm:p-5 flex items-center gap-3 hover:border-crimson/50 transition-all tech-card">
+                <i class="fa-brands fa-react text-cyan-400 text-2xl sm:text-3xl"></i>
+                <div>
+                    <div class="font-bold text-sm sm:text-base">React</div>
+                    <div class="text-xs text-gray-500 font-mono" data-i18n="tech-react-label">FRONTEND</div>
+                </div>
+            </div>
+            <div class="hex-panel p-4 sm:p-5 flex items-center gap-3 hover:border-crimson/50 transition-all tech-card">
+                <i class="fa-solid fa-wind text-blue-400 text-2xl sm:text-3xl"></i>
+                <div>
+                    <div class="font-bold text-sm sm:text-base">Tailwind</div>
+                    <div class="text-xs text-gray-500 font-mono">CSS</div>
+                </div>
+            </div>
+            <div class="hex-panel p-4 sm:p-5 flex items-center gap-3 hover:border-crimson/50 transition-all tech-card">
+                <i class="fa-brands fa-aws text-orange-400 text-2xl sm:text-3xl"></i>
+                <div>
+                    <div class="font-bold text-sm sm:text-base">AWS</div>
+                    <div class="text-xs text-gray-500 font-mono" data-i18n="tech-aws-label">CLOUD</div>
+                </div>
+            </div>
+            <div class="hex-panel p-4 sm:p-5 flex items-center gap-3 hover:border-crimson/50 transition-all tech-card">
+                <i class="fa-solid fa-fire text-yellow-500 text-2xl sm:text-3xl"></i>
+                <div>
+                    <div class="font-bold text-sm sm:text-base">Firebase</div>
+                    <div class="text-xs text-gray-500 font-mono" data-i18n="tech-firebase-label">BACKEND</div>
+                </div>
+            </div>
+            <div class="hex-panel p-4 sm:p-5 flex items-center gap-3 hover:border-crimson/50 transition-all tech-card">
+                <i class="fa-solid fa-table text-green-400 text-2xl sm:text-3xl"></i>
+                <div>
+                    <div class="font-bold text-sm sm:text-base">Pandas</div>
+                    <div class="text-xs text-gray-500 font-mono" data-i18n="tech-pandas-label">DATA</div>
+                </div>
+            </div>
+            <div class="hex-panel p-4 sm:p-5 flex items-center gap-3 hover:border-crimson/50 transition-all tech-card">
+                <i class="fa-solid fa-map text-blue-300 text-2xl sm:text-3xl"></i>
+                <div>
+                    <div class="font-bold text-sm sm:text-base">GIS</div>
+                    <div class="text-xs text-gray-500 font-mono" data-i18n="tech-gis-label">GEOSPATIAL</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Education Section -->
+<section id="education" class="py-16 sm:py-20 px-4 sm:px-6 bg-black/20 border-t border-crimson/20">
+    <div class="max-w-5xl mx-auto">
+        <h2 class="text-2xl sm:text-3xl font-bold mb-10 flex items-center gap-3">
+            <i class="fa-solid fa-graduation-cap text-crimson"></i>
+            <span class="uppercase tracking-wide" data-i18n="sec-edu-title">Academic_Record</span>
+        </h2>
+
+        <div class="grid gap-6">
+            <!-- Master's -->
+            <div class="hex-panel p-6 sm:p-8 rounded-xl hover:border-crimson/50 transition-all">
+                <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 gap-3">
+                    <div>
+                        <div class="text-crimson font-mono text-sm sm:text-base mb-2 uppercase tracking-widest font-bold" data-i18n="edu1-degree">Master of Science</div>
+                        <h3 class="text-xl sm:text-3xl font-bold text-white" data-i18n="edu1-school">Osaka Sangyo University</h3>
+                        <p class="text-gray-400 mt-2 text-sm sm:text-base font-mono" data-i18n="edu1-field">Information Systems</p>
+                    </div>
+                    <div class="text-sm sm:text-base font-mono text-gray-400 bg-crimson/10 px-4 py-2 rounded border border-crimson/30">2023 – 2025</div>
+                </div>
+                <p class="text-base sm:text-lg text-accent mt-4 italic leading-relaxed border-l-2 border-crimson/50 pl-4" data-i18n="edu1-thesis">
+                    <i class="fa-solid fa-flask mr-2"></i>
+                    <strong>Thesis:</strong> Geospatial analysis of 4 major Japanese cities to predict optimal railway station locations using GIS, Python, and Random Forest machine learning
+                </p>
+                <div class="mt-4 text-sm sm:text-base text-gray-300 bg-white/5 p-3 rounded border border-white/10" data-i18n="edu1-role">
+                    <i class="fa-solid fa-chalkboard-user mr-2 text-crimson"></i>
+                    <strong>Role:</strong> Teaching Assistant (Python, Computer Science Basics)
+                </div>
+            </div>
+
+            <!-- Bachelor's -->
+            <div class="hex-panel p-6 sm:p-8 rounded-xl hover:border-crimson/50 transition-all border-l-accent">
+                <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 gap-3">
+                    <div>
+                        <div class="text-gray-500 font-mono text-sm sm:text-base mb-2 uppercase tracking-widest font-bold" data-i18n="edu2-degree">Bachelor of Science</div>
+                        <h3 class="text-xl sm:text-3xl font-bold text-white" data-i18n="edu2-school">Duzce University</h3>
+                        <p class="text-gray-400 mt-2 text-sm sm:text-base font-mono" data-i18n="edu2-field">Mechatronics Engineering</p>
+                    </div>
+                    <div class="text-sm sm:text-base font-mono text-gray-400 bg-white/5 px-4 py-2 rounded border border-white/20">2015 – 2020</div>
+                </div>
+                <div class="mt-4 space-y-2 text-sm sm:text-base text-gray-300">
+                    <div class="flex items-start gap-3 p-2 bg-white/5 rounded" data-i18n="edu2-exchange1"><i class="fa-solid fa-plane-departure text-crimson mt-1"></i> <span><strong>2019:</strong> Exchange Program - Osaka Sangyo University, Japan</span></div>
+                    <div class="flex items-start gap-3 p-2 bg-white/5 rounded" data-i18n="edu2-exchange2"><i class="fa-solid fa-plane-departure text-crimson mt-1"></i> <span><strong>2017:</strong> Exchange Program - Lublin Univ. of Tech., Poland (Computer Science)</span></div>
+                    <div class="flex items-start gap-3 p-2 bg-white/5 rounded" data-i18n="edu2-exchange3"><i class="fa-solid fa-plane-departure text-crimson mt-1"></i> <span><strong>2016:</strong> Exchange Program - Lodz Univ. of Tech., Poland (Mechanical Eng.)</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="mt-12">
+            <h3 class="text-xl sm:text-2xl font-bold mb-6 flex items-center gap-3">
+                <i class="fa-solid fa-trophy text-yellow-400"></i>
+                <span class="uppercase tracking-wide" data-i18n="achievements-title">Achievements</span>
+            </h3>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- TOEIC -->
+                <div class="hex-panel p-6 hover:border-yellow-400/50 transition-all tech-card flex items-start gap-4">
+                    <div class="mt-1 text-yellow-400">
+                        <i class="fa-solid fa-award text-3xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-500 font-mono mb-1 uppercase" data-i18n="ach1-date">March 2025</div>
+                        <h4 class="font-bold text-white text-xl leading-tight">TOEIC: 955</h4>
+                        <div class="text-sm text-gray-400 mt-2" data-i18n="ach1-label">English Proficiency</div>
+                    </div>
+                </div>
+
+                <!-- Rotary -->
+                <div class="hex-panel p-6 hover:border-blue-400/50 transition-all tech-card flex items-start gap-4">
+                    <div class="mt-1 text-blue-400">
+                        <i class="fa-solid fa-medal text-3xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-500 font-mono mb-1 uppercase" data-i18n="ach2-type">Scholarship</div>
+                        <h4 class="font-bold text-white text-lg leading-tight">Rotary Yoneyama</h4>
+                        <div class="text-sm text-gray-400 mt-2" data-i18n="ach2-desc">Competitive scholarship for international students</div>
+                    </div>
+                </div>
+
+                <!-- Erasmus -->
+                <div class="hex-panel p-6 hover:border-orange-400/50 transition-all tech-card flex items-start gap-4">
+                    <div class="mt-1 text-orange-400">
+                        <i class="fa-solid fa-star text-3xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-500 font-mono mb-1 uppercase" data-i18n="ach3-type">Scholarship</div>
+                        <h4 class="font-bold text-white text-lg leading-tight">Erasmus+ (×2)</h4>
+                        <div class="text-sm text-gray-400 mt-2" data-i18n="ach3-desc">Academic excellence in Europe</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Hobbies Section -->
+<section id="hobbies" class="py-16 sm:py-20 px-4 sm:px-6 border-t border-crimson/20">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex items-center gap-4 mb-12">
+            <h2 class="text-3xl sm:text-4xl font-black italic uppercase text-white" data-i18n="sec-hobbies-title">Personal_Interests</h2>
+            <div class="h-[2px] bg-crimson/30 flex-grow"></div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+
+            <!-- Airsoft -->
+            <div class="hex-panel p-6 sm:p-8 rounded-xl hover:border-crimson/50 transition-all">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="flex-shrink-0">
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 bg-crimson/10 rounded-xl flex items-center justify-center border-2 border-crimson/40">
+                            <i class="fa-solid fa-gun text-3xl sm:text-4xl text-crimson"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-white uppercase tracking-wide mb-2" data-i18n="hobby1-title">Airsoft</h3>
+                        <p class="text-sm text-gray-500 font-mono uppercase" data-i18n="hobby1-type">Tactical Combat Sport</p>
+                    </div>
+                </div>
+                <div class="space-y-3 text-base text-gray-300 leading-relaxed">
+                    <div class="flex items-start gap-3 bg-white/5 p-3 rounded border-l-2 border-crimson/50">
+                        <i class="fa-solid fa-crosshairs text-crimson mt-1 flex-shrink-0"></i>
+                        <span data-i18n="hobby1-detail1"><strong class="text-white">Primary:</strong> HK416 Tokyo Marui with 8x scope for precision targeting</span>
+                    </div>
+                    <div class="flex items-start gap-3 bg-white/5 p-3 rounded border-l-2 border-accent/50">
+                        <i class="fa-solid fa-vest text-accent mt-1 flex-shrink-0"></i>
+                        <span data-i18n="hobby1-detail2"><strong class="text-white">Loadout:</strong> Turkish Gendarmerie Commando outfit for authentic tactical operations</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Archery -->
+            <div class="hex-panel p-6 sm:p-8 rounded-xl hover:border-green-500/50 transition-all">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="flex-shrink-0">
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 bg-green-500/10 rounded-xl flex items-center justify-center border-2 border-green-500/40">
+                            <i class="fa-solid fa-bullseye text-3xl sm:text-4xl text-green-500"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-white uppercase tracking-wide mb-2" data-i18n="hobby2-title">Archery</h3>
+                        <p class="text-sm text-gray-500 font-mono uppercase" data-i18n="hobby2-type">Traditional Marksmanship</p>
+                    </div>
+                </div>
+                <div class="space-y-3 text-base text-gray-300 leading-relaxed">
+                    <div class="flex items-start gap-3 bg-white/5 p-3 rounded border-l-2 border-green-500/50">
+                        <i class="fa-solid fa-clock-rotate-left text-green-500 mt-1 flex-shrink-0"></i>
+                        <span data-i18n="hobby2-detail1"><strong class="text-white">Journey:</strong> Passionate about archery since high school, developed skills over years</span>
+                    </div>
+                    <div class="flex items-start gap-3 bg-white/5 p-3 rounded border-l-2 border-green-400/50">
+                        <i class="fa-solid fa-hammer text-green-400 mt-1 flex-shrink-0"></i>
+                        <span data-i18n="hobby2-detail2"><strong class="text-white">Craftsmanship:</strong> Built my own bow and arrows, combining engineering with traditional craft</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Book Reading -->
+            <div class="hex-panel p-6 sm:p-8 rounded-xl hover:border-purple-500/50 transition-all">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="flex-shrink-0">
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 bg-purple-500/10 rounded-xl flex items-center justify-center border-2 border-purple-500/40">
+                            <i class="fa-solid fa-book-open text-3xl sm:text-4xl text-purple-500"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-white uppercase tracking-wide mb-2" data-i18n="hobby3-title">Reading</h3>
+                        <p class="text-sm text-gray-500 font-mono uppercase" data-i18n="hobby3-type">Epic Fantasy Literature</p>
+                    </div>
+                </div>
+                <div class="space-y-3 text-base text-gray-300 leading-relaxed">
+                    <div class="flex items-start gap-3 bg-white/5 p-3 rounded border-l-2 border-purple-500/50">
+                        <i class="fa-solid fa-book text-purple-500 mt-1 flex-shrink-0"></i>
+                        <span data-i18n="hobby3-detail1"><strong class="text-white">Current Read:</strong> The Stormlight Archive - Oathbringer by Brandon Sanderson</span>
+                    </div>
+                    <div class="flex items-start gap-3 bg-white/5 p-3 rounded border-l-2 border-purple-400/50">
+                        <i class="fa-solid fa-dragon text-purple-400 mt-1 flex-shrink-0"></i>
+                        <span data-i18n="hobby3-detail2"><strong class="text-white">Genre:</strong> Deep love for epic fantasy series with rich world-building and complex magic systems</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gaming -->
+            <div class="hex-panel p-6 sm:p-8 rounded-xl hover:border-blue-500/50 transition-all">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="flex-shrink-0">
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 bg-blue-500/10 rounded-xl flex items-center justify-center border-2 border-blue-500/40">
+                            <i class="fa-solid fa-gamepad text-3xl sm:text-4xl text-blue-500"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-white uppercase tracking-wide mb-2" data-i18n="hobby4-title">Gaming</h3>
+                        <p class="text-sm text-gray-500 font-mono uppercase" data-i18n="hobby4-type">Strategic Warfare</p>
+                    </div>
+                </div>
+                <div class="space-y-3 text-base text-gray-300 leading-relaxed">
+                    <div class="flex items-start gap-3 bg-white/5 p-3 rounded border-l-2 border-blue-500/50">
+                        <i class="fa-solid fa-globe text-blue-500 mt-1 flex-shrink-0"></i>
+                        <span data-i18n="hobby4-detail1"><strong class="text-white">Currently Playing:</strong> Europa Universalis V - conquering nations and shaping history</span>
+                    </div>
+                    <div class="flex items-start gap-3 bg-white/5 p-3 rounded border-l-2 border-blue-400/50">
+                        <i class="fa-solid fa-chess text-blue-400 mt-1 flex-shrink-0"></i>
+                        <span data-i18n="hobby4-detail2"><strong class="text-white">Passion:</strong> Grand strategy games - tactical depth, historical simulation, and long-term planning</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-12 border-t border-crimson/20 text-center bg-[#0f0f12]">
+    <p class="text-gray-500 text-sm font-mono px-4 uppercase tracking-wider">
+        &copy; <span id="year"></span> Ramazan Furkan AVCI
+        <span class="block mt-3 text-gray-600 text-xs" data-i18n="footer-status">
+            Status: <span class="text-crimson">Online</span> // Built: <span class="text-accent">Osaka_JP</span> // System: <span class="text-white">AVCI_DATA_CENTER</span>
+        </span>
+    </p>
+</footer>
+
+<script>
+    // ─── Translations ────────────────────────────────────────────────────────────
+    const translations = {
+        en: {
+            typingWords: ["DATA SCIENTIST", "MECHATRONICS ENGINEER", "FULL-STACK DEVELOPER", "CLOUD ARCHITECT"],
+            'nav-exp':       '<span class="text-crimson">01.</span> Experience',
+            'nav-projects':  '<span class="text-crimson">02.</span> Projects',
+            'nav-stack':     '<span class="text-crimson">03.</span> Tech Stack',
+            'nav-edu':       '<span class="text-crimson">04.</span> Education',
+            'nav-hobbies':   '<span class="text-crimson">05.</span> Hobbies',
+            'btn-contact':   'CONTACT',
+            'hero-location': 'Osaka, Japan',
+            'hero-gender':   'Male',
+            'hero-bio':      'Data Scientist at TECHNOPRO DESIGN, specializing in Python automation, cloud infrastructure, and AI/ML solutions. Master\'s graduate from Osaka Sangyo University with expertise in GIS and machine learning.',
+            'quick-stats-title': '// Quick_Stats',
+            'stat-lang-label':   'Languages',
+            'stat-english':      'English',
+            'stat-japanese':     'Japanese',
+            'stat-turkish':      'Turkish',
+            'sec-exp-title':  'Deployment_History',
+            'job1-company':   'TECHNOPRO DESIGN',
+            'job1-role':      'Data Scientist',
+            'job1-location':  '<i class="fa-solid fa-location-dot mr-1"></i> Osaka, Japan',
+            'job1-date':      'APR 2025 – PRESENT',
+            'job1-bullet1':   'Achieved <strong class="text-white">80% reduction</strong> in processing time for 1M+ records using parallel VPC architecture and Python automation',
+            'job1-bullet2':   'Built automation scripts that accelerated manual data workflows by <strong class="text-white">50%</strong>, improving operational efficiency across teams',
+            'job1-bullet3':   'Enhanced conversation bot with <strong class="text-white">page-level PDF referencing</strong> using OpenSearch and local LLM integration',
+            'llm-title':      '// LLM_Experience',
+            'llm-bullet1':    'Built a local <strong class="text-white">RAG search engine</strong> for OCR-processed PDFs, using LLM to do keyword search and intelligent document finding',
+            'llm-bullet2':    'Developed a local <strong class="text-white">GenAI chatbot platform</strong> by connecting LM Studio with ngrok, built a chat app and used it to demonstrate LLM capabilities to new graduates',
+            'llm-bullet3':    'Improved product category accuracy assignment by <strong class="text-white">40%</strong> using GPT-4o Mini and created new scripts for more detailed labeling of inventory data',
+            'job2-role':      'Co-founder & Technical Lead',
+            'job2-location':  '<i class="fa-solid fa-location-dot mr-1"></i> Remote',
+            'job2-bullet1':   'Created web portal and administrative dashboard using modern frameworks, reducing administrative overhead by <strong class="text-white">50%+</strong>',
+            'job2-bullet2':   'Led development team for Web3 mobile game built on Unity, overseeing product lifecycle from concept to alpha release',
+            'job2-bullet3':   'Produced 3D/2D assets and presentation materials, establishing brand identity for user acquisition and <strong class="text-white">venture capital</strong>',
+            'job3-title':     'FREELANCE PROJECTS',
+            'job3-role':      'Full-Stack Developer & Consultant',
+            'job3-location':  '<i class="fa-solid fa-location-dot mr-1"></i> Remote',
+            'job3-bullet1':   'Built salary tracking, inventory management, and transaction systems for manufacturing facility, reducing manual labor by <strong class="text-white">50%+</strong>',
+            'job3-bullet2':   'Migrated business operations from on-premise PC to cloud infrastructure, enabling multi-device access across organization',
+            'job3-bullet3':   'Provided technical consulting on blockchain integration, cloud infrastructure, and web development for digital transformation',
+            'stack-title':    '<span class="text-crimson">~/</span> technical_stack',
+            'tech-python-label':   'PRIMARY',
+            'tech-js-label':       'FULL-STACK',
+            'tech-react-label':    'FRONTEND',
+            'tech-aws-label':      'CLOUD',
+            'tech-firebase-label': 'BACKEND',
+            'tech-pandas-label':   'DATA',
+            'tech-gis-label':      'GEOSPATIAL',
+            'sec-edu-title':  'Academic_Record',
+            'edu1-degree':    'Master of Science',
+            'edu1-school':    'Osaka Sangyo University',
+            'edu1-field':     'Information Systems',
+            'edu1-thesis':    '<i class="fa-solid fa-flask mr-2"></i><strong>Thesis:</strong> Geospatial analysis of 4 major Japanese cities to predict optimal railway station locations using GIS, Python, and Random Forest machine learning',
+            'edu1-role':      '<i class="fa-solid fa-chalkboard-user mr-2 text-crimson"></i><strong>Role:</strong> Teaching Assistant (Python, Computer Science Basics)',
+            'edu2-degree':    'Bachelor of Science',
+            'edu2-school':    'Duzce University',
+            'edu2-field':     'Mechatronics Engineering',
+            'edu2-exchange1': '<i class="fa-solid fa-plane-departure text-crimson mt-1"></i> <span><strong>2019:</strong> Exchange Program - Osaka Sangyo University, Japan</span>',
+            'edu2-exchange2': '<i class="fa-solid fa-plane-departure text-crimson mt-1"></i> <span><strong>2017:</strong> Exchange Program - Lublin Univ. of Tech., Poland (Computer Science)</span>',
+            'edu2-exchange3': '<i class="fa-solid fa-plane-departure text-crimson mt-1"></i> <span><strong>2016:</strong> Exchange Program - Lodz Univ. of Tech., Poland (Mechanical Eng.)</span>',
+            'achievements-title': 'Achievements',
+            'ach1-date':  'March 2025',
+            'ach1-label': 'English Proficiency',
+            'ach2-type':  'Scholarship',
+            'ach2-desc':  'Competitive scholarship for international students',
+            'ach3-type':  'Scholarship',
+            'ach3-desc':  'Academic excellence in Europe',
+            'sec-proj-title':  'Featured_Projects',
+            'proj1-title':     'Habit Tracker',
+            'proj1-desc':      'A comprehensive diary and habit tracking application featuring daily journaling, yearly habit visualization, streak tracking, and mood analytics. Built with React and Firebase for real-time synchronization across devices.',
+            'proj1-feat-title':'<strong class="text-white">Features:</strong>',
+            'proj1-feat1':     'Daily habit tracking with streaks',
+            'proj1-feat2':     'Yearly visualization & analytics',
+            'proj1-feat3':     'Mood tracking & journaling',
+            'proj1-feat4':     'Cloud sync across devices',
+            'proj2-title':     'Factory Manager',
+            'proj2-desc':      'Enterprise-grade management system for manufacturing operations. Comprehensive solution for inventory control, order processing, customer relationship management, and employee administration. Reduced manual workload by 50%.',
+            'proj2-feat-title':'<strong class="text-white">Modules:</strong>',
+            'proj2-feat1':     'Real-time stock management',
+            'proj2-feat2':     'Order tracking & fulfillment',
+            'proj2-feat3':     'Customer database & CRM',
+            'proj2-feat4':     'Employee management portal',
+            'proj3-desc':      'Full-stack development of corporate website and integrated event management system for junwasustain.site. Dual-purpose platform serving both as company presentation and event coordination tool with real-time updates.',
+            'proj3-feat-title':'<strong class="text-white">Capabilities:</strong>',
+            'proj3-feat1':     'Corporate website & portfolio',
+            'proj3-feat2':     'Event creation & management',
+            'proj3-feat3':     'Registration & attendance tracking',
+            'proj3-feat4':     'Admin dashboard with analytics',
+            'live-site-btn':   'LIVE SITE',
+            'sec-hobbies-title': 'Personal_Interests',
+            'hobby1-title':   'Airsoft',
+            'hobby1-type':    'Tactical Combat Sport',
+            'hobby1-detail1': '<strong class="text-white">Primary:</strong> HK416 Tokyo Marui with 8x scope for precision targeting',
+            'hobby1-detail2': '<strong class="text-white">Loadout:</strong> Turkish Gendarmerie Commando outfit for authentic tactical operations',
+            'hobby2-title':   'Archery',
+            'hobby2-type':    'Traditional Marksmanship',
+            'hobby2-detail1': '<strong class="text-white">Journey:</strong> Passionate about archery since high school, developed skills over years',
+            'hobby2-detail2': '<strong class="text-white">Craftsmanship:</strong> Built my own bow and arrows, combining engineering with traditional craft',
+            'hobby3-title':   'Reading',
+            'hobby3-type':    'Epic Fantasy Literature',
+            'hobby3-detail1': '<strong class="text-white">Current Read:</strong> The Stormlight Archive - Oathbringer by Brandon Sanderson',
+            'hobby3-detail2': '<strong class="text-white">Genre:</strong> Deep love for epic fantasy series with rich world-building and complex magic systems',
+            'hobby4-title':   'Gaming',
+            'hobby4-type':    'Strategic Warfare',
+            'hobby4-detail1': '<strong class="text-white">Currently Playing:</strong> Europa Universalis V - conquering nations and shaping history',
+            'hobby4-detail2': '<strong class="text-white">Passion:</strong> Grand strategy games - tactical depth, historical simulation, and long-term planning',
+            'footer-status':  'Status: <span class="text-crimson">Online</span> // Built: <span class="text-accent">Osaka_JP</span> // System: <span class="text-white">AVCI_DATA_CENTER</span>',
+        },
+        ja: {
+            typingWords: ["データサイエンティスト", "メカトロニクスエンジニア", "フルスタック開発者", "クラウドアーキテクト"],
+            'nav-exp':       '<span class="text-crimson">01.</span> 経歴',
+            'nav-projects':  '<span class="text-crimson">02.</span> プロジェクト',
+            'nav-stack':     '<span class="text-crimson">03.</span> 技術スタック',
+            'nav-edu':       '<span class="text-crimson">04.</span> 学歴',
+            'nav-hobbies':   '<span class="text-crimson">05.</span> 趣味',
+            'btn-contact':   'お問い合わせ',
+            'hero-location': '大阪府、日本',
+            'hero-gender':   '男性',
+            'hero-bio':      '株式会社テクノプロデザイン社にてデータサイエンティストとして、Pythonによる業務自動化、クラウドインフラの構築、AIおよび機械学習ソリューションの開発を専門としています。大阪産業大学大学院修了。GISと機械学習を主な専門領域としています。',
+            'quick-stats-title': '// 基本情報',
+            'stat-lang-label':   '言語',
+            'stat-english':      '英語',
+            'stat-japanese':     '日本語',
+            'stat-turkish':      'トルコ語',
+            'sec-exp-title':  '職務経歴',
+            'job1-company':   '株式会社テクノプロデザイン社',
+            'job1-role':      'データサイエンティスト',
+            'job1-location':  '<i class="fa-solid fa-location-dot mr-1"></i> 大阪府、日本',
+            'job1-date':      '2025年4月 – 現在',
+            'job1-bullet1':   '並列VPCアーキテクチャとPython自動化を活用し、100万件超のレコードの処理時間を<strong class="text-white">80%削減</strong>しました。',
+            'job1-bullet2':   '手作業によるデータワークフローを<strong class="text-white">50%</strong>効率化する自動化スクリプトを構築し、全チームの業務生産性を向上させました。',
+            'job1-bullet3':   'OpenSearchとローカルLLMを組み合わせ、会話ボットに<strong class="text-white">PDFのページ単位参照</strong>機能を実装しました。',
+            'llm-title':      '// LLM活用実績',
+            'llm-bullet1':    'OCR処理済みPDFを対象に<strong class="text-white">ローカルRAG検索エンジン</strong>を構築し、LLMによるキーワード検索と高精度な文書探索を実現しました。',
+            'llm-bullet2':    'LM StudioとngrokをつなぎローカルGenAIチャットプラットフォームを開発。チャットアプリを構築し、新卒向け研修で<strong class="text-white">LLMの活用事例</strong>をデモンストレーションしました。',
+            'llm-bullet3':    'GPT-4o Miniを活用して商品カテゴリ分類の精度を<strong class="text-white">40%改善</strong>し、在庫データのより詳細なラベリングを行う新スクリプトも開発しました。',
+            'job2-role':      '共同創業者 & テクニカルリード',
+            'job2-location':  '<i class="fa-solid fa-location-dot mr-1"></i> リモート',
+            'job2-bullet1':   'モダンなフレームワークを用いてWebポータルと管理ダッシュボードを開発し、管理部門の業務負荷を<strong class="text-white">50%以上</strong>削減しました。',
+            'job2-bullet2':   'UnityベースのWeb3モバイルゲームの開発チームを統括し、コンセプト立案からアルファ版リリースまでのプロダクトサイクル全体を監督しました。',
+            'job2-bullet3':   '3D・2Dアセットとプレゼン資料を制作し、ユーザー獲得と<strong class="text-white">ベンチャーキャピタル</strong>向けのブランドアイデンティティを確立しました。',
+            'job3-title':     'フリーランス案件',
+            'job3-role':      'フルスタック開発者 & コンサルタント',
+            'job3-location':  '<i class="fa-solid fa-location-dot mr-1"></i> リモート',
+            'job3-bullet1':   '製造業向けに給与管理・在庫管理・取引管理システムを開発し、手作業による業務を<strong class="text-white">50%以上</strong>削減しました。',
+            'job3-bullet2':   '社内PCからクラウドインフラへの業務移行を実施し、組織内での複数デバイスからのアクセスを可能にしました。',
+            'job3-bullet3':   'ブロックチェーン統合・クラウドインフラ・Web開発に関する技術コンサルティングを提供し、デジタルトランスフォーメーションを推進しました。',
+            'stack-title':    '<span class="text-crimson">~/</span> 技術スタック',
+            'tech-python-label':   '主要言語',
+            'tech-js-label':       'フルスタック',
+            'tech-react-label':    'フロントエンド',
+            'tech-aws-label':      'クラウド',
+            'tech-firebase-label': 'バックエンド',
+            'tech-pandas-label':   'データ',
+            'tech-gis-label':      '地理空間',
+            'sec-edu-title':  '学歴',
+            'edu1-degree':    '理学修士',
+            'edu1-school':    '大阪産業大学',
+            'edu1-field':     '情報システム',
+            'edu1-thesis':    '<i class="fa-solid fa-flask mr-2"></i><strong>修士論文：</strong>GIS・Python・ランダムフォレストを活用した機械学習により、日本の主要4都市における最適な鉄道駅位置を予測する地理空間分析',
+            'edu1-role':      '<i class="fa-solid fa-chalkboard-user mr-2 text-crimson"></i><strong>担当：</strong>ティーチングアシスタント（Python・コンピュータサイエンス基礎）',
+            'edu2-degree':    '理学士',
+            'edu2-school':    'デュゼジェ大学',
+            'edu2-field':     'メカトロニクス工学',
+            'edu2-exchange1': '<i class="fa-solid fa-plane-departure text-crimson mt-1"></i> <span><strong>2019年：</strong>交換留学 – 大阪産業大学（日本）</span>',
+            'edu2-exchange2': '<i class="fa-solid fa-plane-departure text-crimson mt-1"></i> <span><strong>2017年：</strong>交換留学 – ルブリン工科大学（ポーランド・コンピュータサイエンス）</span>',
+            'edu2-exchange3': '<i class="fa-solid fa-plane-departure text-crimson mt-1"></i> <span><strong>2016年：</strong>交換留学 – ウッジ工科大学（ポーランド・機械工学）</span>',
+            'achievements-title': '受賞・実績',
+            'ach1-date':  '2025年3月',
+            'ach1-label': '英語能力証明',
+            'ach2-type':  '奨学金',
+            'ach2-desc':  '留学生を対象とした競争奨学金',
+            'ach3-type':  '奨学金',
+            'ach3-desc':  'ヨーロッパにおける学業優秀者認定',
+            'sec-proj-title':  '主要プロジェクト',
+            'proj1-title':     '習慣トラッカー',
+            'proj1-desc':      '毎日の日記機能と習慣トラッキングを組み合わせた総合アプリです。年間の習慣可視化、連続記録の管理、気分の分析機能を搭載しており、ReactとFirebaseによるリアルタイムなデバイス間同期を実現しています。',
+            'proj1-feat-title':'<strong class="text-white">機能一覧：</strong>',
+            'proj1-feat1':     '連続記録付きの毎日の習慣トラッキング',
+            'proj1-feat2':     '年間可視化と分析',
+            'proj1-feat3':     '気分の記録と日記',
+            'proj1-feat4':     'クラウドによるデバイス間同期',
+            'proj2-title':     '工場管理システム',
+            'proj2-desc':      '製造業向けのエンタープライズグレード管理システムです。在庫管理、受発注処理、顧客管理、従業員管理を一元化した統合ソリューションで、手作業の工数を50%削減しました。',
+            'proj2-feat-title':'<strong class="text-white">主な機能：</strong>',
+            'proj2-feat1':     'リアルタイム在庫管理',
+            'proj2-feat2':     '受発注の追跡と処理',
+            'proj2-feat3':     '顧客データベース・CRM',
+            'proj2-feat4':     '従業員管理ポータル',
+            'proj3-desc':      'junwasustain.siteの企業Webサイトとイベント管理システムをフルスタックで開発しました。企業紹介とイベント運営を兼ね備えたプラットフォームで、リアルタイム更新にも対応しています。',
+            'proj3-feat-title':'<strong class="text-white">主な機能：</strong>',
+            'proj3-feat1':     '企業サイト・ポートフォリオ',
+            'proj3-feat2':     'イベント作成・管理',
+            'proj3-feat3':     '参加登録・出席管理',
+            'proj3-feat4':     '管理者向けダッシュボードと分析',
+            'live-site-btn':   'サイトを見る',
+            'sec-hobbies-title': '個人的な趣味',
+            'hobby1-title':   'エアソフト',
+            'hobby1-type':    '戦術系コンバットスポーツ',
+            'hobby1-detail1': '<strong class="text-white">装備：</strong>東京マルイ製HK416に8倍スコープを搭載し、精密な遠距離射撃を行っています。',
+            'hobby1-detail2': '<strong class="text-white">ロードアウト：</strong>トルコ憲兵隊コマンドスタイルの装備で、本格的な戦術行動を体現しています。',
+            'hobby2-title':   'アーチェリー',
+            'hobby2-type':    '伝統的な射撃競技',
+            'hobby2-detail1': '<strong class="text-white">歩み：</strong>高校時代からアーチェリーに没頭し、長年の練習を通じてスキルを磨き続けています。',
+            'hobby2-detail2': '<strong class="text-white">工芸：</strong>弓と矢を自らの手で制作し、工学的知識と伝統的な職人技を融合させています。',
+            'hobby3-title':   '読書',
+            'hobby3-type':    '壮大なファンタジー文学',
+            'hobby3-detail1': '<strong class="text-white">現在の読書：</strong>ブランドン・サンダースン著「ストームライト・アーカイブ ―誓いの剣―」',
+            'hobby3-detail2': '<strong class="text-white">ジャンル：</strong>精緻な世界観と複雑な魔法体系を持つ、壮大なファンタジーシリーズへの深い愛着',
+            'hobby4-title':   'ゲーム',
+            'hobby4-type':    '戦略シミュレーション',
+            'hobby4-detail1': '<strong class="text-white">プレイ中：</strong>「ヨーロッパ・ユニバーサリスⅤ」 – 国家を征服し、歴史の行方を左右しています。',
+            'hobby4-detail2': '<strong class="text-white">情熱：</strong>グランドストラテジーゲームの奥深い戦術性、歴史シミュレーション、長期的な戦略立案への傾倒',
+            'footer-status':  'ステータス: <span class="text-crimson">オンライン</span> // ビルド: <span class="text-accent">Osaka_JP</span> // システム: <span class="text-white">AVCI_DATA_CENTER</span>',
+        }
+    };
+
+    // ─── Language Toggle ─────────────────────────────────────────────────────────
+    let currentLang = 'en';
+    let typeGeneration = 0;
+
+    function toggleLanguage() {
+        currentLang = currentLang === 'en' ? 'ja' : 'en';
+        const t = translations[currentLang];
+
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.dataset.i18n;
+            if (t[key] !== undefined) el.innerHTML = t[key];
+        });
+
+        document.documentElement.lang = currentLang;
+        document.title = currentLang === 'ja'
+            ? 'Ramazan Furkan AVCI | データサイエンティスト & エンジニア'
+            : 'Ramazan Furkan AVCI | Data Scientist & Engineer';
+
+        const btn = document.getElementById('lang-toggle-btn');
+        btn.textContent = currentLang === 'ja' ? 'English' : '日本語';
+
+        // restart typing animation with new words
+        words = t.typingWords;
+        wordIdx = 0;
+        charIdx = 0;
+        isDeleting = false;
+        typingText.textContent = '';
+        typeGeneration++;
+        type(typeGeneration);
+    }
+
+    // ─── Utilities ───────────────────────────────────────────────────────────────
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileLinks = document.querySelectorAll('.mobile-link');
+
+    mobileMenuBtn.addEventListener('click', () => {
+        mobileMenuBtn.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+    });
+
+    mobileLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            mobileMenuBtn.classList.remove('active');
+            mobileMenu.classList.remove('active');
+        });
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!mobileMenu.contains(e.target) && !mobileMenuBtn.contains(e.target) && mobileMenu.classList.contains('active')) {
+            mobileMenuBtn.classList.remove('active');
+            mobileMenu.classList.remove('active');
+        }
+    });
+
+    // ─── Typing Animation ────────────────────────────────────────────────────────
+    let words = translations.en.typingWords;
+    let wordIdx = 0, charIdx = 0, isDeleting = false;
+    const typingText = document.getElementById('typing-text');
+
+    function type(gen) {
+        if (gen !== typeGeneration) return;
+        const current = words[wordIdx % words.length];
+        if (isDeleting) {
+            typingText.textContent = current.substring(0, charIdx - 1);
+            charIdx--;
+        } else {
+            typingText.textContent = current.substring(0, charIdx + 1);
+            charIdx++;
+        }
+        let speed = isDeleting ? 50 : 100;
+        if (!isDeleting && charIdx === current.length) { speed = 2000; isDeleting = true; }
+        else if (isDeleting && charIdx === 0) { isDeleting = false; wordIdx++; speed = 500; }
+        setTimeout(() => type(gen), speed);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => { typeGeneration++; type(typeGeneration); });
+</script>
+</body>
+</html>
