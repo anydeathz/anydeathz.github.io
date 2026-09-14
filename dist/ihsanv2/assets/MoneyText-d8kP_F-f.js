@@ -1,0 +1,1 @@
+import{j as o,b as r,c as x,t as c,T as m}from"./index-BKJStVLq.js";function i({value:s,currency:t="TRY",sign:a="",tone:e,className:n=""}){return o.jsxs("span",{className:x(m.number,"whitespace-nowrap",e&&c(e).text,n),children:[a,r(s,t)]})}export{i as M};
