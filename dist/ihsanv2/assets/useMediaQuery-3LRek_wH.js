@@ -1,0 +1,1 @@
+import{r as n}from"./index-Cf2Hm1t0.js";const m={md:"(min-width: 768px)",lg:"(min-width: 1024px)"};function h(e){const[s,c]=n.useState(()=>window.matchMedia(e).matches);return n.useEffect(()=>{const t=window.matchMedia(e),a=()=>c(t.matches);return a(),t.addEventListener("change",a),()=>t.removeEventListener("change",a)},[e]),s}export{m as B,h as u};

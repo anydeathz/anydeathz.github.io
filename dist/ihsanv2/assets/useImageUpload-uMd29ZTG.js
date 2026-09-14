@@ -1,0 +1,1 @@
+import{r as n,U as l,k as p}from"./index-Cf2Hm1t0.js";function d(t,o){const[r,s]=n.useState(0);return{upload:n.useCallback(async c=>{const u=[];for(const e of c){s(a=>a+1);try{u.push(await l(e,t,o))}catch(a){p(a)}finally{s(a=>a-1)}}return u},[t,o]),uploading:r>0}}export{d as u};
