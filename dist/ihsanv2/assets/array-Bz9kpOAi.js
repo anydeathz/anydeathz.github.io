@@ -1,0 +1,1 @@
+const s=(e,t,c)=>{if(t===c||t<0||c<0||t>=e.length||c>=e.length)return e;const n=[...e],[a]=n.splice(t,1);return n.splice(c,0,a),n},p=(e,t)=>e.filter((c,n)=>n!==t),r=(e,t,c)=>e.map((n,a)=>a===t?c:n),m=(e,t,c)=>e.map((n,a)=>a===t?{...n,...c}:n);export{p as a,s as m,m as p,r};

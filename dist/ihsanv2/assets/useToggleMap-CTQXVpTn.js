@@ -1,0 +1,1 @@
+import{r as e}from"./index-DIkfPh3b.js";function g(n={}){const[a,o]=e.useState(n),c=e.useCallback(s=>o(t=>({...t,[s]:!t[s]})),[]),r=e.useCallback((s,t)=>o(u=>({...u,[s]:t})),[]);return{map:a,toggle:c,set:r,isOn:s=>!!a[s]}}export{g as u};
