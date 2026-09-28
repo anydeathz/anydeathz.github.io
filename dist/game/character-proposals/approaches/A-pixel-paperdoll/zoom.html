@@ -1,0 +1,14 @@
+<!doctype html><meta charset="utf-8"><style>body{background:#1a1612;margin:8px}canvas{image-rendering:pixelated;margin:2px;background:#2a241e}</style>
+<div id=out></div>
+<script type=module>
+import { renderA } from './gen.js';
+import { spec } from '../../lib/data.js';
+const q = new URLSearchParams(location.search);
+const list = JSON.parse(q.get('s') ?? '[]');
+for (const [o, r] of list) document.getElementById('out').append(renderA(spec(o), r ?? {}).toCanvas(Number(q.get('k') ?? 8)));
+</script>
+<script type=module>
+import { renderCreatureA } from './creatures.js';
+import { CREATURES } from '../../lib/data.js';
+if (new URLSearchParams(location.search).has('c')) for (const c of CREATURES) document.getElementById('out').append(renderCreatureA(c).toCanvas(5));
+</script>

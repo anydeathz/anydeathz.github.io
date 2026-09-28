@@ -1,0 +1,37 @@
+<!doctype html><meta charset="utf-8"><meta name="color-scheme" content="dark"><style>body{background:#0c0b0a;margin:0;color:#ccc;font:12px monospace}</style>
+<div id=out></div>
+<script type=module>
+// ?b=biome &s=textured|voxel &c=A|B|C|D|E &w &h &px &az &seed
+import { mapScene } from './render3d.js';
+import { actor } from './actors3d.js';
+import { generateDungeon, toWorld, isFloor, DIRS } from '../lib/hex.js';
+import { BIOMES, spec } from '../lib/data.js';
+const q = new URLSearchParams(location.search);
+const biome = BIOMES.find(b => b.id === (q.get('b') ?? 'cisterns'));
+const map = generateDungeon(q.get('seed') ?? 'demo');
+const [eq, er] = map.entry, [sq, sr] = map.rooms[1].c;
+const focus = toWorld((eq * 2 + sq) / 3, (er * 2 + sr) / 3);
+const az = Number(q.get('az') ?? 0.5), kind = q.get('c') ?? 'A';
+const t0 = performance.now();
+const S = mapScene(document.getElementById('out'), map, biome, { style: q.get('s') ?? 'textured', az, w: Number(q.get('w') ?? 390), h: Number(q.get('h') ?? 480), px: Number(q.get('px') ?? 3), focus, zoom: Number(q.get('z') ?? 24) });
+const ring = DIRS.map(([a, b]) => [eq + a, er + b]).filter(([a, b]) => isFloor(map, a, b));
+const party = [spec({ cls: 'fighter', race: 'dwarf' }), spec({ cls: 'wizard', race: 'elf', hairStyle: 1 }), spec({ cls: 'ranger', race: 'halfOrc' }), spec({ cls: 'cleric', race: 'human', hairStyle: 2 })];
+const place = (o, q2, r2) => { const [x, y] = toWorld(q2, r2); o.position.set(x, 0, y); S.scene.add(o); };
+party.forEach((s, i) => { const [a, b] = i === 0 ? [eq, er] : ring[i - 1]; place(actor(kind, s, az, az + 0.3), a, b); });
+const foes = [spec({ race: 'human', cls: 'fighter', loadout: { mainHand: 'shortsword', offHand: 'buckler' }, skin: '#ddd3bc' }), spec({ race: 'halfOrc', cls: 'barbarian' })];
+foes[0].form = 'skeleton'; foes[0].race = { ...foes[0].race, bald: true, ears: 'none' };
+foes.forEach((s, i) => place(actor(kind, s, az, az + Math.PI - 0.3), sq + i, sr));
+S.frame(0.3);
+const ms = performance.now() - t0;
+window.__metrics = { ...S.stats, totalMs: +ms.toFixed(1), calls: S.renderer.info.render.calls, triangles: S.renderer.info.render.triangles };
+console.log(JSON.stringify(window.__metrics));
+const gl = S.renderer.getContext(), dbg = gl.getExtension('WEBGL_debug_renderer_info');
+window.__metrics.gpu = dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : 'unknown';
+if (q.has('fps')) {
+  // frame cost, not frame rate: rAF caps at the display's 60 Hz, which hides every difference.
+  // Render 120 frames back to back, gl.finish() after each so GPU time is counted, take the median.
+  const ts = []; for (let i = 0; i < 120; i++) { const t0 = performance.now(); S.frame(i / 60); gl.finish(); ts.push(performance.now() - t0); }
+  ts.sort((a, b) => a - b); window.__fps = { medianMs: +ts[60].toFixed(2), p95Ms: +ts[114].toFixed(2) };
+}
+else if (!q.has('still')) { let f = 0; const loop = t => { S.frame(t / 1000); requestAnimationFrame(loop); }; requestAnimationFrame(loop); }
+</script>

@@ -1,0 +1,30 @@
+<!doctype html><meta charset="utf-8"><style>body{background:#0c0b0a;margin:8px;color:#ccc;font:12px monospace}canvas{image-rendering:pixelated;display:block;margin-bottom:6px}</style>
+<div id=out></div>
+<script type=module>
+import { makeMap2D, present } from './render2d.js';
+import { generateDungeon, toWorld, isFloor, DIRS } from '../lib/hex.js';
+import { BIOMES, spec, CREATURES } from '../lib/data.js';
+import { renderA } from '../approaches/A-pixel-paperdoll/gen.js';
+import { renderCreatureA } from '../approaches/A-pixel-paperdoll/creatures.js';
+const q = new URLSearchParams(location.search);
+const ids = (q.get('b') ?? 'cisterns').split(',');
+const W = Number(q.get('w') ?? 320), H = Number(q.get('h') ?? 220), K = Number(q.get('k') ?? 3);
+for (const id of ids) {
+  const biome = BIOMES.find(b => b.id === id);
+  const map = generateDungeon(q.get('seed') ?? 'demo');
+  const [eq, er] = map.entry;
+  const ring = DIRS.map(([a, b]) => [eq + a, er + b]).filter(([a, b]) => isFloor(map, a, b));
+  const party = [spec({ cls: 'fighter', race: 'dwarf' }), spec({ cls: 'wizard', race: 'elf', hairStyle: 1 }), spec({ cls: 'ranger', race: 'halfOrc' }), spec({ cls: 'cleric', race: 'human', hairStyle: 2 })];
+  const sprites = party.map((s, i) => { const [a, b] = i === 0 ? [eq, er] : ring[i - 1]; return { sprite: renderA(s, { anim: 'idle', frame: i }), q: a, r: b, party: true }; });
+  const [sq, sr] = map.rooms[1].c;
+  [CREATURES[0], CREATURES[2], CREATURES[1]].forEach((c, i) => sprites.push({ sprite: renderCreatureA(c), q: sq + [0, 1, -1][i], r: sr + [0, 0, 1][i] }));
+  const cam = toWorld((eq + sq) / 2, (er + sr) / 2);
+  const M = makeMap2D({ map, biome, cam, w: W, h: H });
+  const times = []; let img; for (let i = 0; i < 10; i++) { const t0 = performance.now(); img = M.frame(sprites, 0.3 + i * 0.05); times.push(performance.now() - t0); }
+  times.sort((a, b) => a - b); const ms = times[5];
+  (window.__metrics ??= []).push({ biome: id, bakeMs: +M.bakeMs.toFixed(1), frameMs: +ms.toFixed(2) });
+  const c = present(img, document.createElement('canvas'), K);
+  const cap = document.createElement('div'); cap.textContent = `${biome.name} — ${W}×${H} bake ${M.bakeMs.toFixed(0)} ms · frame ${ms.toFixed(1)} ms (median of 10)`;
+  document.getElementById('out').append(cap, c);
+}
+</script>
