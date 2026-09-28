@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Relics & Rites</title>
+<meta name="description" content="Sunderdeep — five generative ways to draw every item, potion, scroll, reagent and spell, and five ways to draw a cast on the new hex floors. Every picture on this page was made by code in this folder.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jacquard+24&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Martian+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --basalt: #120f0d;
+    --basalt-2: #1a1512;
+    --soot: #231c17;
+    --vellum: #e8dcc6;
+    --vellum-2: #bfb09a;
+    --ash: #8f8272;
+    --ember: #e0622a;
+    --ember-2: #ff9a4a;
+    --verdigris: #7fb09a;
+    --blood: #a8452f;
+    --rule: #3a2f27;
+    --legendary: #e0b255; /* kept for rarity swatches only — nothing else here is gold */
+    --display: 'Jacquard 24', 'Alegreya', serif;
+    --body: 'Alegreya', Georgia, serif;
+    --mono: 'Martian Mono', ui-monospace, Menlo, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; color: var(--vellum); font: 400 19px/1.55 var(--body);
+    background:
+      radial-gradient(1200px 700px at 12% -10%, #3a1d10 0%, transparent 60%),
+      radial-gradient(900px 600px at 110% 20%, #16241f 0%, transparent 55%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='90' viewBox='0 0 52 90'%3E%3Cpath d='M26 0 L52 15 L52 45 L26 60 L0 45 L0 15 Z M26 60 L26 90 M0 45 L-26 60 M52 45 L78 60' fill='none' stroke='%23241c16' stroke-width='1'/%3E%3C/svg%3E"),
+      var(--basalt);
+  }
+  a { color: var(--ember-2); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  img, canvas { image-rendering: pixelated; }
+  code, .mono { font-family: var(--mono); font-size: 14px; }
+  code { color: var(--verdigris); }
+
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px; }
+
+  /* ── top strip ─────────────────────────────────────────────────────────────── */
+  nav.toc {
+    position: sticky; top: 0; z-index: 10;
+    background: linear-gradient(#120f0dee, #120f0dcc); backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--rule);
+  }
+  nav.toc .wrap { display: flex; gap: 4px; overflow-x: auto; padding-top: 8px; padding-bottom: 8px; scrollbar-width: none; }
+  nav.toc a {
+    flex: none; color: var(--vellum-2); text-decoration: none; font: 600 14px var(--mono);
+    padding: 8px 12px; border-radius: 3px; letter-spacing: .02em;
+  }
+  nav.toc a:hover { color: var(--vellum); background: var(--soot); }
+  nav.toc a b { color: var(--ember); font-weight: 600; margin-right: 6px; }
+
+  /* ── hero ─────────────────────────────────────────────────────────────────── */
+  header.hero { padding: 56px 0 24px; }
+  .kicker { font: 600 14px var(--mono); color: var(--ash); letter-spacing: .12em; text-transform: uppercase; }
+  h1 {
+    font: 400 clamp(72px, 12vw, 150px)/0.86 var(--display); margin: 14px 0 10px; color: var(--vellum);
+    text-shadow: 0 0 40px #e0622a33;
+  }
+  h1 em { font-style: normal; color: var(--ember); }
+  .lede { font-size: 23px; max-width: 760px; color: var(--vellum-2); margin: 0 0 28px; }
+  .lede strong { color: var(--vellum); font-weight: 500; }
+  .hero-shots { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: end; }
+  .phone {
+    width: 222px; padding: 12px 8px 18px; border-radius: 32px; background: #0a0807;
+    border: 1px solid #3a2f27; box-shadow: 0 30px 60px #0009, inset 0 0 0 5px #17110e;
+  }
+  .phone img { display: block; width: 100%; height: auto; border-radius: 20px; }
+  .phone + .cap { text-align: center; }
+
+  /* ── sections ─────────────────────────────────────────────────────────────── */
+  section { padding: 64px 0 20px; border-top: 1px solid var(--rule); margin-top: 40px; }
+  .sec-head { display: grid; grid-template-columns: auto 1fr; gap: 0 22px; align-items: end; margin-bottom: 18px; }
+  .num { font: italic 700 92px/0.8 var(--body); color: var(--ember); min-width: 64px; }
+  h2 { font: 400 clamp(44px, 6vw, 68px)/0.95 var(--display); margin: 0; letter-spacing: .01em; }
+  .sub { grid-column: 2; font: 600 14px var(--mono); color: var(--ash); letter-spacing: .08em; text-transform: uppercase; margin-top: 8px; }
+  h3 { font: 700 24px/1.2 var(--body); margin: 34px 0 6px; color: var(--vellum); }
+  h3 .mono { color: var(--ash); font-weight: 400; margin-left: 8px; }
+  p { max-width: 780px; }
+  .muted { color: var(--ash); }
+
+  /* shots: natural pixel size, scroll sideways if the phone is narrower */
+  .shot { overflow-x: auto; margin: 10px 0 6px; padding: 6px 0; scrollbar-color: #3a2f27 transparent; }
+  .shot img { display: block; max-width: none; }
+  .shot.fit img { max-width: 100%; height: auto; }
+  .cap { font: 400 14px/1.45 var(--mono); color: var(--ash); margin: 4px 0 16px; max-width: 900px; }
+  .cap b { color: var(--vellum-2); font-weight: 600; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr)); gap: 18px 22px; }
+  .grid2 figure, .grid4 figure { margin: 0; }
+  .grid2 img, .grid4 img { width: 100%; height: auto; display: block; border-radius: 2px; }
+  .grid4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 14px; }
+  figcaption { font: 400 14px/1.4 var(--mono); color: var(--ash); margin-top: 6px; }
+  figcaption b { color: var(--vellum-2); }
+
+  /* verdict */
+  .verdict { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 28px; margin-top: 10px; }
+  .verdict .pick { border-left: 3px solid var(--ember); padding: 4px 0 4px 18px; }
+  .verdict .pick .mono { color: var(--ember); font-size: 14px; letter-spacing: .08em; text-transform: uppercase; }
+  .verdict .pick p { margin: 6px 0 0; }
+  .verdict .pick strong { font: 700 26px/1.15 var(--body); display: block; margin-top: 4px; color: var(--vellum); }
+
+  table { border-collapse: collapse; width: 100%; font-size: 16px; }
+  .tbl { overflow-x: auto; margin: 16px 0; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { font: 600 13px var(--mono); color: var(--ash); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+  td.mono, td .mono { font-size: 14px; white-space: nowrap; }
+  tr.lead td { background: #e0622a12; }
+  tr.lead td:first-child { box-shadow: inset 3px 0 0 var(--ember); }
+  .rank { font: italic 700 28px/1 var(--body); color: var(--ember); }
+  .dots { letter-spacing: 2px; color: var(--ember); font-family: var(--mono); font-size: 14px; }
+  .dots i { color: #4a3d33; font-style: normal; }
+
+  .pipeline { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 14px 0 6px; font: 400 14px var(--mono); }
+  .pipeline span { padding: 6px 10px; background: var(--soot); color: var(--vellum-2); border-radius: 2px; }
+  .pipeline i { color: var(--ember); font-style: normal; }
+
+  .pc { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 8px 36px; margin: 14px 0 0; }
+  .pc h4 { font: 600 14px var(--mono); letter-spacing: .08em; text-transform: uppercase; margin: 10px 0 4px; }
+  .pc .good h4 { color: var(--verdigris); } .pc .bad h4 { color: var(--blood); }
+  .pc ul { margin: 0; padding-left: 20px; } .pc li { margin: 4px 0; }
+  .stat { display: flex; flex-wrap: wrap; gap: 8px 26px; margin: 16px 0 0; }
+  .stat div { font: 400 14px var(--mono); color: var(--ash); }
+  .stat div b { display: block; font: 600 24px/1.3 var(--mono); color: var(--vellum); }
+
+  pre { background: #0d0b09; border: 1px solid var(--rule); padding: 14px 16px; overflow-x: auto; font: 400 14px/1.6 var(--mono); color: var(--vellum-2); border-radius: 2px; }
+  pre .k { color: var(--ember-2); } pre .c { color: #6e6255; } pre .s { color: var(--verdigris); }
+
+  /* live bench */
+  .bench { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: 26px; margin-top: 12px; }
+  .controls { display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; align-items: center; font: 400 14px var(--mono); color: var(--vellum-2); }
+  .controls select, .controls input[type=color] {
+    font: 400 14px var(--mono); color: var(--vellum); background: var(--soot); border: 1px solid #4a3d33;
+    padding: 7px 8px; border-radius: 2px; width: 100%; min-height: 36px;
+  }
+  .controls input[type=range] { width: 100%; accent-color: var(--ember); }
+  .controls .row2 { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; }
+  button.b { font: 600 14px var(--mono); color: var(--basalt); background: var(--ember); border: 0; padding: 9px 14px; border-radius: 2px; cursor: pointer; }
+  button.b.ghost { background: transparent; color: var(--vellum-2); box-shadow: inset 0 0 0 1px #4a3d33; }
+  .stage { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-end; }
+  .stage figure { margin: 0; }
+  .stage canvas { display: block; background: radial-gradient(#2d241d, #17120f 70%); border-radius: 3px; }
+  .stage iframe { border: 0; width: 360px; height: 420px; background: radial-gradient(#2d241d, #17120f 70%); border-radius: 3px; }
+  .need-server { display: none; color: var(--ember-2); font: 400 14px var(--mono); margin: 8px 0; }
+  body.file .need-server { display: block; }
+  .mapbench iframe { border: 0; width: 100%; max-width: 780px; aspect-ratio: 780 / 560; display: block; background: #0c0b0a; }
+
+  /* hex diagram */
+  .diag { width: 100%; max-width: 900px; height: auto; display: block; margin: 10px 0; }
+  .diag text { font: 400 13px var(--mono); fill: var(--vellum-2); }
+
+  .rejected li { margin: 8px 0; max-width: 820px; }
+  .rejected b { color: var(--vellum); }
+  footer { padding: 60px 0 80px; color: var(--ash); font: 400 14px var(--mono); }
+
+  /* one well-orchestrated load: the hero rises in three beats */
+  @media (prefers-reduced-motion: no-preference) {
+    .rise { opacity: 0; transform: translateY(14px); animation: rise .9s cubic-bezier(.2, .7, .2, 1) forwards; }
+    .rise.d1 { animation-delay: .08s; } .rise.d2 { animation-delay: .22s; } .rise.d3 { animation-delay: .4s; } .rise.d4 { animation-delay: .6s; }
+    @keyframes rise { to { opacity: 1; transform: none; } }
+    .flicker { animation: flicker 3.2s infinite steps(1); }
+    @keyframes flicker { 0%, 100% { text-shadow: 0 0 40px #e0622a33; } 47% { text-shadow: 0 0 46px #e0622a55; } 49% { text-shadow: 0 0 34px #e0622a2a; } }
+  }
+  @media (max-width: 760px) {
+    body { font-size: 18px; }
+    .num { font-size: 60px; min-width: 40px; }
+    .hero-shots { grid-template-columns: 1fr; }
+    .phone { margin: 0 auto; }
+    .bench { grid-template-columns: 1fr; }
+    .stage iframe { width: 100%; }
+  }
+
+  /* item-proposals additions */
+  .scrollbox { max-height: 760px; overflow: auto; border: 1px solid var(--rule); border-radius: 2px; margin: 10px 0 6px; scrollbar-color: #3a2f27 transparent; }
+  .scrollbox img { display: block; max-width: none; }
+  .pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 560px), 1fr)); gap: 12px 22px; }
+  .pair figure { margin: 0; } .pair img { display: block; max-width: 100%; height: auto; }
+  .seq { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); gap: 10px; }
+  .seq figure { margin: 0; } .seq img { width: 100%; height: auto; display: block; }
+  .objstage { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-end; }
+  .objstage figure { margin: 0; } .objstage figure > div { width: 136px; height: 136px; display: grid; place-items: center; background: radial-gradient(#2d241d, #17120f 70%); border-radius: 3px; }
+  .objstage canvas, .objstage svg { display: block; max-width: 132px; max-height: 132px; }
+  .castbench canvas { display: block; width: 100%; max-width: 720px; height: auto; background: #0c0b0a; }
+  .tag { font: 600 13px var(--mono); padding: 2px 7px; border-radius: 2px; background: var(--soot); color: var(--vellum-2); white-space: nowrap; }
+  .tag.v { color: var(--verdigris); } .tag.w { color: var(--ember-2); }
+  td .num-sm { font: 600 16px var(--mono); color: var(--vellum); }
+</style>
+</head>
+<body>
+<nav class="toc"><div class="wrap">
+  <a href="#verdict"><b>§</b>Verdict</a>
+  <a href="#recipes"><b>0</b>Recipes</a>
+  <a href="#today"><b>−</b>Today</a>
+  <a href="#O1"><b>O1</b>Pixel</a>
+  <a href="#O2"><b>O2</b>Vector</a>
+  <a href="#O3"><b>O3</b>Voxel</a>
+  <a href="#O4"><b>O4</b>Stacked</a>
+  <a href="#O5"><b>O5</b>Toon 3D</a>
+  <a href="#casts"><b>✦</b>Casts</a>
+  <a href="#S1"><b>S1</b>Particles</a>
+  <a href="#S2"><b>S2</b>Hex decals</a>
+  <a href="#S3"><b>S3</b>Field</a>
+  <a href="#S4"><b>S4</b>Toon mesh</a>
+  <a href="#S5"><b>S5</b>Voxel</a>
+  <a href="#hex"><b>⬡</b>Hex areas</a>
+  <a href="#map"><b>▦</b>On the map</a>
+  <a href="#bench"><b>☰</b>Try it</a>
+  <a href="#numbers"><b>#</b>Numbers</a>
+  <a href="#plan"><b>→</b>Plan</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="kicker rise d1">Sunderdeep · docs/item-proposals · 25 Sep 2026</div>
+  <h1 class="rise d2"><span class="flicker">Relics <em>&amp;</em> Rites</span></h1>
+  <p class="lede rise d3">Every item, potion, elixir, throwable, scroll, manual and reagent, all 213 spells, and every area a spell can cover,
+    <strong>drawn from data alone</strong> and put on the new hex floors. The page compares five ways to draw objects and five ways to draw casts.
+    <strong>Code in this folder made every picture on this page.</strong> Nothing in <code>frontend/</code> or
+    <code>character-proposals/</code> was changed. This folder only imports from them.</p>
+  <div class="hero-shots rise d4">
+    <figure style="margin:0">
+      <img width="660" height="440" src="shots/map2d-cinderworks.png" alt="A hex dungeon in the Cinderworks: a Fireball bursting over a room of foes, loot and an opened chest on the floor, a grease pool meeting a fire surface" style="width:100%;height:auto;display:block">
+      <figcaption><b>The recommended pairing:</b> O1 pixel icons as loot, with casts drawn as S1 particles in the air and S2 hex decals on the ground, in M3. A Fireball at impact in the Cinderworks. Every loot item has a rarity ring, and grease meets fire beside the chest.</figcaption>
+    </figure>
+    <div>
+      <div class="phone"><img width="390" height="660" src="shots/map2d-phone.png" alt="The Drowned Vault at phone width with Call Lightning"></div>
+      <div class="cap">The Drowned Vault at 195 px wide, ×2, with Call Lightning.</div>
+    </div>
+  </div>
+</div></header>
+
+<main class="wrap">
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<section id="verdict">
+  <div class="sec-head"><div class="num">§</div><h2>The short version</h2><div class="sub">what to look at, what I'd pick</div></div>
+  <p>Today the game draws items with <code>gen/textures/itemIcon.ts</code>, which is 15 silhouettes with a material and a rarity frame.
+    It draws spells with <code>render/vfx/spells.ts</code>, which is spheres, boxes and rings. <b>There are 99 consumable stacks and they
+    produce 12 distinct icons.</b> Cone, chain, vortex and sigil spells fall back to the melee arc. Loot never appears on the map.
+    Every approach below reads one recipe table and the game's own data: damage hues, surface palettes, rarity and the 76 actions,
+    copied by a tool rather than by hand. From that it produces a distinct picture for every one of the 651 objects and every spell.
+    None of them needs save data.</p>
+  <div class="verdict">
+    <div class="pick"><span class="mono">Objects</span><strong>O1 · Pixel icon grammar</strong>
+      <p>It is the same engine as the recommended character approach (A), so loot and heroes look like one game. It covers all 651 objects in <b>105 ms</b>, about <b>0.16 ms each</b>. One recipe gives the inventory icon at ×2 and the loot on the floor at 18 px. Every element carries a 5×5 mark as well as its hue.</p></div>
+    <div class="pick"><span class="mono">Casts</span><strong>S1 particles + S2 hex decals</strong>
+      <p>S2 draws the ground: exactly which hexes a spell covers, which serves the dice-are-real pillar. S1 draws the air: the projectile, the beam and the burst. Adding both to an M3 frame costs <b>9–16 ms</b> on top of a 2 ms base. In M1, <b>S1 is 0.2 ms per frame and S2 is 2.4 ms</b>.</p></div>
+    <div class="pick"><span class="mono">When it must stand up</span><strong>S4 · Toon meshes</strong>
+      <p>Walls of fire, Moonbeam's column and a cone of prisms are volumes. In M1, S4 draws them at <b>0.3 ms</b> per frame, with a median of 16 draw calls in the arena and a worst case of 77. It is the upgrade path for <code>render/vfx/spells.ts</code> and uses the same kinds of primitives.</p></div>
+  </div>
+
+  <div class="tbl"><table>
+    <thead><tr><th></th><th>Objects</th><th>Look</th><th>Legible at 18–32 px</th><th>All 651, one pass¹</th><th>Each</th><th>Map-ready</th></tr></thead>
+    <tbody>
+      <tr class="lead"><td class="rank">1</td><td><b>O1 · Pixel icon grammar</b><br><span class="muted">masks, ramps, sel-out</span></td><td class="dots">●●●●●</td><td class="dots">●●●●<i>●</i></td><td class="mono">105 ms</td><td class="mono">0.16 ms</td><td>yes: the same sprite as floor loot</td></tr>
+      <tr><td class="rank">2</td><td><b>O2 · Manuscript vector</b><br><span class="muted">SVG, hatching, real glyphs</span></td><td class="dots">●●●●<i>●</i></td><td class="dots">●●●●●</td><td class="mono">41 ms²</td><td class="mono">0.06 ms²</td><td>no: reads as UI, not as a thing on the floor</td></tr>
+      <tr><td class="rank">3</td><td><b>O5 · Lathe/extrude toon 3D</b><br><span class="muted">baked, cached by recipe</span></td><td class="dots">●●●<i>●●</i></td><td class="dots">●●●<i>●●</i></td><td class="mono">463 ms</td><td class="mono">0.71 ms</td><td>yes, as a billboard or a mesh</td></tr>
+      <tr><td class="rank">4</td><td><b>O3 · Voxel mini-models</b><br><span class="muted">meshed volume</span></td><td class="dots">●●●<i>●●</i></td><td class="dots">●●<i>●●●</i></td><td class="mono">1,225 ms</td><td class="mono">1.9 ms</td><td>yes, pairs with M2 and B</td></tr>
+      <tr><td class="rank">5</td><td><b>O4 · Sprite-stacked</b><br><span class="muted">O3's volume, any angle</span></td><td class="dots">●●<i>●●●</i></td><td class="dots">●●<i>●●●</i></td><td class="mono">1,992 ms</td><td class="mono">3.1 ms</td><td>only for Legendary loot that turns</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th>Casts</th><th>Look</th><th>Says which cells</th><th>M3 frame³</th><th>M1 frame⁴</th><th>Draws volumes</th></tr></thead>
+    <tbody>
+      <tr class="lead"><td class="rank">1</td><td><b>S2 · Hex footprint decals</b><br><span class="muted">the ground half</span></td><td class="dots">●●●●<i>●</i></td><td class="dots">●●●●●</td><td class="mono">5.2 ms</td><td class="mono">2.4 ms</td><td>no: pair it with S1</td></tr>
+      <tr class="lead"><td class="rank">1</td><td><b>S1 · Pixel particles</b><br><span class="muted">the air half</span></td><td class="dots">●●●●<i>●</i></td><td class="dots">●●<i>●●●</i></td><td class="mono">1.3 ms</td><td class="mono">0.2 ms</td><td>as particles only</td></tr>
+      <tr><td class="rank">3</td><td><b>S4 · Toon meshes</b><br><span class="muted">three.js primitives</span></td><td class="dots">●●●<i>●●</i></td><td class="dots">●●●●<i>●</i></td><td class="mono">—</td><td class="mono">0.3 ms · ≤77 calls</td><td>yes</td></tr>
+      <tr><td class="rank">4</td><td><b>S3 · Continuous field</b><br><span class="muted">SDF + noise</span></td><td class="dots">●●●●<i>●</i></td><td class="dots">●<i>●●●●</i></td><td class="mono">17.0 ms · p95 189</td><td class="mono">as S2⁵</td><td>no</td></tr>
+      <tr><td class="rank">5</td><td><b>S5 · Voxel particles</b><br><span class="muted">instanced cubes</span></td><td class="dots">●●<i>●●●</i></td><td class="dots">●●<i>●●●</i></td><td class="mono">—</td><td class="mono">0.3 ms · ≤16,394 tris</td><td>as cubes</td></tr>
+    </tbody>
+  </table></div>
+  <p class="cap">
+    <b>Where the numbers come from.</b> Everything was measured by <code>tools/capture.mjs</code> in headless Chrome on an <b>Apple M4 Pro</b>. <b>Nothing was measured on a phone.</b> The dots are my judgement from the pictures on this page, not measurements.<br>
+    ¹ Every item, potion, elixir, throwable, reagent, scroll and manual, the 213 catalogue scrolls, and 212 spell icons, generated once each.<br>
+    ² The SVG markup only. The browser's own rasterising happens later and is not counted.<br>
+    ³ Median over the 72-frame cast matrix at 360×216. The base frame without effects is about 2 ms.<br>
+    ⁴ Build plus render of one frame at ½ resolution, with <code>gl.finish()</code>.<br>
+    ⁵ M1 would bake S3's field the same way as S2, through <code>casts/ground3d.js</code>. That path was not measured separately.
+  </p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<section id="recipes">
+  <div class="sec-head"><div class="num">0</div><h2>One recipe, five renderers</h2><div class="sub">lib/items.js → lib/parts.js → objects/*</div></div>
+  <p>This is the idea from character-proposals, extended: <b>a thing's look is data.</b> Each object has a short recipe, which
+    <code>lib/parts.js</code> compiles <em>once</em> into vector geometry: lathes (bottles, helm domes), polygons (blades, book covers),
+    bars (hafts, rolled scroll ends), ellipses (gems, seals) and ink strokes (sigils). Each of the five object approaches is only a way
+    of drawing that geometry, so they cannot drift apart. A new potion is one row.</p>
+<pre><span class="c">// lib/items.js — potions from data/consumables/potions.ts: the family picks the vessel, the effect picks the liquid</span>
+potionGreaterHealing: { flask: <span class="s">'round'</span>, liquid: <span class="s">'#c8323c'</span>, fill: 0.85, cork: <span class="s">'wax'</span>, tier: 2 }
+alchemistFire:        { flask: <span class="s">'grenade'</span>, liquid: dmg(<span class="s">'fire'</span>), fill: 0.8, cork: <span class="s">'rag'</span> }      <span class="c">// the game's fire hue, never retyped</span>
+reagentBeholderIris:  { form: <span class="s">'eye'</span>, c: <span class="s">'#6a3a6a'</span>, iris: <span class="s">'#d0a030'</span> }                   <span class="c">// one of 27 form grammars</span>
+<span class="c">// lib/spells.js — one row per spell: school · element · delivery · shape · size · surface · list · source</span>
+Fireball          |evo|fire     |projectile|sphere  |20 |fire |arcane |game   <span class="c">// 'game' rows take the sim's own radius: 3.2</span>
+Cone of Cold      |evo|cold     |self      |cone    |60 |     |arcane |srd
+Bursting Sinew    |nec|necrotic |target    |sphere  |5  |     |arcane |bg3    <span class="c">// BG3-only: drafted, marked, CHECK</span></pre>
+  <div class="pipeline"><span>game data (snapshot tool)</span><i>→</i><span>recipe row</span><i>→</i><span>parts: lathe · poly · bar · ell · strokes · mark</span><i>→</i><span>O1 … O5</span><i>→</i><span>+ rarity rim / halo</span></div>
+
+  <h3>Measured, not assumed <span class="mono">tools/snapshot-game.mjs · tools/audit.mjs</span></h3>
+  <p>The game's data is copied by <code>tools/snapshot-game.mjs</code>, which imports <code>frontend/src/data</code> under Node and writes
+    <code>lib/game.js</code>. Nothing is retyped by hand. <code>tools/audit.mjs</code> then fails if any id in the game, or any row in
+    <code>docs/references</code>, has no look. It passes at <b>100%</b>.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Source</th><th>Rows</th><th>With a look</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Item bases (game)</td><td class="mono">54</td><td class="mono">54</td><td>recipes from character-proposals' <code>lib/data.js</code></td></tr>
+      <tr><td>Potions · throwables · scrolls · reagents · solvents (game)</td><td class="mono">14 · 10 · 36 · 34 · 5</td><td class="mono">all 99</td><td>33 named reagents plus the Arcane Shard, and 5 solvents</td></tr>
+      <tr><td>Actions (game)</td><td class="mono">76</td><td class="mono">76</td><td>32 martial ones become <b>manuals</b> (scrolls.md Q4)</td></tr>
+      <tr><td><code>references/spells.md</code>, unique spells</td><td class="mono">213</td><td class="mono">213</td><td><span class="tag">srd 172</span> <span class="tag v">game 32</span> <span class="tag w">bg3 draft 8</span> <span class="tag">not a spell 1</span> (Signed Trade Visa)</td></tr>
+      <tr><td><code>references/potions.md</code></td><td class="mono">41</td><td class="mono">41</td><td>the audit found <b>Tadpole Elixir</b>, which was missed by hand: 27 elixirs, not 26</td></tr>
+    </tbody>
+  </table></div>
+  <p class="cap">Areas by shape across the catalogue: 137 single-target, 37 sphere, 11 cube, 9 aura, 5 cylinder, 5 cone, 5 wall, 3 line and 1 ring. Where the game already has the spell, its <code>aoeRadius</code> replaces the SRD's feet. The eight <b>BG3 rows</b> (Bursting Sinew, Enhance Leap, Warden of Vitality, Artistry of War, Bestial Communion, Dethrone, Summon Quasit and Bone Chill) are drafted from BG3 and <b>must be checked</b>.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<section id="today">
+  <div class="sec-head"><div class="num">−</div><h2>What the game draws today</h2><div class="sub">tools/baseline.mjs runs gen/textures/itemIcon.ts itself</div></div>
+  <p>These are not screenshots and not a reconstruction. <code>tools/baseline.mjs</code> imports the game's own
+    <code>generateItemIcon</code> and <code>generateStackIcon</code> under Node and writes their pixels. The first sheet is all 54 bases.
+    The second is <b>all 99 stacks, which produce 12 distinct images</b>. A Potion of Speed and Fury in a Bottle are the same icon. So
+    are Scroll of Fireball and Scroll of Bless, and a Unicorn Horn and a pouch of Mugwort.</p>
+  <div class="shot"><img width="1266" height="216" src="shots/baseline-items.png" alt="Today's 54 item icons" loading="lazy"></div>
+  <div class="shot"><img width="1406" height="356" src="shots/baseline-stacks.png" alt="Today's 99 stack icons, 12 distinct" loading="lazy"></div>
+  <p class="cap">Rows, in order: potions and throwables share the flask, all 36 scrolls share the scroll, and reagents and solvents share the pouch. Rarity is the only difference. The Legendary frame is gold, which is correct.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<section id="O1">
+  <div class="sec-head"><div class="num">O1</div><h2>Pixel icon grammar</h2><div class="sub">objects/O1-pixel · recommended</div></div>
+  <p>This is character-proposals' pixel engine (<code>lib/pixel.js</code>) fed the shared parts. Each part becomes a mask, painted with a
+    hue-shifted ramp shaded from its own silhouette. The whole icon then gets a selective outline. <b>Glass is a rim and a highlight</b>,
+    so the liquid shows through it, with a meniscus line on top. <b>Every element carries a 5×5 mark</b> (<code>lib/marks.js</code>),
+    the pixel twin of each damage type's glyph. It appears on an elixir's tag, a scroll's seal and a spell icon's corner, because
+    visual-language Q3 says hue alone is never enough. Rarity recolours the outline, and Very Rare and above adds a halo, the same rule
+    the characters follow.</p>
+  <div class="pipeline"><span>parts</span><i>→</i><span>masks at any size</span><i>→</i><span>ramp + silhouette shading</span><i>→</i><span>glass rim · meniscus · marks</span><i>→</i><span>sel-out</span><i>→</i><span>rarity rim / halo</span></div>
+  <h3>One of each kind <span class="mono">×3, then ×1 as on a phone</span></h3>
+  <div class="shot"><img width="1200" height="331" src="shots/O1-sample.png" alt="O1 sample" loading="lazy"></div>
+  <div class="shot"><img width="1200" height="203" src="shots/O1-sample-x1.png" alt="O1 sample at 1x" loading="lazy"></div>
+  <h3>All 54 item bases</h3>
+  <div class="shot"><img width="1200" height="1270" src="shots/O1-items.png" alt="O1 items" loading="lazy"></div>
+  <h3>Potions and throwables <span class="mono">the vessel carries the family, the liquid carries the effect</span></h3>
+  <div class="shot"><img width="1200" height="407" src="shots/O1-potions.png" alt="O1 potions" loading="lazy"></div>
+  <p class="cap">Healing climbs through the tiers from round flask to Erlenmeyer to decanter, and Supreme glows. Cures are slim vials with a label. Mana is tall. Emergency draughts are squat and caged in iron. Buffs are gourds. Throwables have a rag fuse, a metal case or a ceramic shell. <b>Potion of Speed and Draught of Valour were first drawn yellow</b>, which looked gold on the page, so they were moved to quicksilver and ivory.</p>
+  <h3>Elixirs and crafted potions <span class="mono">references/potions.md — no item in code yet</span></h3>
+  <div class="shot"><img width="1200" height="680" src="shots/O1-elixirs.png" alt="O1 elixirs" loading="lazy"></div>
+  <p class="cap">An elixir lasts until a long rest, so it gets a vessel no potion uses: a tall decanter with a tag. The first render had only colour to tell the resistances apart, which breaks the rule, so each tag now carries its type's mark. No rarity was invented for these, so they show as Common.</p>
+  <h3>Scrolls and manuals <span class="mono">the 36 in the game, and the 32 martial actions as manuals</span></h3>
+  <div class="shot"><img width="1200" height="751" src="shots/O1-scrolls.png" alt="O1 scrolls and manuals" loading="lazy"></div>
+  <p class="cap">The paper and the wax give the spell list: arcane is blue wax, divine crimson, primal green. The sigil in the middle is generated from the spell's id (<code>lib/sigil.js</code>). Its frame comes from the school, eight learnable shapes, and its strokes from a hash, so every spell is unique. The seal carries the element's mark. Radiant ink was invisible on parchment in the first render, so pale inks are now darkened while keeping their hue. A manual is a book in its class's leather, stamped with the action's VFX family.</p>
+  <h3>The whole catalogue as scrolls <span class="mono">213, by list, ×1</span></h3>
+  <div class="shot"><img width="1200" height="712" src="shots/O1-catalogue.png" alt="O1 catalogue scrolls" loading="lazy"></div>
+  <h3>Reagents and solvents <span class="mono">27 form grammars</span></h3>
+  <div class="shot"><img width="1200" height="536" src="shots/O1-reagents.png" alt="O1 reagents" loading="lazy"></div>
+  <h3>Spell icons <span class="mono">212, grouped by area shape</span></h3>
+  <p class="cap">Each icon is a medallion. It shows the school frame, the sigil in the element's hue, the element mark bottom-left, and the area pictogram bottom-right (sphere, cone, line, cube, aura or wall). <b>At 32 px the sigil is busy</b>. It reads better at 40 px or more, or in O2.</p>
+  <div class="scrollbox"><img width="1200" height="1877" src="shots/O1-spells.png" alt="O1 spell icons" loading="lazy"></div>
+  <h3>Rarity</h3>
+  <div class="shot"><img width="1200" height="765" src="shots/O1-rarity.png" alt="O1 rarity" loading="lazy"></div>
+  <div class="stat"><div><b>0.16 ms</b>per object (651 in 105 ms)</div><div><b>32×32</b>icon, any size</div><div><b>18 px</b>as floor loot</div><div><b>23</b>element marks</div></div>
+  <div class="pc">
+    <div class="good"><h4>For</h4><ul><li>The same pixel language as the A characters, so hero and loot are drawn the same way.</li><li>Legible at 18–32 px. The vessel, form and mark all carry meaning without colour.</li><li>Cheapest of the five: the whole catalogue costs a tenth of a second, then it is cached.</li><li>One output serves the inventory, the loot on the floor and the shop.</li></ul></div>
+    <div class="bad"><h4>Against</h4><ul><li>Spell sigils crowd at 32 px.</li><li>Text glyphs are impossible, so the 5×5 marks are an approximation of the game's glyphs.</li><li>Shapes are code. A new <em>kind</em> of thing, such as a new reagent form, is a small grammar, not a row.</li></ul></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<section id="O2">
+  <div class="sec-head"><div class="num">O2</div><h2>Manuscript vector</h2><div class="sub">objects/O2-vector · SVG</div></div>
+  <p>The same parts drawn as SVG: flat fills bordered in ink, with <b>engraved hatching</b> on the side away from the light, and glyphs set
+    as real type. This is the game's existing UI language, ink on vellum like the sprite in <code>ui/icons.ts</code>. It is crisp at any
+    size, and it is the only approach that can print the game's own glyphs (✦ ❆ ⚡ ☠ ☾ ☀).</p>
+  <div class="shot"><img width="1200" height="331" src="shots/O2-sample.png" alt="O2 sample" loading="lazy"></div>
+  <div class="shot"><img width="1200" height="1270" src="shots/O2-items.png" alt="O2 items" loading="lazy"></div>
+  <div class="shot"><img width="1200" height="407" src="shots/O2-potions.png" alt="O2 potions" loading="lazy"></div>
+  <div class="shot"><img width="1200" height="680" src="shots/O2-elixirs.png" alt="O2 elixirs" loading="lazy"></div>
+  <div class="shot"><img width="1200" height="751" src="shots/O2-scrolls.png" alt="O2 scrolls" loading="lazy"></div>
+  <div class="shot"><img width="1200" height="536" src="shots/O2-reagents.png" alt="O2 reagents" loading="lazy"></div>
+  <div class="scrollbox"><img width="1200" height="1877" src="shots/O2-spells.png" alt="O2 spell icons" loading="lazy"></div>
+  <div class="shot"><img width="1200" height="765" src="shots/O2-rarity.png" alt="O2 rarity" loading="lazy"></div>
+  <div class="stat"><div><b>0.06 ms</b>markup per object</div><div><b>∞</b>sizes</div><div><b>real glyphs</b>on tags and marks</div></div>
+  <div class="pc">
+    <div class="good"><h4>For</h4><ul><li>It matches the UI it would sit in (Hoard rows, the shop, tooltips).</li><li>It scales to the character sheet's large slots without a new render.</li><li>It shows the game's real damage glyphs.</li></ul></div>
+    <div class="bad"><h4>Against</h4><ul><li>Next to pixel-art characters on the map it looks like a sticker, not a thing lying on the floor.</li><li>Hatching needs about 40 px to read, and turns to noise at 18 px.</li><li>Pairing O2 in the UI with O1 on the map would give two looks for one item.</li></ul></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<section id="O3">
+  <div class="sec-head"><div class="num">O3</div><h2>Voxel mini-models</h2><div class="sub">objects/O3-voxel · objects/voxelize.js</div></div>
+  <p>The parts are voxelised on a 28³ grid. A lathe becomes a solid of revolution, and a polygon becomes an extrusion as thick as its part.
+    Only faces that touch air are meshed. Each model is lit and rendered from a fixed 3/4 camera through one shared WebGL context. Glass
+    is a see-through shell. Rarity is a coloured ring under the object, because a voxel outline cannot carry it.</p>
+  <div class="shot"><img width="1200" height="331" src="shots/O3-sample.png" alt="O3 sample" loading="lazy"></div>
+  <div class="shot"><img width="1200" height="1270" src="shots/O3-items.png" alt="O3 items" loading="lazy"></div>
+  <div class="shot"><img width="1200" height="407" src="shots/O3-potions.png" alt="O3 potions" loading="lazy"></div>
+  <div class="shot"><img width="1200" height="536" src="shots/O3-reagents.png" alt="O3 reagents" loading="lazy"></div>
+  <div class="shot"><img width="1200" height="751" src="shots/O3-scrolls.png" alt="O3 scrolls" loading="lazy"></div>
+  <div class="stat"><div><b>1.9 ms</b>per object</div><div><b>28³</b>grid</div><div><b>1</b>WebGL context for all</div></div>
+  <div class="pc">
+    <div class="good"><h4>For</h4><ul><li>A real volume, reusable by O4 and by the M2 voxel map.</li><li>Potions read as solid glass bottles.</li></ul></div>
+    <div class="bad"><h4>Against</h4><ul><li>At 32 px, sigils and marks lose their strokes to the voxel grid.</li><li>Thin things (rings, bowstrings, feathers) break up.</li><li>Twelve times the cost of O1 for a less legible picture.</li></ul></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<section id="O4">
+  <div class="sec-head"><div class="num">O4</div><h2>Sprite-stacked loot</h2><div class="sub">objects/O4-stack · O3's volume, sliced</div></div>
+  <p>O3's volume is cut into horizontal slices. Each slice is rotated in 2D and drawn one pixel above the last. The result is pixel output
+    at any angle, with no WebGL. Its one real use is <b>Legendary loot that slowly turns on the floor</b>. Motion Q2 forbids motion on
+    anything that happens often, so every ordinary drop must stay still.</p>
+  <div class="shot"><img width="1200" height="610" src="shots/O4-turn.png" alt="O4 turntable" loading="lazy"></div>
+  <div class="shot"><img width="1200" height="403" src="shots/O4-sample.png" alt="O4 sample" loading="lazy"></div>
+  <div class="shot"><img width="1200" height="1635" src="shots/O4-items.png" alt="O4 items" loading="lazy"></div>
+  <div class="stat"><div><b>3.1 ms</b>per object, per angle</div><div><b>∞</b>angles</div></div>
+  <div class="pc">
+    <div class="good"><h4>For</h4><ul><li>Any angle, fully pixel, cheap once sliced.</li></ul></div>
+    <div class="bad"><h4>Against</h4><ul><li>The muddiest of the five: flat items such as swords and scrolls read poorly from their side.</li><li>The slowest per object.</li></ul></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<section id="O5">
+  <div class="sec-head"><div class="num">O5</div><h2>Lathe &amp; extrude toon 3D</h2><div class="sub">objects/O5-lathe3d · baked, cached by recipe hash</div></div>
+  <p>Bottles are real <code>LatheGeometry</code>. Blades, plates and covers are extruded outlines, and bars are capsules. Everything
+    gets character-proposals' toon ramp and inverted-hull outline, and renders at 32 px. Each bake is cached under a hash of the recipe,
+    so it is paid once per distinct object. That is E's idea, applied to items.</p>
+  <div class="shot"><img width="1200" height="331" src="shots/O5-sample.png" alt="O5 sample" loading="lazy"></div>
+  <div class="shot"><img width="1200" height="1270" src="shots/O5-items.png" alt="O5 items" loading="lazy"></div>
+  <div class="shot"><img width="1200" height="407" src="shots/O5-potions.png" alt="O5 potions" loading="lazy"></div>
+  <div class="shot"><img width="1200" height="680" src="shots/O5-elixirs.png" alt="O5 elixirs" loading="lazy"></div>
+  <div class="shot"><img width="1200" height="536" src="shots/O5-reagents.png" alt="O5 reagents" loading="lazy"></div>
+  <div class="stat"><div><b>0.71 ms</b>per object, uncached</div><div><b>≈0 ms</b>cache hit</div></div>
+  <div class="pc">
+    <div class="good"><h4>For</h4><ul><li>The best bottles of the five, because they are true solids of revolution.</li><li>The same meshes could stand in an M1 scene as real objects.</li></ul></div>
+    <div class="bad"><h4>Against</h4><ul><li>Softer than O1. The toon outline is thin at 32 px.</li><li>Decals such as sigils and marks are planes laid in front of the model, not part of it.</li></ul></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<section id="casts">
+  <div class="sec-head"><div class="num">✦</div><h2>Casts, as data over time</h2><div class="sub">casts/cast.js · one timeline, five renderers</div></div>
+  <p>A cast is a spell's look, plus a caster and a target, and from those <code>lib/hexarea.js</code> works out the cells it covers.
+    <code>casts/cast.js</code> turns that into <b>emitters on a 0–1 timeline</b>:</p>
+  <ol>
+    <li><b>Telegraph</b>: a rule on the covered cells, never a fill.</li>
+    <li><b>Release</b>: the projectile, beam, bolt or sweep.</li>
+    <li><b>Impact</b>: the burst, or each cell as the sweep reaches it.</li>
+    <li><b>Aftermath</b>: a zone, a column, or the surface the game says it leaves behind.</li>
+  </ol>
+  <p><code>particlesAt(cast, t)</code> is a <b>pure function of time</b>, so any frame can be drawn on its own, identically on every
+    device. Every approach below renders the same 18 casts at the same four moments, in the same arena. Each approach's matrix is a
+    tall sheet, so scroll inside it.</p>
+  <div class="pipeline"><span>look + caster + target</span><i>→</i><span>hexarea cells</span><i>→</i><span>emitters: telegraph · travel · beam · burst · sweep · column · ring · wall · zone · surface</span><i>→</i><span>S1 … S5</span></div>
+  <p class="cap">The 18 casts are: Fire Bolt · Ray of Frost · Chain Lightning · Fireball · Cone of Cold (hex 60° and 5e 53°) · Lightning Bolt (1 wide) · Sunbeam (2 wide) · Thunderwave (cube) · Moonbeam (cylinder zone) · Spirit Guardians (aura) · Wall of Fire · Cloudkill · Grease · Mass Healing Word · Hex · Shocking Grasp · Spiritual Weapon.<br>
+    <b>Motion Q2</b> allows only the brief cast to move. Zones and surfaces are <em>state</em>: fire and acid get at most a slow shimmer.</p>
+</section>
+
+<section id="S1">
+  <div class="sec-head"><div class="num">S1</div><h2>Pixel particles</h2><div class="sub">casts/S1-pixel-particles · the air half</div></div>
+  <p>The particles are drawn as single pixels and tiny pixel shapes, with a different shape for each element: an ember, a shard, a spark
+    cross, a drip, a puff, a mote, a wisp. They are drawn additively, after lighting, and depth-tested against walls. The projectile
+    head, and a burst's core, add real light to the room through the renderer's light pass. S1 paints nothing on the floor except the
+    surface a cast leaves behind.</p>
+  <div class="scrollbox"><img width="1200" height="9549" src="shots/S1-matrix.png" alt="S1 cast matrix" loading="lazy"></div>
+  <div class="stat"><div><b>1.3 ms</b>median added per frame (p95 10.7)</div><div><b>0.2 ms</b>in M1 as pixel points</div></div>
+  <div class="pc"><div class="good"><h4>For</h4><ul><li>It reads as pixel art and lights the room around it.</li><li>The cheapest cast approach in both renderers.</li></ul></div><div class="bad"><h4>Against</h4><ul><li>It cannot tell you which hex is hit. A dust telegraph is vague.</li><li>Walls and columns are only rising embers.</li></ul></div></div>
+</section>
+
+<section id="S2">
+  <div class="sec-head"><div class="num">S2</div><h2>Hex footprint decals</h2><div class="sub">casts/S2-hex-decals · the ground half · recommended with S1</div></div>
+  <p>The area is drawn as <b>hex cells on the floor</b>. The telegraph is a rule along the outside edge plus a sparse dither. At impact,
+    each cell washes in the element's hue at the moment the effect reaches it, so a cone visibly travels outward. Afterwards the zone or
+    surface stays as floor state. This is literally "how a spell looks on the hex tile system", and it is the one approach that can
+    <b>always state exactly which cells were hit</b>, which is what the dice-are-real pillar asks for.</p>
+  <div class="scrollbox"><img width="1200" height="9549" src="shots/S2-matrix.png" alt="S2 cast matrix" loading="lazy"></div>
+  <h3>S2 in M1 <span class="mono">the same ground functions, baked to a floor decal per frame</span></h3>
+  <div class="scrollbox"><img width="1200" height="9549" src="shots/S2g-matrix.png" alt="S2 in three.js" loading="lazy"></div>
+  <div class="stat"><div><b>5.2 ms</b>median added per frame in M3 (p95 20.9)</div><div><b>2.4 ms</b>in M1, including the texture bake</div></div>
+  <div class="pc"><div class="good"><h4>For</h4><ul><li>It shows the rules exactly, which suits a game about visible dice.</li><li>Surfaces follow the ruling: a low-saturation tint plus a distinct texture (<code>casts/surfaces.js</code>).</li></ul></div><div class="bad"><h4>Against</h4><ul><li>It draws nothing in the air. On its own a Fire Bolt is invisible until it lands.</li><li>The per-frame bake in M1 would want caching per cell-set in the game.</li></ul></div></div>
+</section>
+
+<section id="S3">
+  <div class="sec-head"><div class="num">S3</div><h2>Continuous field</h2><div class="sub">casts/S3-field · soft SDF + noise</div></div>
+  <p>A soft signed-distance field is built from the same cells, plus noise. A Fireball becomes a round, ragged scorch rather than a set
+    of hexes. The telegraph is a single smooth contour. Travelling parts are radial glows. <b>It is the prettiest ground, and it misleads</b>:
+    the soft edge covers cells the rules do not.</p>
+  <div class="scrollbox"><img width="1200" height="9549" src="shots/S3-matrix.png" alt="S3 cast matrix" loading="lazy"></div>
+  <div class="pair">
+    <figure><img width="660" height="440" src="shots/map2d-S3-cinderworks.png" alt="S3 in the Cinderworks" loading="lazy"><figcaption><b>S3</b>: Fireball, Cinderworks</figcaption></figure>
+    <figure><img width="660" height="440" src="shots/map2d-S3-rimehollow.png" alt="S3 in the Rimehollow" loading="lazy"><figcaption><b>S3</b>: Cone of Cold, Rimehollow</figcaption></figure>
+  </div>
+  <div class="stat"><div><b>17.0 ms</b>median added per frame</div><div><b>189 ms</b>p95, the worst of all</div></div>
+  <div class="pc"><div class="good"><h4>For</h4><ul><li>Organic shapes, the most "magical" floor.</li></ul></div><div class="bad"><h4>Against</h4><ul><li>It shows an area the dice did not roll against.</li><li>Every covered pixel sums every cell, so a large cloud's frame cost spikes. That is measured above.</li></ul></div></div>
+</section>
+
+<section id="S4">
+  <div class="sec-head"><div class="num">S4</div><h2>Toon meshes</h2><div class="sub">casts/S4-toon-mesh · M1 only</div></div>
+  <p>Every emitter becomes a primitive with a toon ramp and an emissive colour: a sphere head with a trailing cone, cylinders for beams
+    and columns, a torus for an aura, hex prisms that rise under a sweep, boxes for a wall. The telegraph is the hex rim as 3D lines.
+    <b>This is the same primitive family as today's <code>render/vfx/spells.ts</code></b>, extended to every shape and driven by the
+    same cells.</p>
+  <div class="scrollbox"><img width="1200" height="9549" src="shots/S4-matrix.png" alt="S4 cast matrix" loading="lazy"></div>
+  <div class="stat"><div><b>0.3 ms</b>build + render</div><div><b>16 / 77</b>draw calls, median / max</div><div><b>≤2,440</b>triangles</div></div>
+  <div class="pc"><div class="good"><h4>For</h4><ul><li>The only approach that stands a wall, a column or a cone up as a volume.</li><li>A direct upgrade path for the code that exists.</li></ul></div><div class="bad"><h4>Against</h4><ul><li>It reads as 3D shapes, not pixel art, next to A's sprites.</li><li>Draw calls grow with cells: 77 for the worst cast.</li></ul></div></div>
+</section>
+
+<section id="S5">
+  <div class="sec-head"><div class="num">S5</div><h2>Voxel particles</h2><div class="sub">casts/S5-voxel-particles · M1 · pairs with M2 and B</div></div>
+  <p>These are S1's particles as instanced lit cubes: one draw call for every particle of every cast.</p>
+  <div class="scrollbox"><img width="1200" height="9549" src="shots/S5-matrix.png" alt="S5 cast matrix" loading="lazy"></div>
+  <h3>For comparison: S1's particles in M1 as pixel points</h3>
+  <div class="scrollbox"><img width="1200" height="9549" src="shots/S1g-matrix.png" alt="S1 in three.js" loading="lazy"></div>
+  <div class="stat"><div><b>0.3 ms</b>per frame</div><div><b>≤16,394</b>triangles (Cloudkill)</div></div>
+  <div class="pc"><div class="good"><h4>For</h4><ul><li>It comes free once S1 exists. It is one instanced mesh.</li></ul></div><div class="bad"><h4>Against</h4><ul><li>Sparse, and small at map scale.</li><li>It belongs with the voxel characters (B), which character-proposals did not pick.</li></ul></div></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<section id="hex">
+  <div class="sec-head"><div class="num">⬡</div><h2>Areas on hexes</h2><div class="sub">lib/hexarea.js · drawn from the cell lists</div></div>
+  <p>The sim has <b>one area shape today</b>: a Euclidean disc (<code>aoeRadius</code> and <code>SurfaceGrid.paint</code>) over square
+    tiles. <code>lib/hexarea.js</code> gives the hex versions of it and of every shape the catalogue uses. The functions are pure and
+    import nothing from <code>window</code>, so the sim could own them under R1. The diagrams below are drawn from the functions'
+    output, and the counts are measured.</p>
+  <div class="shot"><img width="1200" height="1691" src="shots/hex-atlas.png" alt="Hex area atlas" loading="lazy"></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Shape</th><th>Measured</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>Disc r 3.2 (Fireball)</td><td class="mono">37 squares → 37 hexes</td><td>At the game's Fireball radius, the move to hexes keeps the same number of cells.</td></tr>
+      <tr><td>Disc r 1.8 (Cleave) · r 3 (Stinking Cloud)</td><td class="mono">9 → 13 · 29 → 37</td><td>Smaller discs <b>grow</b> on hexes (+44% and +28%). A balance question for the hex pass, not answered here.</td></tr>
+      <tr><td>Cone 60° hex vs 53° 5e</td><td class="mono">6/6 · 10/9 · 22/18 at 15/20/30 ft</td><td>The same at 15 ft. The 60° wedge follows grid lines and takes 1–4 more cells at the rim.</td></tr>
+      <tr><td>Line, 2 wide</td><td class="mono">one-sided band</td><td>On hexes the next row is 0.866 away, so a symmetric band is 1 or 3 cells wide. A 2-wide line leans to one side. Found by the first test, which returned 3.</td></tr>
+      <tr><td>Cube</td><td class="mono">n × n axial lozenge</td><td>A square cannot be drawn on hexes, so this is the closest grid-true shape.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<section id="map">
+  <div class="sec-head"><div class="num">▦</div><h2>On the new floors</h2><div class="sub">map/scenes.js · M3 and M1, all eight biomes</div></div>
+  <p>These are real hex dungeons from character-proposals' generator. Each scene has the A-sprite party, foes, <b>loot on the floor</b>
+    (O1 icons at 18 px, each with a rarity ring beneath), an opened chest, a surface pair (grease meeting fire, and a web), and one
+    signature cast per biome drawn as S1 + S2. All shots are at t = 0.6, the moment of impact. M3 is a <em>copy</em> of
+    character-proposals' <code>render2d.js</code> (<code>map/render2d-fx.js</code>) with three hooks added: a ground overlay, a
+    post-light draw, and extra lights. The original is untouched.</p>
+  <h3>M3 · pure 2D <span class="mono">330×220, ×2</span></h3>
+  <div class="grid2">
+    <figure><img width="660" height="440" src="shots/map2d-cisterns.png" alt="" loading="lazy"><figcaption><b>Cisterns</b> · Lightning Bolt</figcaption></figure>
+    <figure><img width="660" height="440" src="shots/map2d-ossuary.png" alt="" loading="lazy"><figcaption><b>Ossuary</b> · Spirit Guardians around the cleric</figcaption></figure>
+    <figure><img width="660" height="440" src="shots/map2d-fungalReach.png" alt="" loading="lazy"><figcaption><b>Fungal Reach</b> · Cloudkill</figcaption></figure>
+    <figure><img width="660" height="440" src="shots/map2d-cinderworks.png" alt="" loading="lazy"><figcaption><b>Cinderworks</b> · Fireball</figcaption></figure>
+    <figure><img width="660" height="440" src="shots/map2d-drownedVault.png" alt="" loading="lazy"><figcaption><b>Drowned Vault</b> · Call Lightning</figcaption></figure>
+    <figure><img width="660" height="440" src="shots/map2d-rimehollow.png" alt="" loading="lazy"><figcaption><b>Rimehollow</b> · Cone of Cold</figcaption></figure>
+    <figure><img width="660" height="440" src="shots/map2d-sableCourt.png" alt="" loading="lazy"><figcaption><b>Sable Court</b> · Hypnotic Pattern</figcaption></figure>
+    <figure><img width="660" height="440" src="shots/map2d-wyrmDeeps.png" alt="" loading="lazy"><figcaption><b>Wyrm Deeps</b> · Wall of Fire, as floor and embers. S1 + S2 cannot stand it up. See S4.</figcaption></figure>
+  </div>
+  <h3>One Fireball, four moments <span class="mono">t = 0.12 · 0.42 · 0.6 · 0.92</span></h3>
+  <div class="seq">
+    <figure><img width="660" height="440" src="shots/map2d-seq-0.12.png" alt="" loading="lazy"><figcaption><b>Telegraph</b>: a rule on the cells</figcaption></figure>
+    <figure><img width="660" height="440" src="shots/map2d-seq.png" alt="" loading="lazy"><figcaption><b>Release</b>: the head arcs and lights the walls</figcaption></figure>
+    <figure><img width="660" height="440" src="shots/map2d-seq-0.6.png" alt="" loading="lazy"><figcaption><b>Impact</b>: cells wash in, and the burst</figcaption></figure>
+    <figure><img width="660" height="440" src="shots/map2d-seq-0.92.png" alt="" loading="lazy"><figcaption><b>Aftermath</b>: the fire surface the game lays (r 2.0)</figcaption></figure>
+  </div>
+  <h3>M1 · three.js <span class="mono">660×460 at ½ resolution</span></h3>
+  <div class="grid2">
+    <figure><img width="660" height="460" src="shots/map3d-cinderworks-S1S2.png" alt="" loading="lazy"><figcaption><b>S1 + S2</b> · Cinderworks · Fireball</figcaption></figure>
+    <figure><img width="660" height="460" src="shots/map3d-rimehollow-S4.png" alt="" loading="lazy"><figcaption><b>S4</b> · Rimehollow · Cone of Cold as rising prisms</figcaption></figure>
+    <figure><img width="660" height="460" src="shots/map3d-wyrmDeeps-S4.png" alt="" loading="lazy"><figcaption><b>S4</b> · Wyrm Deeps · Wall of Fire, standing</figcaption></figure>
+    <figure><img width="660" height="460" src="shots/map3d-fungalReach-S5.png" alt="" loading="lazy"><figcaption><b>S5</b> · Fungal Reach · Cloudkill as voxels</figcaption></figure>
+    <figure><img width="660" height="460" src="shots/map3d-ossuary-S1S2.png" alt="" loading="lazy"><figcaption><b>S1 + S2</b> · Ossuary · Spirit Guardians</figcaption></figure>
+    <figure><img width="660" height="460" src="shots/map3d-sableCourt-S2.png" alt="" loading="lazy"><figcaption><b>S2</b> · Sable Court · Hypnotic Pattern</figcaption></figure>
+  </div>
+  <h3>Loot at map scale <span class="mono">×1 as on a phone, and ×3</span></h3>
+  <div class="shot"><img width="850" height="434" src="shots/loot-ossuary.png" alt="Loot on the Ossuary floor" loading="lazy"></div>
+  <div class="shot"><img width="850" height="434" src="shots/loot-cisterns.png" alt="Loot on the Cisterns floor" loading="lazy"></div>
+  <p class="cap">Loot lies as the O1 icon at 18 px, fanned inside one hex. A ring beneath each item shows its rarity, the same rule as the icon's rim, and only Legendary is gold. <b>At ×1 the individual items are hard to name</b>, but the ring says "loot, and how good". Today drops never touch the map (<code>sim/Run.ts:collect</code>), so showing them is a design decision for you. See the plan.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<section id="bench">
+  <div class="sec-head"><div class="num">☰</div><h2>Try it</h2><div class="sub">any object through all five · any spell on the floor</div></div>
+  <p class="need-server">The live benches need the page served over http (ES modules do not load from file://). Run <code>node docs/item-proposals/tools/serve.mjs</code> and open <code>http://localhost:5179/item-proposals/</code>.</p>
+  <h3>Objects</h3>
+  <div class="bench"><div class="controls" id="objControls"></div><div class="objstage" id="objStage"></div></div>
+  <h3>Casts <span class="mono">every spell in the catalogue · scrub or play</span></h3>
+  <div class="bench castbench"><div class="controls" id="castControls"></div><div id="castStage"></div></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<section id="numbers">
+  <div class="sec-head"><div class="num">#</div><h2>What was measured</h2><div class="sub">tools/capture.mjs → shots/metrics.json</div></div>
+  <p>Every number on this page comes from <code>tools/capture.mjs</code>, <code>tools/audit.mjs</code> or <code>tools/baseline.mjs</code>,
+    run on <b>25 Sep 2026</b> in headless Chrome on an <b>Apple M4 Pro</b> (ANGLE / Metal). <b>None was measured on a phone.</b></p>
+  <div class="tbl"><table>
+    <thead><tr><th>What</th><th>Measured</th><th>How</th></tr></thead>
+    <tbody>
+      <tr><td>Today: icons for the 54 bases · distinct icons across the 99 stacks</td><td class="mono">5.8 ms · 12</td><td>the game's <code>generateItemIcon</code> / <code>generateStackIcon</code> under Node</td></tr>
+      <tr><td>O1 / O2 / O3 / O4 / O5, all 651 objects</td><td class="mono">105 / 41 / 1,225 / 1,992 / 463 ms</td><td>one pass per approach; O2 is markup only</td></tr>
+      <tr><td>M3 base frame, 330×220</td><td class="mono">1.8–4.6 ms</td><td>median of 9 per biome, no effects</td></tr>
+      <tr><td>M3 frame with loot, surfaces and S1 + S2 cast</td><td class="mono">11.0–17.9 ms</td><td>eight biomes, t = 0.6</td></tr>
+      <tr><td>M3 frame, aftermath of Fireball (t = 0.92)</td><td class="mono">37–48 ms</td><td>two captures; the fire surface re-shades every covered pixel each frame. <b>It should be baked once in the game</b>, since state does not move.</td></tr>
+      <tr><td>M3 bake (floor, walls, torches)</td><td class="mono">241–288 ms</td><td>once per floor</td></tr>
+      <tr><td>S1 / S2 / S3 added per frame, arena 360×216</td><td class="mono">1.3 / 5.2 / 17.0 ms (p95 10.7 / 20.9 / 189)</td><td>72 frames each</td></tr>
+      <tr><td>M1 per cast frame: S1 points / S2 decal / S4 meshes / S5 voxels</td><td class="mono">0.2 / 2.4 / 0.3 / 0.3 ms</td><td>build + render, <code>gl.finish()</code>, ½ resolution</td></tr>
+      <tr><td>M1 draw calls, arena: S4 · the rest</td><td class="mono">16–77 · 16–17</td><td>72 frames</td></tr>
+      <tr><td>M1 full scene with loot and cast</td><td class="mono">42–80 calls · 3,874–7,328 tris · 0.2–0.3 ms</td><td>six scenes, 30 frames each</td></tr>
+      <tr><td>Phone GPU, memory, battery</td><td class="mono">not measured</td><td>needs a device</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<section id="plan">
+  <div class="sec-head"><div class="num">→</div><h2>The plan</h2><div class="sub">full version in README.md · not started; each step needs your go-ahead</div></div>
+  <p><b>Recommendation: O1 for every object, and S1 + S2 for casts.</b> Keep S4 in reserve for the volume spells (walls, columns) if
+    the game stays on M1.</p>
+  <ol>
+    <li><b>Recipes into data.</b>
+      <ul>
+        <li>Add <code>vis</code> to <code>StackDef</code> and to the potion, throwable, reagent and solvent rows.</li>
+        <li>Add a <code>look</code> (school, element, delivery, area) to <code>ActionDef</code> beside <code>vfx</code>.</li>
+      </ul>
+      The drafts are in <code>lib/items.js</code> and <code>lib/spells.js</code>. R3 holds, and there is <b>no save change</b>.</li>
+    <li><b>Port O1 to <code>gen/textures/itemIcon.ts</code></b>, replacing the silhouettes. <code>lib/parts.js</code> and <code>lib/marks.js</code> become <code>gen/</code> modules. R1 holds: a canvas factory, and no <code>ui/</code> imports.</li>
+    <li><b>Port S2's ground functions into <code>render/vfx/areaEffects.ts</code></b> and S1's particles into <code>render/vfx/spells.ts</code>. This fills the cone, chain, vortex and sigil families that fall back to melee today.</li>
+    <li><b>Cone, line, cube and wall as <em>sim</em> shapes</b> belong to the hex pass and pass B. <code>lib/hexarea.js</code> is ready for them, but they are not scoped here.</li>
+  </ol>
+  <h3>Open questions for you</h3>
+  <ul class="rejected">
+    <li><b>Should loot appear on the map at all?</b> Today drops go straight to the inventory. The pictures show it working, but that is a design change.</li>
+    <li><b>Cones on hexes: 60° or 53°?</b> The 60° wedge follows the grid. The 5e cone is 1–4 cells smaller at 20–30 ft.</li>
+    <li><b>Small discs grow on hexes</b> (Cleave 9 → 13 cells). Should radii be retuned in the hex pass?</li>
+    <li><b>The eight BG3-only spells</b> are drafted. Confirm their areas and elements.</li>
+    <li><b>Elixirs have no rarity</b> in code or the references. They show as Common until you set one.</li>
+  </ul>
+  <h3>Considered and rejected</h3>
+  <ul class="rejected">
+    <li><b>Icon packs (game-icons.net and similar).</b> They are CC-BY, which breaks the sourcing rule in <code>asset-pipeline.md</code>, and they are the "image per item" approach you want to avoid.</li>
+    <li><b>AI image generation per item or spell.</b> It is not deterministic, does not run offline, and has the same provenance problem.</li>
+    <li><b>Colour-only variants of one flask</b>, which is effectively today's approach. It fails visual-language Q3, and the baseline shows the result: 12 images for 99 stacks.</li>
+    <li><b>Animated idle loot (bobbing, sparkling).</b> Motion Q2 forbids it for anything common. Only Legendary may turn (O4).</li>
+  </ul>
+</section>
+
+<footer class="wrap">
+  <p>Regenerate: <code>node --experimental-strip-types docs/item-proposals/tools/snapshot-game.mjs</code> · <code>node docs/item-proposals/tools/audit.mjs</code> · <code>node --experimental-transform-types docs/item-proposals/tools/baseline.mjs</code> · <code>node docs/item-proposals/tools/capture.mjs</code> · <code>python3 docs/item-proposals/tools/stamp-sizes.py</code>.<br>
+  Serve the live parts: <code>node docs/item-proposals/tools/serve.mjs</code>. Nothing outside <code>docs/item-proposals/</code> was changed.</p>
+</footer>
+</main>
+
+<script type="module">
+if (location.protocol === 'file:') document.body.classList.add('file');
+import('./bench.js').then(m => m.mount()).catch(e => { console.warn('live bench unavailable', e); document.body.classList.add('file'); });
+</script>
+</body>
+</html>
