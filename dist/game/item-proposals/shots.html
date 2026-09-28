@@ -1,0 +1,41 @@
+<!doctype html><meta charset="utf-8"><title>shots</title><meta name="color-scheme" content="dark">
+<style>
+  html, body { background: transparent; margin: 0; }
+  #stage { display: inline-flex; flex-wrap: wrap; gap: 12px 14px; padding: 12px; align-items: flex-end; max-width: var(--max, 1176px); }
+  figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  figcaption { font: 12px/1.2 ui-monospace, Menlo, monospace; color: #a89a86; text-align: center; max-width: 92px; overflow-wrap: anywhere; }
+  canvas, svg, img { image-rendering: pixelated; display: block; }
+  .grp { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+  .grp > b { font: 600 13px ui-monospace, Menlo, monospace; color: #d9c7a8; letter-spacing: .08em; text-transform: uppercase; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px 10px; align-items: flex-end; }
+  .tile { background: radial-gradient(#2d241d, #17120f 75%); border-radius: 3px; padding: 4px; }
+</style>
+<div id="stage"></div>
+<script type="module">
+// Every static figure on the proposals page, one per ?shot=…  — tools/capture.mjs screenshots #stage.
+//   ?shot=<approach>-<set>   approach O1…O5, set from lib/sets.js      e.g. O1-potions, O3-items
+//   ?shot=S<n>-<set>         the cast approaches (casts/…)
+//   ?shot=hex-…, map-…       the hex area atlas and map scenes
+import { SETS } from './lib/sets.js';
+const q = new URLSearchParams(location.search), shot = q.get('shot') ?? 'O1-sample';
+const stage = document.getElementById('stage');
+window.__ready = false; window.__metrics = {};
+const fig = (node, cap, into) => { const f = document.createElement('figure'); const t = document.createElement('div'); t.className = 'tile'; t.append(node); f.append(t); if (cap) { const c = document.createElement('figcaption'); c.textContent = cap; f.append(c); } into.append(f); return f; };
+const group = title => { const g = document.createElement('div'); g.className = 'grp'; g.innerHTML = `<b>${title}</b>`; const r = document.createElement('div'); r.className = 'row'; g.append(r); stage.append(g); return r; };
+const APPROACH = { O1: './objects/O1-pixel/view.js', O2: './objects/O2-vector/view.js', O3: './objects/O3-voxel/view.js', O4: './objects/O4-stack/view.js', O5: './objects/O5-lathe3d/view.js' };
+const [ap, set] = shot.split(/-(.+)/);
+try {
+  if (APPROACH[ap]) {
+    const mod = await import(APPROACH[ap]);
+    const scale = Number(q.get('k') ?? mod.DEFAULT_SCALE ?? 2);
+    const t0 = performance.now(); let n = 0;
+    for (const [title, list] of SETS[set]()) { const r = group(title); for (const o of list) { fig(await mod.view(o, { scale, size: Number(q.get('size') ?? 0) || undefined }), q.has('nocap') ? '' : o.name.replace(/^(Scroll of |Manual: |Elixir of )/, ''), r); n++; } }
+    window.__metrics = { approach: ap, set, n, msTotal: +(performance.now() - t0).toFixed(1), msEach: +((performance.now() - t0) / n).toFixed(3) };
+    if (mod.dispose) mod.dispose();
+  } else {
+    const mod = await import(`./shots-extra.js`);
+    await mod.render(shot, { stage, group, fig, q });
+  }
+} catch (e) { console.error(e); throw e; }
+window.__ready = true;
+</script>
