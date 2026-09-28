@@ -1,0 +1,21 @@
+{
+  "corridors": {
+    "floors": 24,
+    "corridorCells": 1476,
+    "inThreeWideBand": 356,
+    "fraction": 0.241,
+    "worstFloor": 0.05
+  },
+  "shoving": {
+    "engagedSeconds": 7402.2,
+    "shovePerEngagedSecond": 0.0461,
+    "worstSingleTick": 0.336,
+    "samples": 74022
+  },
+  "wallTops": {
+    "floors": 8,
+    "toppedCells": 1370,
+    "unfacedHeightSteps": 403,
+    "edgesIntoVoid": 2584
+  }
+}
